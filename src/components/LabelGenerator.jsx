@@ -5,7 +5,7 @@ import { Badge } from './ui/badge';
 import { Card } from './ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from './ui/tabs';
 import { Copy, Check, Info } from 'lucide-react';
-import { useCpl } from '../context/CplContext';
+import { useCpl } from '../hooks/useCpl';
 
 const PRESET_MEALS = [
   {

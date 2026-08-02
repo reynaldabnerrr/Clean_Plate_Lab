@@ -1,26 +1,21 @@
 import React, { useState } from 'react';
-import { useCpl } from '../context/CplContext';
+import { useCpl } from '../hooks/useCpl';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from './ui/dialog';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Card } from './ui/card';
 import { Input } from './ui/input';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from './ui/tabs';
-import { 
-  ShieldCheck, 
+import {
   Plus, 
   Trash2, 
   Edit3, 
   Lock, 
   LogOut, 
-  CheckCircle2, 
-  Clock, 
-  TrendingUp, 
   Utensils, 
   Package, 
   FileText,
-  Search,
-  X
+  Search
 } from 'lucide-react';
 
 export function AdminDashboard({ isOpen, onClose }) {

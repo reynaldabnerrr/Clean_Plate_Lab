@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { CplPrimaryLogo } from './CplLogo';
 import { Button } from './ui/button';
 import { Menu, X, ArrowRight, Globe, Sparkles } from 'lucide-react';
-import { useCpl } from '../context/CplContext';
+import { useCpl } from '../hooks/useCpl';
 
 export function Navbar({ onOpenOrder, onOpenGuideline }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -226,4 +226,3 @@ export function Navbar({ onOpenOrder, onOpenGuideline }) {
     </>
   );
 }
-

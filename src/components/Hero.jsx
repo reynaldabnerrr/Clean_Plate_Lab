@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { CplBadgeLogo, CplFlaskIcon } from './CplLogo';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
-import { ShieldCheck, Award, ArrowRight, CheckCircle2, Zap, Leaf, Scale } from 'lucide-react';
-import { useCpl } from '../context/CplContext';
+import { ShieldCheck, Award, ArrowRight, CheckCircle2, Zap, Leaf, Truck } from 'lucide-react';
+import { useCpl } from '../hooks/useCpl';
 
 export function Hero({ onOpenOrder, onScrollToLabel }) {
   const { t } = useCpl();
@@ -30,6 +30,30 @@ export function Hero({ onOpenOrder, onScrollToLabel }) {
     setIsHeroHovered(true);
   };
 
+  const metrics = [
+    {
+      badge: 'CUSTOM',
+      value: '25g-100g',
+      title: t('heroAvgProtein'),
+      description: t('heroAvgProteinDesc'),
+      icon: Zap,
+    },
+    {
+      badge: 'CLEAN',
+      value: '100%',
+      title: t('heroWholeFood'),
+      description: t('heroWholeFoodDesc'),
+      icon: Leaf,
+    },
+    {
+      badge: 'DAILY',
+      value: '1x/Hari',
+      title: t('heroMacroAcc'),
+      description: t('heroMacroAccDesc'),
+      icon: Truck,
+    },
+  ];
+
   return (
     <section className="relative overflow-hidden pt-8 sm:pt-12 pb-16 sm:pb-20 border-b border-[var(--cpl-border-muted)] bg-[var(--cpl-cream)]">
       {/* Background Subtle Grid Accent */}
@@ -38,15 +62,21 @@ export function Hero({ onOpenOrder, onScrollToLabel }) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
 
         {/* Top Status Eyebrow */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6 sm:mb-8">
-          <Badge variant="default" className="flex items-center gap-2 text-xs py-1 px-3">
+        <div className="mb-6 flex flex-col items-start justify-between gap-2 sm:mb-8 sm:flex-row sm:items-center sm:gap-4">
+          <Badge variant="default" className="flex min-h-8 items-center gap-2 px-3 py-1.5 text-[10px] sm:text-xs">
             <span className="w-2 h-2 rounded-full bg-[var(--cpl-sage)] animate-pulse shrink-0" />
             <span>{t('heroEyebrow')}</span>
           </Badge>
 
-          <div className="flex flex-wrap items-center gap-4 text-[11px] sm:text-xs font-display font-semibold uppercase tracking-wider text-[var(--cpl-dark-muted)]">
-            <span className="flex items-center gap-1.5"><ShieldCheck size={14} className="text-[var(--cpl-sage)] shrink-0" /> {t('heroBadge1')}</span>
-            <span className="hidden md:flex items-center gap-1.5"><Award size={14} className="text-[var(--cpl-sage)] shrink-0" /> {t('heroBadge2')}</span>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 font-display text-[10px] font-semibold uppercase text-[var(--cpl-dark-muted)] sm:justify-end sm:text-xs">
+            <span className="flex min-h-8 items-center gap-1.5">
+              <ShieldCheck size={14} className="shrink-0 text-[var(--cpl-sage)]" />
+              <span>{t('heroBadge1')}</span>
+            </span>
+            <span className="hidden min-h-8 items-center gap-1.5 md:flex">
+              <Award size={14} className="shrink-0 text-[var(--cpl-sage)]" />
+              <span>{t('heroBadge2')}</span>
+            </span>
           </div>
         </div>
 
@@ -65,70 +95,40 @@ export function Hero({ onOpenOrder, onScrollToLabel }) {
               {t('heroSubtitle')}
             </p>
 
-            {/* Redesigned Premium Key Metric Highlights */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 pt-2">
-              {/* Stat 1: Custom Protein Tiers */}
-              <div className="relative p-4 sm:p-5 bg-white border-2 border-[#1E1E1E] shadow-[4px_4px_0px_0px_#1E1E1E] hover:shadow-[6px_6px_0px_0px_#8A9C7A] hover:-translate-y-0.5 transition-all duration-200 group">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="w-8 h-8 rounded-full bg-[#EBF0E6] flex items-center justify-center text-[#647554] border border-[#8A9C7A]/40 group-hover:bg-[#8A9C7A] group-hover:text-white transition-colors shrink-0">
-                    <Zap size={16} />
-                  </div>
-                  <span className="text-[9px] font-mono font-extrabold uppercase px-2 py-0.5 rounded bg-[#8A9C7A]/15 text-[#647554] tracking-widest">
-                    CUSTOM
-                  </span>
-                </div>
-                <div className="font-display text-2xl sm:text-3xl font-black text-[#1E1E1E] tracking-tight group-hover:text-[#8A9C7A] transition-colors">
-                  25g<span className="text-[#8A9C7A]">-100g</span>
-                </div>
-                <div className="text-[11px] font-display font-extrabold uppercase tracking-wider text-[#1E1E1E] mt-1">
-                  {t('heroAvgProtein')}
-                </div>
-                <div className="text-[10px] text-gray-500 font-sans mt-0.5">
-                  {t('heroAvgProteinDesc')}
-                </div>
-              </div>
+            {/* Compact on mobile, data cards from tablet upward */}
+            <div className="grid grid-cols-1 gap-2.5 pt-1 sm:grid-cols-3 sm:gap-3">
+              {metrics.map((metric) => {
+                const MetricIcon = metric.icon;
 
-              {/* Stat 2: 100% Low Calorie */}
-              <div className="relative p-4 sm:p-5 bg-white border-2 border-[#1E1E1E] shadow-[4px_4px_0px_0px_#1E1E1E] hover:shadow-[6px_6px_0px_0px_#8A9C7A] hover:-translate-y-0.5 transition-all duration-200 group">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="w-8 h-8 rounded-full bg-[#EBF0E6] flex items-center justify-center text-[#647554] border border-[#8A9C7A]/40 group-hover:bg-[#8A9C7A] group-hover:text-white transition-colors shrink-0">
-                    <Leaf size={16} />
-                  </div>
-                  <span className="text-[9px] font-mono font-extrabold uppercase px-2 py-0.5 rounded bg-[#8A9C7A]/15 text-[#647554] tracking-widest">
-                    CLEAN
-                  </span>
-                </div>
-                <div className="font-display text-2xl sm:text-3xl font-black text-[#1E1E1E] tracking-tight group-hover:text-[#8A9C7A] transition-colors">
-                  100<span className="text-[#8A9C7A]">%</span>
-                </div>
-                <div className="text-[11px] font-display font-extrabold uppercase tracking-wider text-[#1E1E1E] mt-1">
-                  {t('heroWholeFood')}
-                </div>
-                <div className="text-[10px] text-gray-500 font-sans mt-0.5">
-                  {t('heroWholeFoodDesc')}
-                </div>
-              </div>
+                return (
+                  <div
+                    key={metric.badge}
+                    className="group grid min-h-0 grid-cols-[32px_86px_minmax(0,1fr)] items-center gap-3 border border-[#1E1E1E]/20 bg-white p-3 shadow-[3px_3px_0px_0px_#1E1E1E] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[4px_4px_0px_0px_#8A9C7A] sm:block sm:min-h-[154px] sm:border-2 sm:p-4"
+                  >
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full border border-[#8A9C7A]/40 bg-[#EBF0E6] text-[#647554] transition-colors group-hover:bg-[#8A9C7A] group-hover:text-white">
+                      <MetricIcon size={15} />
+                    </div>
 
-              {/* Stat 3: Daily Delivery */}
-              <div className="relative p-4 sm:p-5 bg-white border-2 border-[#1E1E1E] shadow-[4px_4px_0px_0px_#1E1E1E] hover:shadow-[6px_6px_0px_0px_#8A9C7A] hover:-translate-y-0.5 transition-all duration-200 group">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="w-8 h-8 rounded-full bg-[#EBF0E6] flex items-center justify-center text-[#647554] border border-[#8A9C7A]/40 group-hover:bg-[#8A9C7A] group-hover:text-white transition-colors shrink-0">
-                    <Scale size={16} />
+                    <div className="font-display text-lg font-black text-[#1E1E1E] sm:mt-3 sm:text-2xl">
+                      {metric.value}
+                    </div>
+
+                    <div className="min-w-0">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="truncate font-display text-[10px] font-extrabold uppercase text-[#1E1E1E] sm:text-[11px]">
+                          {metric.title}
+                        </p>
+                        <span className="hidden rounded bg-[#8A9C7A]/15 px-1.5 py-0.5 font-mono text-[8px] font-extrabold text-[#647554] sm:inline-flex">
+                          {metric.badge}
+                        </span>
+                      </div>
+                      <p className="mt-0.5 line-clamp-2 text-[9px] leading-snug text-gray-500 sm:text-[10px]">
+                        {metric.description}
+                      </p>
+                    </div>
                   </div>
-                  <span className="text-[9px] font-mono font-extrabold uppercase px-2 py-0.5 rounded bg-[#8A9C7A]/15 text-[#647554] tracking-widest">
-                    DAILY
-                  </span>
-                </div>
-                <div className="font-display text-2xl sm:text-3xl font-black text-[#1E1E1E] tracking-tight group-hover:text-[#8A9C7A] transition-colors">
-                  1x<span className="text-[#8A9C7A]">/Hari</span>
-                </div>
-                <div className="text-[11px] font-display font-extrabold uppercase tracking-wider text-[#1E1E1E] mt-1">
-                  {t('heroMacroAcc')}
-                </div>
-                <div className="text-[10px] text-gray-500 font-sans mt-0.5">
-                  {t('heroMacroAccDesc')}
-                </div>
-              </div>
+                );
+              })}
             </div>
 
             {/* Action Buttons */}

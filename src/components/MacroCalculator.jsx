@@ -4,7 +4,7 @@ import { Badge } from './ui/badge';
 import { Card } from './ui/card';
 import { Slider } from './ui/slider';
 import { Calculator, Target, ArrowRight } from 'lucide-react';
-import { useCpl } from '../context/CplContext';
+import { useCpl } from '../hooks/useCpl';
 
 export function MacroCalculator({ onOpenOrder }) {
   const { t } = useCpl();
@@ -47,7 +47,7 @@ export function MacroCalculator({ onOpenOrder }) {
       : t('calcPlanWellness');
 
   return (
-    <section id="calculator" className="py-16 sm:py-24 bg-[var(--cpl-cream)] border-b border-[var(--cpl-border)]">
+    <section id="calculator" className="py-16 sm:py-24 bg-(--cpl-cream) border-b border-[var(--cpl-border)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header */}
@@ -288,4 +288,3 @@ export function MacroCalculator({ onOpenOrder }) {
     </section>
   );
 }
-

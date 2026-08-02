@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { useState } from 'react';
+import { CplContext } from './cpl-context';
 
 const INITIAL_MENU_ITEMS = [
   {
@@ -146,8 +147,6 @@ const INITIAL_ORDERS = [
     amount: 6800000
   }
 ];
-
-const CplContext = createContext();
 
 export function CplProvider({ children }) {
   const [menuItems, setMenuItems] = useState(INITIAL_MENU_ITEMS);
@@ -354,6 +353,19 @@ export function CplProvider({ children }) {
       orderInquiryBadge: "Pemesanan Catering CPL Makassar",
       orderModalTitle: "Formulir Pemesanan Meal Plan CPL",
       orderModalSub: "Pilih tingkat protein dan lengkapi data untuk memesan via WhatsApp.",
+      orderCustomerDetails: "Data pemesan",
+      orderProteinTier: "Pilih porsi protein",
+      orderDeliveryHighlight: "1 box segar, setiap hari",
+      orderDeliveryDetail: "Pesanan disiapkan dan diantar 1x sehari setiap Senin-Sabtu. Hari Minggu tidak dihitung.",
+      orderDeliverySchedule: "Jadwal & lokasi pengiriman",
+      orderSummary: "Ringkasan pesanan",
+      orderSelectedPlan: "Paket terpilih",
+      orderEstimatedTotal: "Total estimasi",
+      orderServingUnit: "porsi",
+      orderDayUnit: "hari",
+      orderSundayExcluded: "Hari Minggu tidak dihitung",
+      orderContinue: "Lanjut",
+      orderBack: "Kembali",
       orderName: "Nama Lengkap",
       orderPhone: "Nomor WhatsApp",
       orderPlan: "Pilih Porsi Protein",
@@ -417,7 +429,7 @@ export function CplProvider({ children }) {
       heroAvgProteinDesc: "Select 25g, 60g, 80g & 100g",
       heroWholeFood: "High Protein Density",
       heroWholeFoodDesc: "Calculated Macro Precision",
-      heroMacroAcc: "Daily Chilled Transit",
+      heroMacroAcc: "Fresh Daily Delivery",
       heroMacroAccDesc: "Cooked & delivered fresh daily",
       heroCtaPrimary: "Order Daily Catering",
       heroCtaSecondary: "Inspect Nutrition Label",
@@ -585,6 +597,19 @@ export function CplProvider({ children }) {
       orderInquiryBadge: "CPL Order Inquiry Makassar",
       orderModalTitle: "CPL Meal Plan Inquiry Form",
       orderModalSub: "Choose your protein tier and fill details to order via WhatsApp.",
+      orderCustomerDetails: "Customer details",
+      orderProteinTier: "Choose protein portion",
+      orderDeliveryHighlight: "1 fresh box, every day",
+      orderDeliveryDetail: "Your meal is prepared and delivered once daily, Monday-Saturday. Sundays are excluded.",
+      orderDeliverySchedule: "Delivery schedule & location",
+      orderSummary: "Order summary",
+      orderSelectedPlan: "Selected plan",
+      orderEstimatedTotal: "Estimated total",
+      orderServingUnit: "serving",
+      orderDayUnit: "day",
+      orderSundayExcluded: "Sundays are excluded",
+      orderContinue: "Continue",
+      orderBack: "Back",
       orderName: "Full Name",
       orderPhone: "WhatsApp Phone Number",
       orderPlan: "Select Protein Tier",
@@ -686,8 +711,4 @@ export function CplProvider({ children }) {
       {children}
     </CplContext.Provider>
   );
-}
-
-export function useCpl() {
-  return useContext(CplContext);
 }

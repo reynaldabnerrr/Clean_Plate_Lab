@@ -1,50 +1,102 @@
-import React, { useState } from 'react';
+import React, { useId, useState } from 'react';
 import confetti from 'canvas-confetti';
-import { useCpl } from '../context/CplContext';
+import { useCpl } from '../hooks/useCpl';
+import { CplLogoImage } from './CplLogo';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from './ui/dialog';
 import { Button } from './ui/button';
-import { Badge } from './ui/badge';
 import { Input } from './ui/input';
-import { CheckCircle, Send, ShieldCheck, Calendar, Calculator, CreditCard, Sparkles, MapPin, Phone, User, Flame } from 'lucide-react';
+import {
+  ArrowRight,
+  CalendarDays,
+  Check,
+  CheckCircle,
+  Clock3,
+  MapPin,
+  MessageCircle,
+  PackageCheck,
+  Phone,
+  ShieldCheck,
+  Truck,
+  User,
+  UtensilsCrossed,
+} from 'lucide-react';
+
+const TIER_OPTIONS = [
+  { tier: 25, price: 25000 },
+  { tier: 60, price: 40000 },
+  { tier: 80, price: 50000 },
+  { tier: 100, price: 60000 },
+];
+
+const DAY_IN_MS = 24 * 60 * 60 * 1000;
+
+function toDateInputValue(date) {
+  const timezoneOffset = date.getTimezoneOffset() * 60 * 1000;
+  return new Date(date.getTime() - timezoneOffset).toISOString().split('T')[0];
+}
+
+function calculateDeliveryDays(start, end) {
+  if (!start || !end) return 0;
+
+  const startDate = new Date(`${start}T00:00:00Z`);
+  const endDate = new Date(`${end}T00:00:00Z`);
+  if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime()) || endDate < startDate) return 0;
+
+  let deliveryDays = 0;
+  const cursor = new Date(startDate);
+
+  while (cursor <= endDate) {
+    if (cursor.getUTCDay() !== 0) deliveryDays += 1;
+    cursor.setUTCDate(cursor.getUTCDate() + 1);
+  }
+
+  return deliveryDays;
+}
+
+function formatOrderDate(value) {
+  if (!value) return '-';
+
+  return new Intl.DateTimeFormat('id-ID', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'Asia/Makassar',
+  }).format(new Date(`${value}T00:00:00+08:00`));
+}
 
 export function OrderModal({ isOpen, onClose }) {
   const { addOrder, t } = useCpl();
+  const fieldId = useId();
+  const today = toDateInputValue(new Date());
 
-  const getTodayString = () => new Date().toISOString().split('T')[0];
-  const getDefaultEndString = () => new Date(Date.now() + 4 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
   const [proteinTier, setProteinTier] = useState(25);
-  const [startDate, setStartDate] = useState(getTodayString());
-  const [endDate, setEndDate] = useState(getDefaultEndString());
-  const [address, setAddress] = useState("");
+  const [startDate, setStartDate] = useState(today);
+  const [endDate, setEndDate] = useState(toDateInputValue(new Date(Date.now() + 4 * DAY_IN_MS)));
+  const [address, setAddress] = useState('');
   const [submitted, setSubmitted] = useState(false);
 
-  const TIER_OPTIONS = [
-    { tier: 25, label: "25g Protein", price: 25000, desc: "Light & Fit Prep" },
-    { tier: 60, label: "60g Protein", price: 40000, desc: "Lean Muscle Prep" },
-    { tier: 80, label: "80g Protein", price: 50000, desc: "High Athlete Prep" },
-    { tier: 100, label: "100g Protein", price: 60000, desc: "Pro Performance" },
-  ];
+  const selectedTier = TIER_OPTIONS.find((option) => option.tier === proteinTier) || TIER_OPTIONS[0];
+  const planString = `${selectedTier.tier}g Protein Plan - Rp ${selectedTier.price.toLocaleString('id-ID')} / porsi`;
+  const totalDays = calculateDeliveryDays(startDate, endDate);
+  const totalCost = totalDays * selectedTier.price;
 
-  const selectedTierObj = TIER_OPTIONS.find(t => t.tier === proteinTier) || TIER_OPTIONS[0];
-  const planString = `${selectedTierObj.label} Plan - Rp ${selectedTierObj.price.toLocaleString('id-ID')} / porsi`;
-
-  const calculateTotalDays = (start, end) => {
-    if (!start || !end) return 1;
-    const s = new Date(start);
-    const e = new Date(end);
-    const diff = Math.ceil((e - s) / (1000 * 60 * 60 * 24)) + 1;
-    return isNaN(diff) || diff < 1 ? 1 : diff;
+  const handleStartDateChange = (value) => {
+    setStartDate(value);
+    if (endDate < value) setEndDate(value);
   };
 
-  const totalDays = calculateTotalDays(startDate, endDate);
-  const totalCost = totalDays * selectedTierObj.price;
+  const handleOpenChange = (open) => {
+    if (!open) {
+      setSubmitted(false);
+      onClose();
+    }
+  };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    
+  const handleSubmit = (event) => {
+    event.preventDefault();
+
     addOrder({
       customerName: name,
       phone,
@@ -53,47 +105,50 @@ export function OrderModal({ isOpen, onClose }) {
       endDate,
       totalDays,
       address,
-      amount: totalCost
+      amount: totalCost,
     });
 
     setSubmitted(true);
 
-    // Formulate WhatsApp message to +62 899-6727-181 using 100% clean universal typography
     const message = `*CLEAN PLATE LAB MAKASSAR*
-_High Protein Clinical Nutrition_
+_GOOD FOOD. CLEAR DATA. BETTER YOU._
 ----------------------------------
 
-Halo Admin Clean Plate Lab!
-Saya mau konfirmasi pemesanan Meal Plan:
+Halo Tim Clean Plate Lab,
+Saya ingin mengajukan pemesanan meal plan dengan rincian berikut:
 
-*Detail Pemesan*
+*DATA PEMESAN*
 • Nama: *${name}*
-• WhatsApp: *${phone}*
+• Nomor WhatsApp: *${phone}*
 
-*Paket Meal Plan*
-• Porsi Protein: *${planString}*
-• Periode Delivery: *${startDate}* s/d *${endDate}*
-• Total Durasi: *${totalDays} ${t('orderDaysUnit')}*
+*PILIHAN MEAL PLAN*
+• Target protein: *${selectedTier.tier}g per porsi*
+• Harga per porsi: *Rp ${selectedTier.price.toLocaleString('id-ID')}*
+• Periode pengiriman: *${formatOrderDate(startDate)} - ${formatOrderDate(endDate)}*
+• Total pesanan: *${totalDays} box (${totalDays} ${t('orderDaysUnit')})*
+• Hari layanan: *Senin-Sabtu (Minggu tidak dihitung)*
 
-*Rincian Pembayaran*
-• Total Estimasi: *Rp ${totalCost.toLocaleString('id-ID')}*
+*RINGKASAN BIAYA*
+• Estimasi total: *Rp ${totalCost.toLocaleString('id-ID')}*
 
-*Alamat Pengiriman*
+*ALAMAT PENGIRIMAN*
 ${address}
 
 ----------------------------------
-Mohon info rekening & instruksi pembayarannya. Terima kasih!`;
-    const waUrl = `https://api.whatsapp.com/send?phone=628996727181&text=${encodeURIComponent(message)}`;
-    window.open(waUrl, '_blank');
+Mohon konfirmasi ketersediaan jadwal, total akhir, dan petunjuk pembayaran. Terima kasih.`;
+
+    const whatsappUrl = `https://api.whatsapp.com/send?phone=628996727181&text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
 
     try {
       confetti({
         particleCount: 120,
         spread: 80,
-        origin: { y: 0.6 }
+        origin: { y: 0.6 },
+        colors: ['#8A9C7A', '#1E1E1E', '#F5F2EA'],
       });
-    } catch (err) {
-      console.log("Confetti trigger error", err);
+    } catch (error) {
+      console.log('Confetti trigger error', error);
     }
   };
 
@@ -103,234 +158,276 @@ Mohon info rekening & instruksi pembayarannya. Terima kasih!`;
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg max-h-[92vh] overflow-y-auto bg-[#F5F2EA] text-[#1E1E1E] p-6 sm:p-8 space-y-5 border-2 border-[#1E1E1E] rounded-3xl shadow-2xl">
-        
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+      <DialogContent
+        style={{ width: 'min(calc(100vw - 1rem), 56rem)', maxWidth: 'none' }}
+        className="max-h-[calc(100dvh_-_1.5rem)] overflow-x-hidden overflow-y-auto border-0 bg-[#F7F5EF] p-0 text-[#1E1E1E] shadow-2xl [&>button]:right-4 [&>button]:top-4 [&>button]:z-20 [&>button]:text-white"
+      >
         {!submitted ? (
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <DialogHeader className="border-b-2 border-[#1E1E1E]/20 pb-4">
-              <Badge variant="default" className="w-fit mb-2 bg-[#8A9C7A] text-white font-extrabold px-3 py-1 rounded-full uppercase tracking-widest text-[10px]">
-                <Sparkles size={12} className="mr-1" />
-                <span>{t('orderInquiryBadge')}</span>
-              </Badge>
-              <DialogTitle className="text-2xl sm:text-3xl font-display font-black uppercase tracking-tight text-[#1E1E1E]">
-                {t('orderModalTitle')}
-              </DialogTitle>
-              <DialogDescription className="text-xs text-[var(--cpl-dark-muted)] font-medium leading-relaxed mt-1">
+          <form onSubmit={handleSubmit} className="min-w-0">
+            <DialogHeader className="relative overflow-hidden border-0 bg-[#1E1E1E] px-5 py-5 text-left sm:px-7 sm:py-6">
+              <div className="absolute inset-y-0 right-0 hidden w-40 border-l border-white/10 sm:block" aria-hidden="true">
+                <div className="grid h-full grid-cols-5 opacity-20">
+                  {Array.from({ length: 15 }).map((_, index) => (
+                    <span key={index} className="border-b border-r border-white/30" />
+                  ))}
+                </div>
+              </div>
+
+              <div className="relative flex items-center gap-2.5 pr-10">
+                <CplLogoImage size={42} className="border-white/40 shadow-none" />
+                <div className="min-w-0">
+                  <p className="truncate font-display text-[10px] font-bold uppercase text-[#B8C8AA]">
+                    {t('orderInquiryBadge')}
+                  </p>
+                  <DialogTitle className="mt-1 text-xl font-black uppercase leading-tight text-white sm:text-2xl">
+                    {t('orderModalTitle')}
+                  </DialogTitle>
+                </div>
+              </div>
+              <DialogDescription className="relative mt-2 max-w-lg pl-[52px] font-sans text-xs leading-relaxed text-white/60">
                 {t('orderModalSub')}
               </DialogDescription>
             </DialogHeader>
 
-            {/* Name Input */}
-            <div className="space-y-1.5">
-              <label className="block text-xs font-display font-bold uppercase tracking-wider text-[#1E1E1E] flex items-center gap-1.5">
-                <User size={14} className="text-[#8A9C7A]" />
-                <span>{t('orderName')}:</span>
-              </label>
-              <Input
-                type="text"
-                required
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="e.g. Alex Pratama"
-                className="bg-white text-black font-bold h-11 border-2 border-gray-300 rounded-2xl focus:border-[#8A9C7A] focus:ring-0 text-xs px-4"
-              />
-            </div>
+            <div className="grid min-w-0 gap-6 p-5 sm:p-7 md:grid-cols-2 md:gap-7">
+              <div className="min-w-0 space-y-5">
+                <section aria-labelledby={`${fieldId}-contact-title`}>
+                  <div className="mb-3 flex items-center gap-2.5">
+                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#1E1E1E] font-mono text-[10px] font-bold text-white">01</span>
+                    <h3 id={`${fieldId}-contact-title`} className="font-display text-xs font-extrabold uppercase">
+                      {t('orderCustomerDetails')}
+                    </h3>
+                    <span className="h-px flex-1 bg-[#1E1E1E]/15" />
+                  </div>
 
-            {/* WhatsApp Phone Input */}
-            <div className="space-y-1.5">
-              <label className="block text-xs font-display font-bold uppercase tracking-wider text-[#1E1E1E] flex items-center gap-1.5">
-                <Phone size={14} className="text-[#8A9C7A]" />
-                <span>{t('orderPhone')}:</span>
-              </label>
-              <Input
-                type="tel"
-                required
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="e.g. +62 812 3456 7890"
-                className="bg-white text-black font-bold h-11 border-2 border-gray-300 rounded-2xl focus:border-[#8A9C7A] focus:ring-0 text-xs px-4"
-              />
-            </div>
-
-            {/* Interactive Protein Tier Cards (2x2 Grid) */}
-            <div className="space-y-2">
-              <label className="block text-xs font-display font-bold uppercase tracking-wider text-[#1E1E1E] flex items-center gap-1.5">
-                <Flame size={14} className="text-[#8A9C7A]" />
-                <span>Pilih Porsi Protein Katering:</span>
-              </label>
-
-              <div className="grid grid-cols-2 gap-2.5">
-                {TIER_OPTIONS.map((item) => {
-                  const isSelected = proteinTier === item.tier;
-                  return (
-                    <button
-                      key={item.tier}
-                      type="button"
-                      onClick={() => setProteinTier(item.tier)}
-                      className={`p-3 rounded-2xl border-2 text-left transition-all duration-200 flex flex-col justify-between cursor-pointer ${
-                        isSelected
-                          ? "bg-[#1E1E1E] text-white border-[#1E1E1E] shadow-md scale-[1.02]"
-                          : "bg-white text-[#1E1E1E] border-gray-300 hover:border-[#8A9C7A]"
-                      }`}
-                    >
-                      <div className="flex justify-between items-start">
-                        <span className="font-display font-extrabold text-xs">{item.label}</span>
-                        {isSelected && <Sparkles size={12} className="text-[#8A9C7A]" />}
+                  <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
+                    <div className="min-w-0 space-y-1.5">
+                      <label htmlFor={`${fieldId}-name`} className="block font-display text-[10px] font-bold uppercase text-[#4D4D4D]">
+                        {t('orderName')}
+                      </label>
+                      <div className="relative">
+                        <User size={15} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#647554]" />
+                        <Input
+                          id={`${fieldId}-name`}
+                          type="text"
+                          required
+                          autoComplete="name"
+                          value={name}
+                          onChange={(event) => setName(event.target.value)}
+                          placeholder="Alex Pratama"
+                          className="h-11 min-w-0 rounded-lg border-[#1E1E1E]/25 bg-white pl-9 pr-3 font-sans text-xs font-semibold"
+                        />
                       </div>
-                      <div className={`text-[11px] font-mono font-bold mt-1 ${isSelected ? "text-[#8A9C7A]" : "text-gray-600"}`}>
-                        Rp {item.price.toLocaleString('id-ID')} <span className="text-[9px] font-sans font-normal opacity-80">/ porsi</span>
+                    </div>
+
+                    <div className="min-w-0 space-y-1.5">
+                      <label htmlFor={`${fieldId}-phone`} className="block font-display text-[10px] font-bold uppercase text-[#4D4D4D]">
+                        {t('orderPhone')}
+                      </label>
+                      <div className="relative">
+                        <Phone size={15} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#647554]" />
+                        <Input
+                          id={`${fieldId}-phone`}
+                          type="tel"
+                          required
+                          autoComplete="tel"
+                          inputMode="tel"
+                          value={phone}
+                          onChange={(event) => setPhone(event.target.value)}
+                          placeholder="+62 812 3456 7890"
+                          className="h-11 min-w-0 rounded-lg border-[#1E1E1E]/25 bg-white pl-9 pr-3 font-sans text-xs font-semibold"
+                        />
                       </div>
-                    </button>
-                  );
-                })}
+                    </div>
+                  </div>
+                </section>
+
+                <section aria-labelledby={`${fieldId}-protein-title`}>
+                  <div className="mb-3 flex items-center gap-2.5">
+                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#1E1E1E] font-mono text-[10px] font-bold text-white">02</span>
+                    <h3 id={`${fieldId}-protein-title`} className="font-display text-xs font-extrabold uppercase">
+                      {t('orderProteinTier')}
+                    </h3>
+                    <span className="h-px flex-1 bg-[#1E1E1E]/15" />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2.5" role="radiogroup" aria-label={t('orderProteinTier')}>
+                    {TIER_OPTIONS.map((option) => {
+                      const isSelected = proteinTier === option.tier;
+
+                      return (
+                        <button
+                          key={option.tier}
+                          type="button"
+                          role="radio"
+                          aria-checked={isSelected}
+                          onClick={() => setProteinTier(option.tier)}
+                          className={`min-h-20 min-w-0 rounded-lg border-2 p-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8A9C7A] ${
+                            isSelected
+                              ? 'border-[#1E1E1E] bg-[#1E1E1E] text-white'
+                              : 'border-[#1E1E1E]/15 bg-white text-[#1E1E1E] hover:border-[#8A9C7A]'
+                          }`}
+                        >
+                          <span className="flex items-center justify-between gap-1">
+                            <strong className="font-display text-xl font-black leading-none">{option.tier}g</strong>
+                            {isSelected && <Check size={14} className="text-[#B8C8AA]" strokeWidth={3} />}
+                          </span>
+                          <span className={`mt-2 block font-mono text-[10px] font-bold ${isSelected ? 'text-[#B8C8AA]' : 'text-[#647554]'}`}>
+                            Rp {option.price.toLocaleString('id-ID')}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <div className="mt-3 flex min-w-0 items-start gap-3 rounded-lg border border-[#8A9C7A]/50 bg-[#E7EEE1] p-3.5">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#647554] text-white">
+                      <Truck size={17} aria-hidden="true" />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-display text-[11px] font-extrabold uppercase text-[#33402B]">
+                        {t('orderDeliveryHighlight')}
+                      </p>
+                      <p className="mt-1 text-[10px] leading-relaxed text-[#526049]">
+                        {t('orderDeliveryDetail')}
+                      </p>
+                    </div>
+                    <div className="hidden shrink-0 flex-col gap-1 font-mono text-[8px] font-bold uppercase text-[#647554] sm:flex">
+                      <span className="inline-flex items-center gap-1"><Clock3 size={10} /> 1x / day</span>
+                      <span className="inline-flex items-center gap-1"><UtensilsCrossed size={10} /> 1 box / day</span>
+                    </div>
+                  </div>
+                </section>
               </div>
 
-              <div className="text-[11px] font-bold text-[#647554] bg-[#EBF0E6] p-2.5 rounded-2xl border border-[#8A9C7A]/40 text-center font-sans mt-2">
-                💡 Pengiriman katering harian dikirim 1x sehari (1 Box Makanan / Hari)
-              </div>
-            </div>
+              <section aria-labelledby={`${fieldId}-delivery-title`} className="min-w-0">
+                <div className="mb-3 flex items-center gap-2.5">
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#1E1E1E] font-mono text-[10px] font-bold text-white">03</span>
+                  <h3 id={`${fieldId}-delivery-title`} className="font-display text-xs font-extrabold uppercase">
+                    {t('orderDeliverySchedule')}
+                  </h3>
+                  <span className="h-px flex-1 bg-[#1E1E1E]/15" />
+                </div>
 
-            {/* Date Range Selection (Start Date & End Date) */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-              <div className="space-y-1.5">
-                <label className="block text-xs font-display font-bold uppercase tracking-wider text-[#1E1E1E] flex items-center gap-1.5">
-                  <Calendar size={14} className="text-[#8A9C7A]" />
-                  <span>{t('orderStartDate')}:</span>
-                </label>
-                <Input
-                  type="date"
-                  required
-                  value={startDate}
-                  min={getTodayString()}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  className="bg-white text-black font-bold h-11 border-2 border-gray-300 rounded-2xl text-xs px-3"
-                />
-              </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="min-w-0 space-y-1.5">
+                    <label htmlFor={`${fieldId}-start`} className="block truncate font-display text-[10px] font-bold uppercase text-[#4D4D4D]">
+                      {t('orderStartDate')}
+                    </label>
+                    <Input
+                      id={`${fieldId}-start`}
+                      type="date"
+                      required
+                      value={startDate}
+                      min={today}
+                      onChange={(event) => handleStartDateChange(event.target.value)}
+                      className="h-11 min-w-0 rounded-lg border-[#1E1E1E]/25 bg-white px-2 font-mono text-[10px]"
+                    />
+                  </div>
 
-              <div className="space-y-1.5">
-                <label className="block text-xs font-display font-bold uppercase tracking-wider text-[#1E1E1E] flex items-center gap-1.5">
-                  <Calendar size={14} className="text-[#8A9C7A]" />
-                  <span>{t('orderEndDate')}:</span>
-                </label>
-                <Input
-                  type="date"
-                  required
-                  value={endDate}
-                  min={startDate || getTodayString()}
-                  onChange={(e) => setEndDate(e.target.value)}
-                  className="bg-white text-black font-bold h-11 border-2 border-gray-300 rounded-2xl text-xs px-3"
-                />
-              </div>
-            </div>
+                  <div className="min-w-0 space-y-1.5">
+                    <label htmlFor={`${fieldId}-end`} className="block truncate font-display text-[10px] font-bold uppercase text-[#4D4D4D]">
+                      {t('orderEndDate')}
+                    </label>
+                    <Input
+                      id={`${fieldId}-end`}
+                      type="date"
+                      required
+                      value={endDate}
+                      min={startDate || today}
+                      onChange={(event) => setEndDate(event.target.value)}
+                      className="h-11 min-w-0 rounded-lg border-[#1E1E1E]/25 bg-white px-2 font-mono text-[10px]"
+                    />
+                  </div>
+                </div>
 
-            {/* Live Calculation Summary Card */}
-            <div className="p-4 bg-[#EBF0E6] border-2 border-[#8A9C7A] rounded-2xl space-y-2 shadow-sm">
-              <div className="flex justify-between items-center text-xs font-display font-bold text-[#1E1E1E]">
-                <span className="flex items-center gap-1.5 text-gray-700">
-                  <Calculator size={15} className="text-[#647554]" />
-                  <span>{t('orderTotalDays')}:</span>
-                </span>
-                <span className="font-black text-sm text-[#647554]">
-                  {totalDays} {t('orderDaysUnit')}
-                </span>
-              </div>
+                <div className="mt-4 space-y-1.5">
+                  <label htmlFor={`${fieldId}-address`} className="block font-display text-[10px] font-bold uppercase text-[#4D4D4D]">
+                    {t('orderAddress')}
+                  </label>
+                  <div className="relative">
+                    <MapPin size={15} className="pointer-events-none absolute left-3 top-3 text-[#647554]" />
+                    <textarea
+                      id={`${fieldId}-address`}
+                      required
+                      rows={2}
+                      autoComplete="street-address"
+                      value={address}
+                      onChange={(event) => setAddress(event.target.value)}
+                      placeholder={t('orderAddressPlaceholder')}
+                      className="block h-20 w-full resize-none rounded-lg border border-[#1E1E1E]/25 bg-white py-3 pl-9 pr-3 font-sans text-xs font-semibold text-[#1E1E1E] outline-none placeholder:font-normal placeholder:text-gray-400 focus:ring-2 focus:ring-[#8A9C7A]"
+                    />
+                  </div>
+                </div>
 
-              <div className="flex justify-between items-center text-xs font-display font-extrabold text-[#1E1E1E] pt-2 border-t border-[#8A9C7A]/40">
-                <span>{t('orderTotalCost')}:</span>
-                <span className="font-display font-black text-lg text-[#1E1E1E]">
-                  Rp {totalCost.toLocaleString('id-ID')}
-                </span>
-              </div>
-            </div>
+                <div className="mt-4 grid grid-cols-[1fr_auto] items-center gap-3 rounded-lg border-2 border-[#8A9C7A] bg-[#E7EEE1] p-4" aria-live="polite">
+                  <div className="min-w-0">
+                    <p className="flex items-center gap-1.5 text-[10px] font-bold uppercase text-[#526049]">
+                      <PackageCheck size={14} /> {t('orderSummary')}
+                    </p>
+                    <p className="mt-1 font-mono text-[10px] font-bold">
+                      {selectedTier.tier}g · {totalDays} {t('orderDaysUnit')} · {totalDays} box
+                    </p>
+                    <p className="mt-1 text-[9px] text-[#647554]">{t('orderSundayExcluded')}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-[9px] font-bold uppercase text-[#526049]">{t('orderEstimatedTotal')}</p>
+                    <p className="whitespace-nowrap font-display text-xl font-black">Rp {totalCost.toLocaleString('id-ID')}</p>
+                  </div>
+                </div>
 
-            {/* Delivery Address Textarea */}
-            <div className="space-y-1.5">
-              <label className="block text-xs font-display font-bold uppercase tracking-wider text-[#1E1E1E] flex items-center gap-1.5">
-                <MapPin size={14} className="text-[#8A9C7A]" />
-                <span>{t('orderAddress')}:</span>
-              </label>
-              <textarea
-                required
-                rows={2}
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                placeholder={t('orderAddressPlaceholder')}
-                className="w-full p-3 border-2 border-gray-300 rounded-2xl text-xs font-display bg-white text-black font-bold focus:border-[#8A9C7A] focus:outline-none"
-              />
-            </div>
+                <Button
+                  type="submit"
+                  variant="dark"
+                  disabled={totalDays === 0}
+                  className="mt-4 h-auto min-h-12 w-full min-w-0 whitespace-normal rounded-lg bg-[#1E1E1E] px-4 py-3 text-center text-xs leading-tight text-white hover:bg-[#647554]"
+                >
+                  <MessageCircle size={18} />
+                  <span className="min-w-0 break-words">{t('orderSubmit')}</span>
+                  <ArrowRight size={17} className="hidden min-[430px]:block" />
+                </Button>
 
-            {/* Submit Button */}
-            <div className="pt-2">
-              <Button
-                type="submit"
-                variant="default"
-                size="lg"
-                className="w-full flex items-center justify-center gap-2 bg-[#8A9C7A] hover:bg-[#647554] text-white font-black text-sm rounded-full h-12 shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer"
-              >
-                <Send size={18} />
-                <span>{t('orderSubmit')}</span>
-              </Button>
-            </div>
-
-            {/* Guarantee Trust Note */}
-            <div className="text-[10px] text-center text-gray-600 font-mono flex items-center justify-center gap-1.5 pt-1">
-              <ShieldCheck size={14} className="text-[#8A9C7A]" />
-              <span>{t('orderGuaranteeNote')}</span>
+                <div className="mt-2 flex items-center justify-center gap-1.5 text-center text-[9px] leading-tight text-[#526049]">
+                  <ShieldCheck size={12} className="shrink-0" />
+                  <span>{t('orderGuaranteeNote')}</span>
+                </div>
+              </section>
             </div>
           </form>
         ) : (
-          /* Submitted Confirmation Card */
-          <div className="py-6 text-center space-y-5">
-            <div className="w-16 h-16 bg-[#EBF0E6] text-[#647554] rounded-full flex items-center justify-center mx-auto border-2 border-[#8A9C7A] shadow-sm">
-              <CheckCircle size={36} />
-            </div>
-
-            <h3 className="font-display text-2xl sm:text-3xl font-extrabold uppercase tracking-tight text-[#1E1E1E]">
-              {t('orderSuccessMsg')}
-            </h3>
-
-            <p className="text-xs text-[var(--cpl-dark-muted)] leading-relaxed max-w-sm mx-auto font-sans">
-              {t('orderSuccessDetail').replace('{name}', name).replace('{plan}', planString)}
-            </p>
-
-            <div className="p-5 bg-white border-2 border-[#1E1E1E] rounded-3xl shadow-sm text-left space-y-3 my-2">
-              <div className="flex items-center justify-between border-b border-gray-200 pb-2.5">
-                <div className="flex items-center gap-2 text-xs font-display font-extrabold uppercase text-[#1E1E1E]">
-                  <Calendar size={16} className="text-[#8A9C7A]" />
-                  <span>Periode Pengiriman</span>
-                </div>
-                <span className="text-[10px] font-mono font-bold px-2.5 py-1 bg-[#EBF0E6] text-[#647554] rounded-full border border-[#8A9C7A]/30">
-                  {totalDays} {t('orderDaysUnit')}
+          <div className="grid min-h-[340px] bg-[#F7F5EF] sm:grid-cols-[0.75fr_1.25fr]">
+            <div className="flex items-center justify-center bg-[#1E1E1E] p-5 text-white sm:p-8">
+              <div className="text-center">
+                <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-[#B8C8AA]/50 bg-[#8A9C7A]">
+                  <CheckCircle size={30} />
                 </span>
-              </div>
-
-              <div className="text-xs font-mono font-bold text-[#1E1E1E] flex items-center justify-between">
-                <span className="text-gray-500">Rentang Tanggal:</span>
-                <span className="text-[#1E1E1E]">{startDate} &nbsp;➜&nbsp; {endDate}</span>
-              </div>
-
-              <div className="flex items-center justify-between border-t border-gray-200 pt-3">
-                <div className="flex items-center gap-2 text-xs font-display font-extrabold uppercase text-[#1E1E1E]">
-                  <CreditCard size={16} className="text-[#8A9C7A]" />
-                  <span>Total Estimasi Biaya</span>
-                </div>
-                <span className="text-lg font-display font-black text-[#647554]">
-                  Rp {totalCost.toLocaleString('id-ID')}
-                </span>
+                <p className="mt-3 font-mono text-[8px] font-bold uppercase text-[#B8C8AA]">CPL order recorded</p>
               </div>
             </div>
 
-            <Button 
-              variant="default" 
-              onClick={handleReset} 
-              className="bg-[#1E1E1E] hover:bg-[#333] text-white font-extrabold rounded-full px-8 py-3 text-xs"
-            >
-              {t('orderBackBtn')}
-            </Button>
+            <div className="flex items-center p-5 sm:p-8">
+              <div className="w-full min-w-0">
+                <p className="font-display text-[8px] font-bold uppercase text-[#647554]">WhatsApp handoff</p>
+                <h3 className="mt-1 font-display text-lg font-black uppercase sm:text-2xl">{t('orderSuccessMsg')}</h3>
+                <p className="mt-2 text-[9px] leading-relaxed text-[#555] sm:text-xs">
+                  {t('orderSuccessDetail').replace('{name}', name).replace('{plan}', planString)}
+                </p>
+
+                <div className="mt-4 rounded-lg border border-[#1E1E1E]/20 bg-white p-3">
+                  <div className="flex items-center justify-between gap-3 text-[9px]">
+                    <span className="flex items-center gap-1"><CalendarDays size={12} /> {totalDays} {t('orderDaysUnit')}</span>
+                    <span className="font-display text-base font-black">Rp {totalCost.toLocaleString('id-ID')}</span>
+                  </div>
+                </div>
+
+                <Button variant="dark" onClick={handleReset} className="mt-4 rounded-lg px-5">
+                  {t('orderBackBtn')}
+                </Button>
+              </div>
+            </div>
           </div>
         )}
-
       </DialogContent>
     </Dialog>
   );

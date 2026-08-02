@@ -4,7 +4,7 @@ import { Badge } from './ui/badge';
 import { Card } from './ui/card';
 import { Slider } from './ui/slider';
 import { Building2, Users, Send, CheckCircle2 } from 'lucide-react';
-import { useCpl } from '../context/CplContext';
+import { useCpl } from '../hooks/useCpl';
 
 export function CorporateCatering({ onOpenOrder }) {
   const { t } = useCpl();

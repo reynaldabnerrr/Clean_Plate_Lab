@@ -5,7 +5,6 @@ import { Hero } from './components/Hero';
 import { BrandPillars } from './components/BrandPillars';
 import { LabelGenerator } from './components/LabelGenerator';
 import { MenuSection } from './components/MenuSection';
-import { PackagingSection } from './components/PackagingSection';
 import { MacroCalculator } from './components/MacroCalculator';
 import { CorporateCatering } from './components/CorporateCatering';
 import { OrderModal } from './components/OrderModal';
@@ -51,9 +50,6 @@ function MainApp() {
         onSelectMeal={() => setOrderOpen(true)}
       />
 
-      {/* CPL Packaging & Freshness Standard */}
-      <PackagingSection />
-
       {/* Harris-Benedict Clinical Macro Calculator */}
       <MacroCalculator 
         onOpenOrder={() => setOrderOpen(true)}
@@ -65,9 +61,7 @@ function MainApp() {
       />
 
       {/* Footer */}
-      <Footer 
-        onOpenOrder={() => setOrderOpen(true)}
-      />
+      <Footer />
 
       {/* Order Inquiry Modal */}
       <OrderModal 

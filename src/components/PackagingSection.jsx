@@ -3,7 +3,7 @@ import { CplBadgeLogo, CplPrimaryLogo } from './CplLogo';
 import { Badge } from './ui/badge';
 import { Card } from './ui/card';
 import { Thermometer, ShieldCheck, CheckCircle2 } from 'lucide-react';
-import { useCpl } from '../context/CplContext';
+import { useCpl } from '../hooks/useCpl';
 
 export function PackagingSection() {
   const { t } = useCpl();

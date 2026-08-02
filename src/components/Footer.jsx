@@ -1,7 +1,7 @@
 import React from 'react';
 import { CplPrimaryLogo } from './CplLogo';
 import { Mail, MapPin, Phone, ArrowUp } from 'lucide-react';
-import { useCpl } from '../context/CplContext';
+import { useCpl } from '../hooks/useCpl';
 
 const InstagramIcon = ({ size = 18, className = "" }) => (
   <svg 
@@ -21,7 +21,7 @@ const InstagramIcon = ({ size = 18, className = "" }) => (
   </svg>
 );
 
-export function Footer({ onOpenOrder }) {
+export function Footer() {
   const { t } = useCpl();
 
   const scrollToTop = () => {

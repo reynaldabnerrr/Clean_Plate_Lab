@@ -3,7 +3,7 @@ import { CplFlaskIcon } from './CplLogo';
 import { Badge } from './ui/badge';
 import { Card } from './ui/card';
 import { Leaf, BarChart3, Check } from 'lucide-react';
-import { useCpl } from '../context/CplContext';
+import { useCpl } from '../hooks/useCpl';
 
 export function BrandPillars() {
   const { t } = useCpl();
