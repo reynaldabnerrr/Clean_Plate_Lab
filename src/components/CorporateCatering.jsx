@@ -117,7 +117,7 @@ export function CorporateCatering({ onOpenOrder }) {
               </div>
               <Slider
                 min={1}
-                max={7}
+                max={6}
                 step={1}
                 value={[daysPerWeek]}
                 onValueChange={(val) => setDaysPerWeek(val[0])}
