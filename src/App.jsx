@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import { CplProvider } from './context/CplContext';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
@@ -74,6 +75,9 @@ function MainApp() {
         isOpen={guidelineOpen}
         onClose={() => setGuidelineOpen(false)}
       />
+
+      {/* Vercel Web Analytics */}
+      <Analytics />
 
     </div>
   );
