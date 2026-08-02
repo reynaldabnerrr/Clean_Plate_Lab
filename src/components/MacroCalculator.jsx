@@ -47,8 +47,8 @@ export function MacroCalculator({ onOpenOrder }) {
       : t('calcPlanWellness');
 
   return (
-    <section id="calculator" className="py-16 sm:py-24 bg-(--cpl-cream) border-b border-[var(--cpl-border)]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="calculator" className="overflow-x-clip border-b border-[var(--cpl-border)] bg-(--cpl-cream) py-16 sm:py-24">
+      <div className="mx-auto min-w-0 max-w-7xl px-4 sm:px-6 lg:px-8">
         
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-16 space-y-4">
@@ -63,10 +63,10 @@ export function MacroCalculator({ onOpenOrder }) {
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-12 gap-8 lg:gap-10 items-stretch">
+        <div className="grid min-w-0 items-stretch gap-8 lg:grid-cols-12 lg:gap-10">
           
           {/* Inputs Column (Equal Height) */}
-          <Card className="lg:col-span-6 p-5 sm:p-8 bg-[var(--cpl-white)] border-2 border-[var(--cpl-dark)] flex flex-col justify-between space-y-6 rounded-3xl shadow-sm h-full">
+          <Card className="flex h-full min-w-0 w-full flex-col justify-between space-y-6 rounded-3xl border-2 border-[var(--cpl-dark)] bg-[var(--cpl-white)] p-5 shadow-sm sm:p-8 lg:col-span-6">
             
             <div className="flex items-center gap-2 border-b border-[var(--cpl-border)] pb-4">
               <Calculator size={20} className="text-[var(--cpl-sage)] shrink-0" />
@@ -85,7 +85,7 @@ export function MacroCalculator({ onOpenOrder }) {
                   type="button"
                   variant={gender === "male" ? "default" : "outline"}
                   onClick={() => setGender("male")}
-                  className={`min-h-[44px] rounded-xl ${gender === "male" ? "bg-[#8A9C7A] text-white font-extrabold" : ""}`}
+                  className={`min-h-11 min-w-0 rounded-xl px-2 ${gender === "male" ? "bg-[#8A9C7A] text-white font-extrabold" : ""}`}
                 >
                   {t('calcMale')}
                 </Button>
@@ -93,7 +93,7 @@ export function MacroCalculator({ onOpenOrder }) {
                   type="button"
                   variant={gender === "female" ? "default" : "outline"}
                   onClick={() => setGender("female")}
-                  className={`min-h-[44px] rounded-xl ${gender === "female" ? "bg-[#8A9C7A] text-white font-extrabold" : ""}`}
+                  className={`min-h-11 min-w-0 rounded-xl px-2 ${gender === "female" ? "bg-[#8A9C7A] text-white font-extrabold" : ""}`}
                 >
                   {t('calcFemale')}
                 </Button>
@@ -153,7 +153,7 @@ export function MacroCalculator({ onOpenOrder }) {
               <select
                 value={activity}
                 onChange={(e) => setActivity(Number(e.target.value))}
-                className="w-full h-11 p-3 border border-[var(--cpl-dark)] text-xs font-display font-bold bg-[var(--cpl-cream)] text-[var(--cpl-dark)] focus:outline-none rounded-xl"
+                className="h-11 w-full min-w-0 max-w-full truncate rounded-xl border border-[var(--cpl-dark)] bg-[var(--cpl-cream)] p-3 font-display text-xs font-bold text-[var(--cpl-dark)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cpl-sage)]"
               >
                 <option value={1.2}>{t('calcActivitySedentary')}</option>
                 <option value={1.375}>{t('calcActivityLight')}</option>
@@ -202,12 +202,12 @@ export function MacroCalculator({ onOpenOrder }) {
           </Card>
 
           {/* Results Output Column (Equal Height) */}
-          <div className="lg:col-span-6 flex flex-col justify-between gap-6 h-full">
+          <div className="flex h-full min-w-0 w-full flex-col justify-between gap-6 lg:col-span-6">
             
             {/* Target Card (Rounded) */}
-            <Card className="p-5 sm:p-8 bg-[var(--cpl-dark)] text-white border-2 border-[var(--cpl-dark)] shadow-xl relative overflow-hidden rounded-3xl flex-1 flex flex-col justify-between">
-              <div className="flex justify-between items-start mb-6">
-                <div>
+            <Card className="relative flex min-w-0 w-full flex-1 flex-col justify-between overflow-hidden rounded-3xl border-2 border-[var(--cpl-dark)] bg-[var(--cpl-dark)] p-5 text-white shadow-xl sm:p-8">
+              <div className="mb-6 flex flex-col items-start justify-between gap-3 sm:flex-row">
+                <div className="min-w-0">
                   <div className="text-[10px] sm:text-xs font-display font-bold uppercase tracking-widest text-[var(--cpl-sage)]">
                     {t('calcEnergyNeeds')}
                   </div>
@@ -216,29 +216,29 @@ export function MacroCalculator({ onOpenOrder }) {
                   </h4>
                 </div>
 
-                <div className="text-right shrink-0">
+                <div className="shrink-0 text-left sm:text-right">
                   <div className="text-[10px] sm:text-xs font-mono text-gray-400 uppercase">TDEE</div>
                   <div className="text-xl sm:text-2xl font-display font-extrabold text-[var(--cpl-sage)]">{targetCalories} KCAL</div>
                 </div>
               </div>
 
               {/* Macro Bar Metrics (Rounded) */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 text-center border-t border-gray-700 pt-6 mb-6">
-                <div className="p-3 bg-white/10 rounded-2xl">
+              <div className="mb-6 grid grid-cols-3 gap-2 border-t border-gray-700 pt-6 text-center sm:gap-4">
+                <div className="rounded-2xl bg-white/10 p-2 sm:p-3">
                   <div className="text-[10px] font-display font-bold uppercase tracking-wider text-[var(--cpl-sage)]">{t('calcDailyProtein')}</div>
-                  <div className="font-display text-2xl sm:text-3xl font-black text-white mt-1">{targetProteinGrams}g</div>
+                  <div className="mt-1 font-display text-xl font-black text-white sm:text-3xl">{targetProteinGrams}g</div>
                   <div className="text-[9px] text-gray-400 font-mono">{(targetProteinGrams*4/targetCalories*100).toFixed(0)}% energy</div>
                 </div>
 
-                <div className="p-3 bg-white/10 rounded-2xl">
+                <div className="rounded-2xl bg-white/10 p-2 sm:p-3">
                   <div className="text-[10px] font-display font-bold uppercase tracking-wider text-gray-300">{t('calcDailyCarbs')}</div>
-                  <div className="font-display text-2xl sm:text-3xl font-black text-white mt-1">{targetCarbGrams}g</div>
+                  <div className="mt-1 font-display text-xl font-black text-white sm:text-3xl">{targetCarbGrams}g</div>
                   <div className="text-[9px] text-gray-400 font-mono">{(targetCarbGrams*4/targetCalories*100).toFixed(0)}% energy</div>
                 </div>
 
-                <div className="p-3 bg-white/10 rounded-2xl">
+                <div className="rounded-2xl bg-white/10 p-2 sm:p-3">
                   <div className="text-[10px] font-display font-bold uppercase tracking-wider text-gray-300">{t('calcDailyFat')}</div>
-                  <div className="font-display text-2xl sm:text-3xl font-black text-white mt-1">{targetFatGrams}g</div>
+                  <div className="mt-1 font-display text-xl font-black text-white sm:text-3xl">{targetFatGrams}g</div>
                   <div className="text-[9px] text-gray-400 font-mono">{(targetFatGrams*9/targetCalories*100).toFixed(0)}% energy</div>
                 </div>
               </div>
@@ -250,14 +250,14 @@ export function MacroCalculator({ onOpenOrder }) {
             </Card>
 
             {/* Tailored CPL Recommendation (Rounded) */}
-            <Card className="p-5 sm:p-6 bg-[var(--cpl-sage-light)] border-2 border-[var(--cpl-sage)] space-y-4 rounded-3xl shadow-sm">
+            <Card className="min-w-0 w-full space-y-4 rounded-3xl border-2 border-[var(--cpl-sage)] bg-[var(--cpl-sage-light)] p-5 shadow-sm sm:p-6">
               <div className="flex items-center gap-2 text-xs font-display font-bold uppercase tracking-widest text-[var(--cpl-sage-dark)]">
                 <Target size={16} className="shrink-0" />
                 <span>{t('calcRecommendationTitle')}</span>
               </div>
 
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <h4 className="font-display text-xl sm:text-2xl font-extrabold uppercase text-[var(--cpl-dark)]">
+                <h4 className="min-w-0 wrap-break-word font-display text-xl font-extrabold uppercase text-[var(--cpl-dark)] sm:text-2xl">
                   {recommendedPlanName}
                 </h4>
                 <Badge variant="solid" className="bg-[#8A9C7A] text-white w-fit">
@@ -273,7 +273,7 @@ export function MacroCalculator({ onOpenOrder }) {
                 variant="default"
                 size="lg"
                 onClick={onOpenOrder}
-                className="w-full flex items-center justify-center gap-2 bg-[#8A9C7A] hover:bg-[#647554] text-white font-extrabold min-h-[44px]"
+                className="flex h-auto min-h-12 w-full items-center justify-center gap-2 whitespace-normal bg-[#8A9C7A] px-4 py-3 text-center text-xs font-extrabold leading-tight text-white hover:bg-[#647554]"
               >
                 <span>{t('calcSubscribeBtn').replace('{plan}', recommendedPlanName)}</span>
                 <ArrowRight size={16} />

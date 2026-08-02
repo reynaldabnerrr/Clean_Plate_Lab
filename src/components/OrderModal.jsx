@@ -161,11 +161,11 @@ Mohon konfirmasi ketersediaan jadwal, total akhir, dan petunjuk pembayaran. Teri
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent
         style={{ width: 'min(calc(100vw - 1rem), 56rem)', maxWidth: 'none' }}
-        className="max-h-[calc(100dvh_-_1.5rem)] overflow-x-hidden overflow-y-auto border-0 bg-[#F7F5EF] p-0 text-[#1E1E1E] shadow-2xl [&>button]:right-4 [&>button]:top-4 [&>button]:z-20 [&>button]:text-white"
+        className="max-h-[calc(100dvh-1.5rem)] overflow-x-hidden overflow-y-auto rounded-[28px] border border-black/10 bg-[#F7F5EF] p-0 text-[#1E1E1E] shadow-2xl sm:rounded-[32px] [&>button]:right-3 [&>button]:top-3 [&>button]:z-30 [&>button]:grid [&>button]:size-11 [&>button]:place-items-center [&>button]:rounded-full [&>button]:border-2 [&>button]:border-white/70 [&>button]:bg-white [&>button]:p-0 [&>button]:text-[#1E1E1E] [&>button]:opacity-100 [&>button]:shadow-[0_8px_24px_rgba(0,0,0,0.28)] [&>button]:transition-[transform,background-color,box-shadow] [&>button:hover]:scale-105 [&>button:hover]:bg-[#EBF0E6] [&>button:active]:scale-95 [&>button:focus-visible]:ring-2 [&>button:focus-visible]:ring-[#B8C8AA] [&>button:focus-visible]:ring-offset-2 [&>button:focus-visible]:ring-offset-[#1E1E1E] sm:[&>button]:right-4 sm:[&>button]:top-4"
       >
         {!submitted ? (
           <form onSubmit={handleSubmit} className="min-w-0">
-            <DialogHeader className="relative overflow-hidden border-0 bg-[#1E1E1E] px-5 py-5 text-left sm:px-7 sm:py-6">
+            <DialogHeader className="relative overflow-hidden border-0 bg-[#1E1E1E] py-5 pl-5 pr-16 text-left sm:py-6 sm:pl-7 sm:pr-20">
               <div className="absolute inset-y-0 right-0 hidden w-40 border-l border-white/10 sm:block" aria-hidden="true">
                 <div className="grid h-full grid-cols-5 opacity-20">
                   {Array.from({ length: 15 }).map((_, index) => (
@@ -174,7 +174,7 @@ Mohon konfirmasi ketersediaan jadwal, total akhir, dan petunjuk pembayaran. Teri
                 </div>
               </div>
 
-              <div className="relative flex items-center gap-2.5 pr-10">
+              <div className="relative flex items-center gap-2.5">
                 <CplLogoImage size={42} className="border-white/40 shadow-none" />
                 <div className="min-w-0">
                   <p className="truncate font-display text-[10px] font-bold uppercase text-[#B8C8AA]">
