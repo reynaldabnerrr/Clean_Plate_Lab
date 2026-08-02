@@ -25,32 +25,32 @@ export function MenuSection({ onSelectMeal }) {
   };
 
   return (
-    <section id="menu" className="py-24 bg-[var(--cpl-white)] border-b border-[var(--cpl-border-muted)]">
+    <section id="menu" className="py-16 sm:py-24 bg-[var(--cpl-white)] border-b border-[var(--cpl-border-muted)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 sm:mb-12">
           <div>
             <Badge variant="default" className="mb-3">
               <span>{t('menuEyebrow')}</span>
             </Badge>
-            <h2 className="font-display text-4xl sm:text-6xl font-extrabold uppercase tracking-tight text-[var(--cpl-dark)]">
+            <h2 className="font-display text-3xl sm:text-6xl font-extrabold uppercase tracking-tight text-[var(--cpl-dark)]">
               {t('menuTitle')}
             </h2>
-            <p className="text-lg text-[var(--cpl-dark-muted)] font-light mt-2 max-w-xl">
+            <p className="text-base sm:text-lg text-[var(--cpl-dark-muted)] font-light mt-2 max-w-xl">
               {t('menuSubtitle')}
             </p>
           </div>
 
-          {/* Category Filter Tabs */}
-          <div className="flex flex-wrap gap-2">
+          {/* Category Filter Tabs with horizontal scroll on mobile */}
+          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none flex-nowrap sm:flex-wrap max-w-full">
             {categories.map((cat) => (
               <Button
                 key={cat}
                 size="sm"
                 variant={activeCategory === cat ? "default" : "outline"}
                 onClick={() => setActiveCategory(cat)}
-                className={activeCategory === cat ? "bg-[#8A9C7A] text-white" : ""}
+                className={`whitespace-nowrap shrink-0 ${activeCategory === cat ? "bg-[#8A9C7A] text-white font-extrabold" : ""}`}
               >
                 {cat === "All" ? t('menuFilterAll') : cat}
               </Button>
@@ -59,7 +59,7 @@ export function MenuSection({ onSelectMeal }) {
         </div>
 
         {/* Menu Cards Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
           {filteredItems.map((meal) => {
             const isAdded = !!selectedMeals[meal.id];
             const rawTags = language === 'ID' ? (meal.tags_ID || meal.tags) : (meal.tags_EN || meal.tags);
@@ -69,11 +69,11 @@ export function MenuSection({ onSelectMeal }) {
             return (
               <Card 
                 key={meal.id}
-                className="flex flex-col justify-between overflow-hidden group rounded-none"
+                className="flex flex-col justify-between overflow-hidden group rounded-none border border-[var(--cpl-border-muted)]"
               >
                 <div>
                   {/* Image Container with Badge */}
-                  <div className="relative h-56 overflow-hidden bg-[var(--cpl-cream)]">
+                  <div className="relative h-48 sm:h-56 overflow-hidden bg-[var(--cpl-cream)]">
                     <img 
                       src={meal.image} 
                       alt={meal.name}
@@ -83,18 +83,18 @@ export function MenuSection({ onSelectMeal }) {
                       {meal.code}
                     </div>
 
-                    <Badge variant="solid" className="absolute top-3 right-3 bg-[#8A9C7A] text-white font-extrabold">
+                    <Badge variant="solid" className="absolute top-3 right-3 bg-[#8A9C7A] text-white font-extrabold text-xs">
                       {meal.protein}g Protein
                     </Badge>
                   </div>
 
                   {/* Body Content */}
-                  <div className="p-6 space-y-4">
-                    <div className="flex justify-between items-start">
-                      <h3 className="font-display text-2xl font-extrabold text-[var(--cpl-dark)] uppercase tracking-tight">
+                  <div className="p-5 sm:p-6 space-y-4">
+                    <div className="flex justify-between items-start gap-2">
+                      <h3 className="font-display text-xl sm:text-2xl font-extrabold text-[var(--cpl-dark)] uppercase tracking-tight">
                         {meal.name}
                       </h3>
-                      <span className="font-display font-bold text-xs text-[var(--cpl-dark-muted)] bg-[var(--cpl-cream)] px-2 py-1 rounded">
+                      <span className="font-display font-bold text-[11px] sm:text-xs text-[var(--cpl-dark-muted)] bg-[var(--cpl-cream)] px-2 py-1 rounded shrink-0">
                         {meal.kcal} KCAL
                       </span>
                     </div>
@@ -136,11 +136,11 @@ export function MenuSection({ onSelectMeal }) {
                 </div>
 
                 {/* Card Action */}
-                <div className="p-6 pt-0">
+                <div className="p-5 sm:p-6 pt-0">
                   <Button
                     variant={isAdded ? "dark" : "secondary"}
                     onClick={() => toggleSelectMeal(meal.id)}
-                    className="w-full flex items-center justify-center gap-2"
+                    className="w-full flex items-center justify-center gap-2 min-h-[44px]"
                   >
                     {isAdded ? (
                       <>
@@ -165,3 +165,4 @@ export function MenuSection({ onSelectMeal }) {
     </section>
   );
 }
+

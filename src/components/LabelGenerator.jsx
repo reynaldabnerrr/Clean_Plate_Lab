@@ -92,23 +92,23 @@ export function LabelGenerator({ onOpenOrder }) {
   };
 
   return (
-    <section id="label-generator" className="py-20 bg-[var(--cpl-cream)] border-b border-[var(--cpl-border-muted)]">
+    <section id="label-generator" className="py-16 sm:py-20 bg-[var(--cpl-cream)] border-b border-[var(--cpl-border-muted)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16 space-y-3">
+        <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-16 space-y-3">
           <Badge variant="default">
             <span>{t('labelEyebrow')}</span>
           </Badge>
-          <h2 className="font-display text-4xl sm:text-5xl font-extrabold uppercase tracking-tight text-[var(--cpl-dark)]">
+          <h2 className="font-display text-3xl sm:text-5xl font-extrabold uppercase tracking-tight text-[var(--cpl-dark)]">
             {t('labelTitle')}
           </h2>
-          <p className="text-base text-[var(--cpl-dark-muted)] font-normal">
+          <p className="text-sm sm:text-base text-[var(--cpl-dark-muted)] font-normal">
             {t('labelSubtitle')}
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-12 gap-10 items-start">
+        <div className="grid lg:grid-cols-12 gap-8 lg:gap-10 items-start">
           
           {/* Left Controls */}
           <div className="lg:col-span-6 space-y-6">
@@ -127,7 +127,7 @@ export function LabelGenerator({ onOpenOrder }) {
                       <Card
                         key={meal.code}
                         onClick={() => handleSelectPreset(meal)}
-                        className={`p-4 cursor-pointer transition-all rounded-none ${
+                        className={`p-3.5 sm:p-4 cursor-pointer transition-all rounded-none ${
                           isSelected
                             ? 'border-2 border-[var(--cpl-sage)] bg-[var(--cpl-sage-light)]'
                             : 'border border-[var(--cpl-border-muted)] bg-[var(--cpl-white)] hover:border-[var(--cpl-dark)]'
@@ -137,7 +137,7 @@ export function LabelGenerator({ onOpenOrder }) {
                           <span>{meal.code}</span>
                           <span className="font-bold text-[var(--cpl-dark)]">{meal.kcal} KCAL</span>
                         </div>
-                        <div className="font-display font-extrabold text-sm uppercase text-[var(--cpl-dark)] mt-1">
+                        <div className="font-display font-extrabold text-sm uppercase text-[var(--cpl-dark)] mt-1 truncate">
                           {meal.name}
                         </div>
                         <div className="flex gap-3 text-xs text-[var(--cpl-dark-muted)] mt-2 font-mono">
@@ -151,7 +151,7 @@ export function LabelGenerator({ onOpenOrder }) {
                 </div>
               </TabsContent>
 
-              <TabsContent value="custom" className="space-y-5 bg-[var(--cpl-white)] p-6 border border-[var(--cpl-border-muted)] mt-4">
+              <TabsContent value="custom" className="space-y-5 bg-[var(--cpl-white)] p-4 sm:p-6 border border-[var(--cpl-border-muted)] mt-4">
                 <div>
                   <label className="block text-xs font-display font-bold uppercase tracking-widest text-[var(--cpl-dark)] mb-2">
                     Meal Title:
@@ -192,7 +192,7 @@ export function LabelGenerator({ onOpenOrder }) {
 
             <Card className="p-4 bg-[var(--cpl-white)] text-xs space-y-2 rounded-none border border-[var(--cpl-border-muted)]">
               <div className="font-display font-bold uppercase tracking-wider text-[var(--cpl-dark)] flex items-center gap-1.5">
-                <Info size={14} className="text-[var(--cpl-sage)]" />
+                <Info size={14} className="text-[var(--cpl-sage)] shrink-0" />
                 <span>{t('labelIngredients')}</span>
               </div>
               <p className="text-[var(--cpl-dark-muted)] leading-relaxed font-normal">
@@ -200,11 +200,11 @@ export function LabelGenerator({ onOpenOrder }) {
               </p>
             </Card>
 
-            <div className="flex gap-3">
+            <div className="flex flex-col sm:flex-row gap-3">
               <Button
                 variant="outline"
                 onClick={handleCopySpec}
-                className="flex-1 flex items-center justify-center gap-2 rounded-full"
+                className="flex-1 flex items-center justify-center gap-2 rounded-full min-h-[44px]"
               >
                 {copied ? <Check size={16} className="text-green-500" /> : <Copy size={16} />}
                 <span>{copied ? "Copied Spec" : "Copy Macro Specs"}</span>
@@ -213,7 +213,7 @@ export function LabelGenerator({ onOpenOrder }) {
               <Button
                 variant="default"
                 onClick={onOpenOrder}
-                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-[#8A9C7A] hover:bg-[#647554] text-white"
+                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-[#8A9C7A] hover:bg-[#647554] text-white min-h-[44px]"
               >
                 <span>{t('labelInspectCta')}</span>
               </Button>
@@ -222,49 +222,49 @@ export function LabelGenerator({ onOpenOrder }) {
           </div>
 
           {/* Right Live Label Display */}
-          <div className="lg:col-span-6 flex justify-center sticky top-28">
+          <div className="lg:col-span-6 flex justify-center lg:sticky lg:top-28">
             <div className="w-full max-w-md">
               
               {/* Exact CPL Guideline Label Card */}
-              <div className="cpl-label-paper p-8 rounded-none border-2 border-[#1E1E1E] shadow-2xl relative">
+              <div className="cpl-label-paper p-5 sm:p-8 rounded-none border-2 border-[#1E1E1E] shadow-2xl relative">
                 
-                <div className="flex justify-between items-center border-b-2 border-[#1E1E1E] pb-3 mb-6">
-                  <span className="font-extrabold text-base tracking-wider">{currentCode}</span>
-                  <Badge variant="solid" className="px-3 py-1 text-xs font-extrabold uppercase tracking-widest bg-[#8A9C7A] text-white">
+                <div className="flex justify-between items-center border-b-2 border-[#1E1E1E] pb-3 mb-5 sm:mb-6">
+                  <span className="font-extrabold text-sm sm:text-base tracking-wider">{currentCode}</span>
+                  <Badge variant="solid" className="px-2.5 py-1 text-[10px] sm:text-xs font-extrabold uppercase tracking-widest bg-[#8A9C7A] text-white">
                     MEAL PREP
                   </Badge>
                 </div>
 
-                <h3 className="font-black text-4xl tracking-tight text-[#1E1E1E] uppercase leading-none mb-1">
+                <h3 className="font-black text-2xl sm:text-4xl tracking-tight text-[#1E1E1E] uppercase leading-tight sm:leading-none mb-1 break-words">
                   {currentTitle}
                 </h3>
                 
-                <p className="text-xs font-bold text-[#647554] tracking-widest uppercase mb-6">
+                <p className="text-[10px] sm:text-xs font-bold text-[#647554] tracking-widest uppercase mb-5 sm:mb-6">
                   MEAL PREP FOR A BETTER TOMORROW
                 </p>
 
                 {/* Macro Table Grid */}
-                <div className="border-2 border-[#1E1E1E] mb-6 text-sm font-bold bg-white/40">
-                  <div className="grid grid-cols-2 border-b border-[#1E1E1E] p-3">
+                <div className="border-2 border-[#1E1E1E] mb-5 sm:mb-6 text-xs sm:text-sm font-bold bg-white/40">
+                  <div className="grid grid-cols-2 border-b border-[#1E1E1E] p-2.5 sm:p-3">
                     <span className="text-gray-700">PROTEIN</span>
-                    <span className="text-right text-[#8A9C7A] font-black text-base">{protein}g</span>
+                    <span className="text-right text-[#8A9C7A] font-black text-sm sm:text-base">{protein}g</span>
                   </div>
-                  <div className="grid grid-cols-2 border-b border-[#1E1E1E] p-3 bg-white/60">
+                  <div className="grid grid-cols-2 border-b border-[#1E1E1E] p-2.5 sm:p-3 bg-white/60">
                     <span className="text-gray-700">CARBS</span>
                     <span className="text-right font-extrabold">{carbs}g</span>
                   </div>
-                  <div className="grid grid-cols-2 border-b border-[#1E1E1E] p-3">
+                  <div className="grid grid-cols-2 border-b border-[#1E1E1E] p-2.5 sm:p-3">
                     <span className="text-gray-700">FAT</span>
                     <span className="text-right font-extrabold">{fat}g</span>
                   </div>
-                  <div className="grid grid-cols-2 p-3 bg-[#8A9C7A]/20">
+                  <div className="grid grid-cols-2 p-2.5 sm:p-3 bg-[#8A9C7A]/20">
                     <span className="text-[#1E1E1E] font-black">CALORIES</span>
-                    <span className="text-right font-black text-base text-[#1E1E1E]">{calculatedKcal} KCAL</span>
+                    <span className="text-right font-black text-sm sm:text-base text-[#1E1E1E]">{calculatedKcal} KCAL</span>
                   </div>
                 </div>
 
                 {/* Dates */}
-                <div className="grid grid-cols-3 text-xs font-mono border-b-2 border-[#1E1E1E] pb-4 mb-4 text-gray-800 uppercase">
+                <div className="grid grid-cols-3 text-[10px] sm:text-xs font-mono border-b-2 border-[#1E1E1E] pb-3 sm:pb-4 mb-4 text-gray-800 uppercase">
                   <div>
                     <div className="text-[9px] text-gray-500">PREPARED</div>
                     <div className="font-bold">TODAY</div>
@@ -280,19 +280,19 @@ export function LabelGenerator({ onOpenOrder }) {
                 </div>
 
                 {/* Stamp */}
-                <div className="flex items-end justify-between pt-2">
-                  <div className="flex items-center gap-3">
-                    <CplFlaskIcon size={28} color="#8A9C7A" />
-                    <div className="text-[11px] font-black tracking-wider text-[#1E1E1E] uppercase leading-tight">
+                <div className="flex items-end justify-between pt-1 sm:pt-2">
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <CplFlaskIcon size={24} color="#8A9C7A" className="sm:w-7 sm:h-7" />
+                    <div className="text-[9px] sm:text-[11px] font-black tracking-wider text-[#1E1E1E] uppercase leading-tight">
                       <div>REAL FOOD.</div>
                       <div>CLEAR DATA.</div>
                       <div>BETTER YOU.</div>
                     </div>
                   </div>
 
-                  <div className="w-32">
+                  <div className="w-24 sm:w-32">
                     <div className="barcode-strip" />
-                    <div className="text-[9px] text-center font-mono mt-1 tracking-widest text-gray-800">
+                    <div className="text-[8px] sm:text-[9px] text-center font-mono mt-1 tracking-widest text-gray-800">
                       {currentCode}-2026
                     </div>
                   </div>
@@ -309,3 +309,4 @@ export function LabelGenerator({ onOpenOrder }) {
     </section>
   );
 }
+

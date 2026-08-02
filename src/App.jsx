@@ -56,6 +56,7 @@ function MainApp() {
       {/* Clean Navigation Bar */}
       <Navbar 
         onOpenOrder={() => setOrderOpen(true)}
+        onOpenGuideline={() => setGuidelineOpen(true)}
       />
 
       {/* Hero Section */}
