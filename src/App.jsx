@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import { CplProvider } from './context/CplContext';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
@@ -74,6 +75,9 @@ function MainApp() {
         isOpen={guidelineOpen}
         onClose={() => setGuidelineOpen(false)}
       />
+
+      {/* Vercel Speed Insights */}
+      <SpeedInsights />
 
     </div>
   );
