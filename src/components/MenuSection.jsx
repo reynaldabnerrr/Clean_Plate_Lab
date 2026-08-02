@@ -3,14 +3,20 @@ import { useCpl } from '../context/CplContext';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Card } from './ui/card';
-import { Plus, Check } from 'lucide-react';
+import { Plus, Check, Sparkles } from 'lucide-react';
 
 export function MenuSection({ onSelectMeal }) {
   const { menuItems, language, t } = useCpl();
   const [activeCategory, setActiveCategory] = useState("All");
   const [selectedMeals, setSelectedMeals] = useState({});
 
-  const categories = ["All", "High Protein", "Lean Muscle", "Plant Power", "Keto / Low Carb"];
+  const categories = [
+    { id: "All", label: t('menuFilterAll') },
+    { id: "High Protein", label: t('menuFilterHighProtein') },
+    { id: "Lean Muscle", label: t('menuFilterLean') },
+    { id: "Plant Power", label: t('menuFilterPlant') },
+    { id: "Keto / Low Carb", label: t('menuFilterKeto') },
+  ];
 
   const filteredItems = activeCategory === "All" 
     ? menuItems 
@@ -46,13 +52,13 @@ export function MenuSection({ onSelectMeal }) {
           <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none flex-nowrap sm:flex-wrap max-w-full">
             {categories.map((cat) => (
               <Button
-                key={cat}
+                key={cat.id}
                 size="sm"
-                variant={activeCategory === cat ? "default" : "outline"}
-                onClick={() => setActiveCategory(cat)}
-                className={`whitespace-nowrap shrink-0 ${activeCategory === cat ? "bg-[#8A9C7A] text-white font-extrabold" : ""}`}
+                variant={activeCategory === cat.id ? "default" : "outline"}
+                onClick={() => setActiveCategory(cat.id)}
+                className={`whitespace-nowrap shrink-0 ${activeCategory === cat.id ? "bg-[#8A9C7A] text-white font-extrabold" : ""}`}
               >
-                {cat === "All" ? t('menuFilterAll') : cat}
+                {cat.label}
               </Button>
             ))}
           </div>
@@ -63,13 +69,13 @@ export function MenuSection({ onSelectMeal }) {
           {filteredItems.map((meal) => {
             const isAdded = !!selectedMeals[meal.id];
             const rawTags = language === 'ID' ? (meal.tags_ID || meal.tags) : (meal.tags_EN || meal.tags);
-            const tags = Array.isArray(rawTags) ? rawTags : [rawTags];
-            const description = language === 'ID' ? (meal.desc_ID || meal.desc) : (meal.desc_EN || meal.desc);
+            const tags = Array.isArray(rawTags) ? rawTags : (rawTags ? [rawTags] : []);
+            const description = language === 'ID' ? (meal.desc_ID || meal.desc || '') : (meal.desc_EN || meal.desc || '');
 
             return (
               <Card 
                 key={meal.id}
-                className="flex flex-col justify-between overflow-hidden group rounded-none border border-[var(--cpl-border-muted)]"
+                className="flex flex-col justify-between overflow-hidden group rounded-3xl border border-[var(--cpl-border-muted)] bg-white shadow-sm hover:shadow-xl transition-all duration-300"
               >
                 <div>
                   {/* Image Container with Badge */}
@@ -77,13 +83,17 @@ export function MenuSection({ onSelectMeal }) {
                     <img 
                       src={meal.image} 
                       alt={meal.name}
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80";
+                      }}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
-                    <div className="absolute top-3 left-3 bg-[#1E1E1E] text-white font-mono text-[10px] font-bold px-2 py-1 tracking-widest uppercase">
+                    <div className="absolute top-3 left-3 bg-[#1E1E1E] text-white font-mono text-[10px] font-bold px-2.5 py-1 tracking-widest uppercase rounded-full">
                       {meal.code}
                     </div>
 
-                    <Badge variant="solid" className="absolute top-3 right-3 bg-[#8A9C7A] text-white font-extrabold text-xs">
+                    <Badge variant="solid" className="absolute top-3 right-3 bg-[#8A9C7A] text-white font-extrabold text-xs rounded-full px-3 py-1">
                       {meal.protein}g Protein
                     </Badge>
                   </div>
@@ -94,7 +104,7 @@ export function MenuSection({ onSelectMeal }) {
                       <h3 className="font-display text-xl sm:text-2xl font-extrabold text-[var(--cpl-dark)] uppercase tracking-tight">
                         {meal.name}
                       </h3>
-                      <span className="font-display font-bold text-[11px] sm:text-xs text-[var(--cpl-dark-muted)] bg-[var(--cpl-cream)] px-2 py-1 rounded shrink-0">
+                      <span className="font-display font-bold text-[11px] sm:text-xs text-[var(--cpl-dark-muted)] bg-[var(--cpl-cream)] px-2.5 py-1 rounded-full shrink-0">
                         {meal.kcal} KCAL
                       </span>
                     </div>
@@ -106,24 +116,24 @@ export function MenuSection({ onSelectMeal }) {
                     {/* Tags */}
                     <div className="flex flex-wrap gap-1.5 pt-1">
                       {tags.map((tag, i) => (
-                        <span key={i} className="text-[10px] font-mono bg-[var(--cpl-sage-light)] text-[var(--cpl-sage-dark)] font-bold px-2 py-0.5">
+                        <span key={i} className="text-[10px] font-mono bg-[var(--cpl-sage-light)] text-[var(--cpl-sage-dark)] font-bold px-2.5 py-1 rounded-full">
                           #{tag}
                         </span>
                       ))}
                     </div>
 
-                    {/* Macro Breakdown Bar */}
-                    <div className="pt-4 border-t border-[var(--cpl-border-light)] grid grid-cols-4 text-center font-display text-xs">
+                    {/* Macro Breakdown Bar (Rounded Grid) */}
+                    <div className="pt-3 pb-3 border border-[var(--cpl-border-light)] grid grid-cols-4 text-center font-display text-xs bg-[var(--cpl-cream)] rounded-2xl">
                       <div className="border-r border-[var(--cpl-border-light)] pr-1">
-                        <div className="text-[9px] text-gray-500 font-bold uppercase">PROT</div>
+                        <div className="text-[9px] text-gray-500 font-bold uppercase">{t('heroProtein')}</div>
                         <div className="font-extrabold text-[var(--cpl-sage-dark)]">{meal.protein}g</div>
                       </div>
                       <div className="border-r border-[var(--cpl-border-light)] px-1">
-                        <div className="text-[9px] text-gray-500 font-bold uppercase">CARBS</div>
+                        <div className="text-[9px] text-gray-500 font-bold uppercase">{t('heroCarbs')}</div>
                         <div className="font-extrabold text-[var(--cpl-dark)]">{meal.carbs}g</div>
                       </div>
                       <div className="border-r border-[var(--cpl-border-light)] px-1">
-                        <div className="text-[9px] text-gray-500 font-bold uppercase">FAT</div>
+                        <div className="text-[9px] text-gray-500 font-bold uppercase">{t('heroFat')}</div>
                         <div className="font-extrabold text-[var(--cpl-dark)]">{meal.fat}g</div>
                       </div>
                       <div className="pl-1">
@@ -138,21 +148,11 @@ export function MenuSection({ onSelectMeal }) {
                 {/* Card Action */}
                 <div className="p-5 sm:p-6 pt-0">
                   <Button
-                    variant={isAdded ? "dark" : "secondary"}
-                    onClick={() => toggleSelectMeal(meal.id)}
-                    className="w-full flex items-center justify-center gap-2 min-h-[44px]"
+                    variant="default"
+                    onClick={onSelectMeal}
+                    className="w-full flex items-center justify-center gap-2 min-h-[44px] text-xs font-extrabold bg-[#8A9C7A] hover:bg-[#647554] text-white rounded-full"
                   >
-                    {isAdded ? (
-                      <>
-                        <Check size={16} className="text-green-400" />
-                        <span>Added to Selection</span>
-                      </>
-                    ) : (
-                      <>
-                        <Plus size={16} />
-                        <span>{t('menuSelectCta')}</span>
-                      </>
-                    )}
+                    <span>{t('menuSelectCta')}</span>
                   </Button>
                 </div>
 

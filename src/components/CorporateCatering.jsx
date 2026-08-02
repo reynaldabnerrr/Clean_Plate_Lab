@@ -10,10 +10,17 @@ export function CorporateCatering({ onOpenOrder }) {
   const { t } = useCpl();
   const [headcount, setHeadcount] = useState(25);
   const [daysPerWeek, setDaysPerWeek] = useState(5);
-  const [mealType, setMealType] = useState("lunch");
+  const [proteinTier, setProteinTier] = useState(25); // 25 | 60 | 80 | 100
 
-  const costPerMeal = headcount > 50 ? 55000 : 65000;
-  const totalMealsPerWeek = headcount * daysPerWeek * (mealType === "full" ? 2 : 1);
+  const getTierPrice = (tier) => {
+    if (tier === 100) return 60000;
+    if (tier === 80) return 50000;
+    if (tier === 60) return 40000;
+    return 25000;
+  };
+
+  const costPerMeal = getTierPrice(proteinTier);
+  const totalMealsPerWeek = headcount * daysPerWeek;
   const estimatedWeeklyCost = totalMealsPerWeek * costPerMeal;
 
   return (
@@ -47,13 +54,13 @@ export function CorporateCatering({ onOpenOrder }) {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Card className="p-4 bg-[var(--cpl-cream)] border border-[var(--cpl-border)] rounded-none">
+              <Card className="p-4 bg-[var(--cpl-cream)] border border-[var(--cpl-border)] rounded-2xl shadow-sm">
                 <Building2 size={24} className="text-[var(--cpl-sage)] mb-2" />
                 <h4 className="font-display font-extrabold text-sm uppercase text-[var(--cpl-dark)]">{t('b2bCard1Title')}</h4>
                 <p className="text-xs text-[var(--cpl-dark-muted)] mt-1">{t('b2bCard1Desc')}</p>
               </Card>
 
-              <Card className="p-4 bg-[var(--cpl-cream)] border border-[var(--cpl-border)] rounded-none">
+              <Card className="p-4 bg-[var(--cpl-cream)] border border-[var(--cpl-border)] rounded-2xl shadow-sm">
                 <Users size={24} className="text-[var(--cpl-sage)] mb-2" />
                 <h4 className="font-display font-extrabold text-sm uppercase text-[var(--cpl-dark)]">{t('b2bCard2Title')}</h4>
                 <p className="text-xs text-[var(--cpl-dark-muted)] mt-1">{t('b2bCard2Desc')}</p>
@@ -76,14 +83,14 @@ export function CorporateCatering({ onOpenOrder }) {
             </div>
           </div>
 
-          {/* Right Interactive Estimator */}
-          <Card className="lg:col-span-6 bg-[var(--cpl-cream)] p-8 border-2 border-[var(--cpl-dark)] space-y-6 rounded-none">
+          {/* Right Interactive Estimator (Rounded) */}
+          <Card className="lg:col-span-6 bg-[var(--cpl-cream)] p-8 border-2 border-[var(--cpl-dark)] space-y-6 rounded-3xl shadow-md">
             <div className="flex justify-between items-center border-b border-[var(--cpl-border)] pb-4">
               <h3 className="font-display text-xl font-extrabold uppercase text-[var(--cpl-dark)]">
                 {t('b2bEstimatorTitle')}
               </h3>
-              <Badge variant="solid" className="bg-[#8A9C7A] text-white">
-                B2B Tier Pricing
+              <Badge variant="solid" className="bg-[#8A9C7A] text-white rounded-full px-3 py-1">
+                {t('b2bTierPricing')}
               </Badge>
             </div>
 
@@ -91,7 +98,7 @@ export function CorporateCatering({ onOpenOrder }) {
             <div className="space-y-2">
               <div className="flex justify-between text-xs font-display font-bold text-[var(--cpl-dark)]">
                 <span>{t('b2bTeamSize')}</span>
-                <span className="text-[var(--cpl-sage-dark)] font-extrabold text-sm">{headcount} People</span>
+                <span className="text-[var(--cpl-sage-dark)] font-extrabold text-sm">{headcount} {t('b2bPeopleUnit')}</span>
               </div>
               <Slider
                 min={10}
@@ -106,7 +113,7 @@ export function CorporateCatering({ onOpenOrder }) {
             <div className="space-y-2">
               <div className="flex justify-between text-xs font-display font-bold text-[var(--cpl-dark)]">
                 <span>{t('b2bDeliveryDays')}</span>
-                <span className="font-extrabold text-sm">{daysPerWeek} Days</span>
+                <span className="font-extrabold text-sm">{daysPerWeek} {t('b2bDaysUnit')}</span>
               </div>
               <Slider
                 min={1}
@@ -117,36 +124,41 @@ export function CorporateCatering({ onOpenOrder }) {
               />
             </div>
 
-            {/* Meal Type Buttons */}
+            {/* Protein Tier Selection Buttons */}
             <div>
               <label className="block text-xs font-display font-bold uppercase tracking-widest text-[var(--cpl-dark-muted)] mb-2">
-                {t('b2bServiceOption')}
+                Pilih Porsi Protein Katering:
               </label>
-              <div className="grid grid-cols-2 gap-3">
-                <Button
-                  type="button"
-                  variant={mealType === "lunch" ? "dark" : "outline"}
-                  onClick={() => setMealType("lunch")}
-                  className={mealType === "lunch" ? "bg-[#1E1E1E] text-white font-bold" : ""}
-                >
-                  {t('b2bLunchOnly')}
-                </Button>
-                <Button
-                  type="button"
-                  variant={mealType === "full" ? "dark" : "outline"}
-                  onClick={() => setMealType("full")}
-                  className={mealType === "full" ? "bg-[#1E1E1E] text-white font-bold" : ""}
-                >
-                  {t('b2bFullDay')}
-                </Button>
+              <div className="grid grid-cols-2 gap-2.5">
+                {[
+                  { tier: 25, label: "25g Protein", price: "Rp 25.000" },
+                  { tier: 60, label: "60g Protein", price: "Rp 40.000" },
+                  { tier: 80, label: "80g Protein", price: "Rp 50.000" },
+                  { tier: 100, label: "100g Protein", price: "Rp 60.000" },
+                ].map((item) => (
+                  <Button
+                    key={item.tier}
+                    type="button"
+                    variant={proteinTier === item.tier ? "dark" : "outline"}
+                    onClick={() => setProteinTier(item.tier)}
+                    className={`flex flex-col items-center justify-center p-3 h-auto min-h-[46px] border-2 transition-all rounded-xl ${
+                      proteinTier === item.tier 
+                        ? "bg-[#1E1E1E] text-white font-extrabold border-[#1E1E1E]" 
+                        : "bg-white text-[#1E1E1E] font-bold border-gray-300 hover:border-[#8A9C7A]"
+                    }`}
+                  >
+                    <span className="text-xs">{item.label}</span>
+                    <span className={`text-[10px] ${proteinTier === item.tier ? "text-[#8A9C7A]" : "text-gray-500"}`}>{item.price}</span>
+                  </Button>
+                ))}
               </div>
             </div>
 
             {/* Estimated Total Bar */}
-            <div className="p-4 bg-[var(--cpl-white)] border border-[var(--cpl-dark)] space-y-2">
+            <div className="p-4 bg-[var(--cpl-white)] border border-[var(--cpl-dark)] space-y-2 rounded-2xl shadow-sm">
               <div className="flex justify-between text-xs font-display font-bold text-[var(--cpl-dark-muted)]">
                 <span>{t('b2bWeeklyMeals')}</span>
-                <span className="font-mono text-[var(--cpl-dark)]">{totalMealsPerWeek} boxes / wk</span>
+                <span className="font-mono text-[var(--cpl-dark)]">{totalMealsPerWeek} {t('b2bBoxesPerWk')}</span>
               </div>
 
               <div className="flex justify-between items-baseline pt-2 border-t border-[var(--cpl-border-light)]">
@@ -156,7 +168,7 @@ export function CorporateCatering({ onOpenOrder }) {
                 </span>
               </div>
               <div className="text-[10px] text-right font-mono text-gray-500">
-                Rate: Rp {costPerMeal.toLocaleString('id-ID')} / meal box
+                Tarif: Rp {costPerMeal.toLocaleString('id-ID')} / box makan
               </div>
             </div>
 

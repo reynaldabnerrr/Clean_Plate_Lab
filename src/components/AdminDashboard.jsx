@@ -318,8 +318,8 @@ export function AdminDashboard({ isOpen, onClose }) {
                   </Button>
                 </div>
 
-                {/* Menu Table */}
-                <div className="border-2 border-[#1E1E1E] bg-white overflow-x-auto">
+                {/* Menu Table (Rounded) */}
+                <div className="border-2 border-[#1E1E1E] bg-white overflow-x-auto rounded-2xl shadow-sm">
                   <table className="w-full text-left text-xs font-sans">
                     <thead className="bg-[#EBF0E6] text-[#1E1E1E] font-display font-extrabold uppercase border-b-2 border-[#1E1E1E]">
                       <tr>
@@ -375,7 +375,7 @@ export function AdminDashboard({ isOpen, onClose }) {
 
               {/* ORDERS TAB */}
               <TabsContent value="orders" className="space-y-4 mt-4">
-                <div className="border-2 border-[#1E1E1E] bg-white overflow-x-auto">
+                <div className="border-2 border-[#1E1E1E] bg-white overflow-x-auto rounded-2xl shadow-sm">
                   <table className="w-full text-left text-xs font-sans">
                     <thead className="bg-[#EBF0E6] text-[#1E1E1E] font-display font-extrabold uppercase border-b-2 border-[#1E1E1E]">
                       <tr>

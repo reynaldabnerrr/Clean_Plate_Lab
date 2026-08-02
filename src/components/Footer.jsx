@@ -1,9 +1,27 @@
 import React from 'react';
 import { CplPrimaryLogo } from './CplLogo';
-import { Mail, MapPin, Phone, ArrowUp, Globe, MessageSquare, ShieldCheck } from 'lucide-react';
+import { Mail, MapPin, Phone, ArrowUp } from 'lucide-react';
 import { useCpl } from '../context/CplContext';
 
-export function Footer({ onOpenOrder, onOpenAdmin }) {
+const InstagramIcon = ({ size = 18, className = "" }) => (
+  <svg 
+    width={size} 
+    height={size} 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round" 
+    className={className}
+  >
+    <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
+  </svg>
+);
+
+export function Footer({ onOpenOrder }) {
   const { t } = useCpl();
 
   const scrollToTop = () => {
@@ -45,43 +63,48 @@ export function Footer({ onOpenOrder, onOpenAdmin }) {
               <li><a href="#menu" className="hover:text-white transition-colors">{t('weeklyMenu')}</a></li>
               <li><a href="#calculator" className="hover:text-white transition-colors">{t('macroCalculator')}</a></li>
               <li><a href="#catering" className="hover:text-white transition-colors">{t('b2bCatering')}</a></li>
-              <li>
-                <button onClick={onOpenAdmin} className="text-[#8A9C7A] hover:underline text-left flex items-center gap-1 font-bold">
-                  <ShieldCheck size={14} />
-                  <span>{t('adminPortal')}</span>
-                </button>
-              </li>
             </ul>
           </div>
 
           {/* Col 3: Contact & Kitchen Location */}
           <div className="md:col-span-4 space-y-4">
             <h4 className="font-display font-extrabold text-sm uppercase tracking-wider text-[#8A9C7A]">
-              Kitchen & Contact
+              {t('footerKitchenContact')}
             </h4>
-            <div className="space-y-3 text-xs text-gray-400 font-sans">
-              <div className="flex items-start gap-2">
-                <MapPin size={16} className="text-[#8A9C7A] flex-shrink-0 mt-0.5" />
-                <span>Central Kitchen: Senopati Wellness Hub, Kebayoran Baru, Jakarta Selatan</span>
+            <div className="space-y-3 text-xs text-gray-300 font-sans">
+              <div className="flex items-start gap-2.5">
+                <MapPin size={18} className="text-[#8A9C7A] flex-shrink-0 mt-0.5" />
+                <span className="leading-relaxed">{t('footerCentralKitchen')}</span>
               </div>
-              <div className="flex items-center gap-2">
-                <Phone size={16} className="text-[#8A9C7A] flex-shrink-0" />
-                <span>WhatsApp: +62 812-CPL-FOOD (275-3663)</span>
+              
+              <div className="flex items-center gap-2.5">
+                <Phone size={18} className="text-[#8A9C7A] flex-shrink-0" />
+                <a 
+                  href="https://wa.me/628996727181" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="hover:text-[#8A9C7A] transition-colors font-medium"
+                >
+                  WhatsApp: +62 899-6727-181
+                </a>
               </div>
-              <div className="flex items-center gap-2">
-                <Mail size={16} className="text-[#8A9C7A] flex-shrink-0" />
-                <span>hello@cleanplatelab.id</span>
-              </div>
-            </div>
 
-            <div className="pt-2 flex items-center gap-4">
-              <a href="#" className="p-2 bg-white/10 hover:bg-[#8A9C7A] hover:text-white rounded transition-colors text-gray-300">
-                <Globe size={16} />
-              </a>
-              <a href="#" className="p-2 bg-white/10 hover:bg-[#8A9C7A] hover:text-white rounded transition-colors text-gray-300">
-                <MessageSquare size={16} />
-              </a>
-              <span className="text-xs font-mono text-gray-400">@cleanplatelab</span>
+              <div className="flex items-center gap-2.5">
+                <InstagramIcon size={18} className="text-[#8A9C7A] flex-shrink-0" />
+                <a 
+                  href="https://www.instagram.com/cleanplatelab.id/" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="hover:text-[#8A9C7A] transition-colors font-medium font-mono text-[11px]"
+                >
+                  Instagram: @cleanplatelab.id
+                </a>
+              </div>
+
+              <div className="flex items-center gap-2.5">
+                <Mail size={18} className="text-[#8A9C7A] flex-shrink-0" />
+                <span className="font-medium">hello@cleanplatelab.id</span>
+              </div>
             </div>
           </div>
 
@@ -90,14 +113,14 @@ export function Footer({ onOpenOrder, onOpenAdmin }) {
         {/* Bottom Strip */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-[10px] font-mono text-gray-500 uppercase tracking-widest">
           <div>
-            © 2026 CLEAN PLATE LAB. {t('footerLegal')} MADE FOR A BETTER TOMORROW.
+            © 2026 CLEAN PLATE LAB. {t('footerLegal')} {t('footerMadeForTomorrow')}
           </div>
 
           <button
             onClick={scrollToTop}
             className="flex items-center gap-2 px-3 py-1.5 bg-white/10 hover:bg-[#8A9C7A] hover:text-white text-gray-300 transition-colors"
           >
-            <span>Back To Top</span>
+            <span>{t('footerBackToTop')}</span>
             <ArrowUp size={12} />
           </button>
         </div>

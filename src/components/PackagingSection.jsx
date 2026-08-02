@@ -2,7 +2,7 @@ import React from 'react';
 import { CplBadgeLogo, CplPrimaryLogo } from './CplLogo';
 import { Badge } from './ui/badge';
 import { Card } from './ui/card';
-import { Thermometer, Recycle, CheckCircle2 } from 'lucide-react';
+import { Thermometer, ShieldCheck, CheckCircle2 } from 'lucide-react';
 import { useCpl } from '../context/CplContext';
 
 export function PackagingSection() {
@@ -34,10 +34,10 @@ export function PackagingSection() {
               {/* Top Badge */}
               <div className="flex justify-between items-center border-b-2 border-[#1E1E1E] pb-4">
                 <span className="font-mono text-xs font-bold uppercase tracking-widest text-[#1E1E1E]">
-                  BOX REF: CPL-KRAFT-2026
+                  {t('packBoxRef')}
                 </span>
                 <span className="bg-[#8A9C7A] text-white text-[10px] font-bold px-2 py-1 uppercase">
-                  100% Biodegradable
+                  {t('pack100Biodegradable')}
                 </span>
               </div>
 
@@ -45,32 +45,32 @@ export function PackagingSection() {
               <div className="py-4 space-y-2 text-center">
                 <CplPrimaryLogo size="large" color="#647554" className="items-center justify-center" />
                 <div className="text-xs font-display font-extrabold uppercase tracking-widest text-[#1E1E1E] pt-2">
-                  MEALS THAT DO MORE THAN FILL.
+                  {t('packBoxSlogan')}
                 </div>
               </div>
 
-              {/* Box Details Strip */}
-              <div className="p-4 bg-[#F5F2EA] border-2 border-[#1E1E1E] text-xs font-mono space-y-1 text-gray-800">
+              {/* Box Details Strip (Rounded) */}
+              <div className="p-4 bg-[#F5F2EA] border-2 border-[#1E1E1E] text-xs font-mono space-y-1 text-gray-800 rounded-2xl shadow-sm">
                 <div className="flex justify-between">
-                  <span>THERMAL SEAL:</span>
-                  <span className="font-bold text-[#8A9C7A]">ACTIVE FRESH</span>
+                  <span>{t('packThermalSeal')}</span>
+                  <span className="font-bold text-[#8A9C7A]">{t('packThermalSealVal')}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>MATERIAL:</span>
-                  <span className="font-bold">UNBLEACHED KRAFT PULP</span>
+                  <span>{t('packMaterial')}</span>
+                  <span className="font-bold">{t('packMaterialVal')}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>MICROWAVE SAFE:</span>
-                  <span className="font-bold">YES (30-45 SECS)</span>
+                  <span>{t('packMicrowave')}</span>
+                  <span className="font-bold">{t('packMicrowaveVal')}</span>
                 </div>
               </div>
 
               {/* Slogan & Circular Badge */}
               <div className="flex items-center justify-between pt-2 border-t-2 border-[#1E1E1E]">
                 <div className="text-[10px] font-bold tracking-wider text-[#1E1E1E] uppercase leading-tight">
-                  <div>GOOD FOOD.</div>
-                  <div>CLEAR DATA.</div>
-                  <div>BETTER YOU.</div>
+                  <div>{t('heroTitle1')}</div>
+                  <div>{t('heroTitle2')}</div>
+                  <div>{t('heroTitle3')}</div>
                 </div>
 
                 <CplBadgeLogo size={80} color="#8A9C7A" className="bg-white/80" />
@@ -92,14 +92,14 @@ export function PackagingSection() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Card className="p-5 bg-[var(--cpl-white)] border border-[var(--cpl-border)] rounded-none space-y-2">
-                <Thermometer size={24} className="text-[var(--cpl-sage)]" />
+              <Card className="p-5 bg-[var(--cpl-white)] border border-[var(--cpl-border)] rounded-2xl shadow-sm space-y-2">
+                <ShieldCheck size={24} className="text-[var(--cpl-sage)]" />
                 <h4 className="font-display font-extrabold text-sm uppercase text-[var(--cpl-dark)]">{t('packItem3Title')}</h4>
                 <p className="text-xs text-[var(--cpl-dark-muted)]">{t('packItem3Desc')}</p>
               </Card>
 
-              <Card className="p-5 bg-[var(--cpl-white)] border border-[var(--cpl-border)] rounded-none space-y-2">
-                <Recycle size={24} className="text-[var(--cpl-sage)]" />
+              <Card className="p-5 bg-[var(--cpl-white)] border border-[var(--cpl-border)] rounded-2xl shadow-sm space-y-2">
+                <Thermometer size={24} className="text-[var(--cpl-sage)]" />
                 <h4 className="font-display font-extrabold text-sm uppercase text-[var(--cpl-dark)]">{t('packItem2Title')}</h4>
                 <p className="text-xs text-[var(--cpl-dark-muted)]">{t('packItem2Desc')}</p>
               </Card>
@@ -108,15 +108,15 @@ export function PackagingSection() {
             <div className="space-y-3 pt-2">
               <div className="flex items-center gap-3 text-xs font-display font-bold uppercase text-[var(--cpl-dark)]">
                 <CheckCircle2 size={16} className="text-[var(--cpl-sage)]" />
-                <span>Hermetically sealed meal sleeves prevent air oxidation</span>
+                <span>{t('packFeature1')}</span>
               </div>
               <div className="flex items-center gap-3 text-xs font-display font-bold uppercase text-[var(--cpl-dark)]">
                 <CheckCircle2 size={16} className="text-[var(--cpl-sage)]" />
-                <span>Easy reheatable design for microwave or oven warming</span>
+                <span>{t('packFeature2')}</span>
               </div>
               <div className="flex items-center gap-3 text-xs font-display font-bold uppercase text-[var(--cpl-dark)]">
                 <CheckCircle2 size={16} className="text-[var(--cpl-sage)]" />
-                <span>Custom batch code printed directly on sleeve for audit trail</span>
+                <span>{t('packFeature3')}</span>
               </div>
             </div>
 

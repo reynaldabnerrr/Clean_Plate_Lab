@@ -39,12 +39,12 @@ export function MacroCalculator({ onOpenOrder }) {
   const carbKcal = Math.max(0, targetCalories - proteinKcal - fatKcal);
   const targetCarbGrams = Math.round(carbKcal / 4);
 
-  const recommendedMealsPerDay = targetProteinGrams > 120 ? 3 : 2;
+  const recommendedMealsPerDay = 1;
   const recommendedPlanName = goal === "muscle" 
-    ? "CPL ATHLETE PRO FUEL" 
+    ? t('calcPlanAthlete') 
     : goal === "cut" 
-      ? "CPL LEAN MUSCLE CUT" 
-      : "CPL BALANCED WELLNESS";
+      ? t('calcPlanCut') 
+      : t('calcPlanWellness');
 
   return (
     <section id="calculator" className="py-16 sm:py-24 bg-[var(--cpl-cream)] border-b border-[var(--cpl-border)]">
@@ -63,10 +63,10 @@ export function MacroCalculator({ onOpenOrder }) {
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-12 gap-8 lg:gap-10 items-start">
+        <div className="grid lg:grid-cols-12 gap-8 lg:gap-10 items-stretch">
           
-          {/* Inputs Column */}
-          <Card className="lg:col-span-6 p-5 sm:p-8 bg-[var(--cpl-white)] border-2 border-[var(--cpl-dark)] space-y-6 rounded-none">
+          {/* Inputs Column (Equal Height) */}
+          <Card className="lg:col-span-6 p-5 sm:p-8 bg-[var(--cpl-white)] border-2 border-[var(--cpl-dark)] flex flex-col justify-between space-y-6 rounded-3xl shadow-sm h-full">
             
             <div className="flex items-center gap-2 border-b border-[var(--cpl-border)] pb-4">
               <Calculator size={20} className="text-[var(--cpl-sage)] shrink-0" />
@@ -85,7 +85,7 @@ export function MacroCalculator({ onOpenOrder }) {
                   type="button"
                   variant={gender === "male" ? "default" : "outline"}
                   onClick={() => setGender("male")}
-                  className={`min-h-[44px] ${gender === "male" ? "bg-[#8A9C7A] text-white font-extrabold" : ""}`}
+                  className={`min-h-[44px] rounded-xl ${gender === "male" ? "bg-[#8A9C7A] text-white font-extrabold" : ""}`}
                 >
                   {t('calcMale')}
                 </Button>
@@ -93,7 +93,7 @@ export function MacroCalculator({ onOpenOrder }) {
                   type="button"
                   variant={gender === "female" ? "default" : "outline"}
                   onClick={() => setGender("female")}
-                  className={`min-h-[44px] ${gender === "female" ? "bg-[#8A9C7A] text-white font-extrabold" : ""}`}
+                  className={`min-h-[44px] rounded-xl ${gender === "female" ? "bg-[#8A9C7A] text-white font-extrabold" : ""}`}
                 >
                   {t('calcFemale')}
                 </Button>
@@ -133,7 +133,7 @@ export function MacroCalculator({ onOpenOrder }) {
               <div className="space-y-2">
                 <div className="flex justify-between text-xs font-display font-bold text-[var(--cpl-dark)]">
                   <span>{t('calcAgeLabel')}</span>
-                  <span className="font-extrabold text-sm">{age} yrs</span>
+                  <span className="font-extrabold text-sm">{age} {t('calcYears')}</span>
                 </div>
                 <Slider
                   min={16}
@@ -153,7 +153,7 @@ export function MacroCalculator({ onOpenOrder }) {
               <select
                 value={activity}
                 onChange={(e) => setActivity(Number(e.target.value))}
-                className="w-full h-11 p-3 border border-[var(--cpl-dark)] text-xs font-display font-bold bg-[var(--cpl-cream)] text-[var(--cpl-dark)] focus:outline-none"
+                className="w-full h-11 p-3 border border-[var(--cpl-dark)] text-xs font-display font-bold bg-[var(--cpl-cream)] text-[var(--cpl-dark)] focus:outline-none rounded-xl"
               >
                 <option value={1.2}>{t('calcActivitySedentary')}</option>
                 <option value={1.375}>{t('calcActivityLight')}</option>
@@ -174,7 +174,7 @@ export function MacroCalculator({ onOpenOrder }) {
                   size="sm"
                   variant={goal === "cut" ? "dark" : "outline"}
                   onClick={() => setGoal("cut")}
-                  className={`min-h-[40px] ${goal === "cut" ? "bg-[#1E1E1E] text-white font-extrabold" : ""}`}
+                  className={`min-h-[40px] rounded-xl ${goal === "cut" ? "bg-[#1E1E1E] text-white font-extrabold" : ""}`}
                 >
                   {t('calcGoalCut')}
                 </Button>
@@ -183,7 +183,7 @@ export function MacroCalculator({ onOpenOrder }) {
                   size="sm"
                   variant={goal === "maintain" ? "dark" : "outline"}
                   onClick={() => setGoal("maintain")}
-                  className={`min-h-[40px] ${goal === "maintain" ? "bg-[#1E1E1E] text-white font-extrabold" : ""}`}
+                  className={`min-h-[40px] rounded-xl ${goal === "maintain" ? "bg-[#1E1E1E] text-white font-extrabold" : ""}`}
                 >
                   {t('calcGoalMaintain')}
                 </Button>
@@ -192,7 +192,7 @@ export function MacroCalculator({ onOpenOrder }) {
                   size="sm"
                   variant={goal === "muscle" ? "dark" : "outline"}
                   onClick={() => setGoal("muscle")}
-                  className={`min-h-[40px] ${goal === "muscle" ? "bg-[#1E1E1E] text-white font-extrabold" : ""}`}
+                  className={`min-h-[40px] rounded-xl ${goal === "muscle" ? "bg-[#1E1E1E] text-white font-extrabold" : ""}`}
                 >
                   {t('calcGoalMuscle')}
                 </Button>
@@ -201,11 +201,11 @@ export function MacroCalculator({ onOpenOrder }) {
 
           </Card>
 
-          {/* Results Output Column */}
-          <div className="lg:col-span-6 space-y-6">
+          {/* Results Output Column (Equal Height) */}
+          <div className="lg:col-span-6 flex flex-col justify-between gap-6 h-full">
             
-            {/* Target Card */}
-            <Card className="p-5 sm:p-8 bg-[var(--cpl-dark)] text-white border-2 border-[var(--cpl-dark)] shadow-xl relative overflow-hidden rounded-none">
+            {/* Target Card (Rounded) */}
+            <Card className="p-5 sm:p-8 bg-[var(--cpl-dark)] text-white border-2 border-[var(--cpl-dark)] shadow-xl relative overflow-hidden rounded-3xl flex-1 flex flex-col justify-between">
               <div className="flex justify-between items-start mb-6">
                 <div>
                   <div className="text-[10px] sm:text-xs font-display font-bold uppercase tracking-widest text-[var(--cpl-sage)]">
@@ -222,21 +222,21 @@ export function MacroCalculator({ onOpenOrder }) {
                 </div>
               </div>
 
-              {/* Macro Bar Metrics */}
+              {/* Macro Bar Metrics (Rounded) */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 text-center border-t border-gray-700 pt-6 mb-6">
-                <div className="p-3 bg-white/10">
+                <div className="p-3 bg-white/10 rounded-2xl">
                   <div className="text-[10px] font-display font-bold uppercase tracking-wider text-[var(--cpl-sage)]">{t('calcDailyProtein')}</div>
                   <div className="font-display text-2xl sm:text-3xl font-black text-white mt-1">{targetProteinGrams}g</div>
                   <div className="text-[9px] text-gray-400 font-mono">{(targetProteinGrams*4/targetCalories*100).toFixed(0)}% energy</div>
                 </div>
 
-                <div className="p-3 bg-white/10">
+                <div className="p-3 bg-white/10 rounded-2xl">
                   <div className="text-[10px] font-display font-bold uppercase tracking-wider text-gray-300">{t('calcDailyCarbs')}</div>
                   <div className="font-display text-2xl sm:text-3xl font-black text-white mt-1">{targetCarbGrams}g</div>
                   <div className="text-[9px] text-gray-400 font-mono">{(targetCarbGrams*4/targetCalories*100).toFixed(0)}% energy</div>
                 </div>
 
-                <div className="p-3 bg-white/10">
+                <div className="p-3 bg-white/10 rounded-2xl">
                   <div className="text-[10px] font-display font-bold uppercase tracking-wider text-gray-300">{t('calcDailyFat')}</div>
                   <div className="font-display text-2xl sm:text-3xl font-black text-white mt-1">{targetFatGrams}g</div>
                   <div className="text-[9px] text-gray-400 font-mono">{(targetFatGrams*9/targetCalories*100).toFixed(0)}% energy</div>
@@ -244,13 +244,13 @@ export function MacroCalculator({ onOpenOrder }) {
               </div>
 
               <div className="text-xs text-gray-300 font-mono space-y-1">
-                <p>• Protein target: <strong>{proteinRatio}g / kg body weight</strong>.</p>
-                <p>• Estimated BMR: <strong>{Math.round(bmr)} Kcal</strong> | Factor: <strong>{activity}x</strong></p>
+                <p>{t('calcProteinTargetDesc').replace('{ratio}', proteinRatio)}</p>
+                <p>{t('calcBmrEstimate')} <strong>{Math.round(bmr)} Kcal</strong> | {t('calcFactor')} <strong>{activity}x</strong></p>
               </div>
             </Card>
 
-            {/* Tailored CPL Recommendation */}
-            <Card className="p-5 sm:p-6 bg-[var(--cpl-sage-light)] border-2 border-[var(--cpl-sage)] space-y-4 rounded-none">
+            {/* Tailored CPL Recommendation (Rounded) */}
+            <Card className="p-5 sm:p-6 bg-[var(--cpl-sage-light)] border-2 border-[var(--cpl-sage)] space-y-4 rounded-3xl shadow-sm">
               <div className="flex items-center gap-2 text-xs font-display font-bold uppercase tracking-widest text-[var(--cpl-sage-dark)]">
                 <Target size={16} className="shrink-0" />
                 <span>{t('calcRecommendationTitle')}</span>
@@ -261,12 +261,12 @@ export function MacroCalculator({ onOpenOrder }) {
                   {recommendedPlanName}
                 </h4>
                 <Badge variant="solid" className="bg-[#8A9C7A] text-white w-fit">
-                  {recommendedMealsPerDay} Meals / Day
+                  {recommendedMealsPerDay} {t('calcMealsPerDay')}
                 </Badge>
               </div>
 
               <p className="text-xs text-[var(--cpl-dark-muted)] leading-relaxed">
-                Target: <strong>{targetProteinGrams}g protein</strong>. Recommended: <strong>{recommendedPlanName}</strong> ({recommendedMealsPerDay} fresh meal boxes daily).
+                {t('calcRecSummary').replace('{protein}', targetProteinGrams).replace('{plan}', recommendedPlanName).replace('{meals}', recommendedMealsPerDay)}
               </p>
 
               <Button
@@ -275,7 +275,7 @@ export function MacroCalculator({ onOpenOrder }) {
                 onClick={onOpenOrder}
                 className="w-full flex items-center justify-center gap-2 bg-[#8A9C7A] hover:bg-[#647554] text-white font-extrabold min-h-[44px]"
               >
-                <span>Subscribe to {recommendedPlanName}</span>
+                <span>{t('calcSubscribeBtn').replace('{plan}', recommendedPlanName)}</span>
                 <ArrowRight size={16} />
               </Button>
             </Card>

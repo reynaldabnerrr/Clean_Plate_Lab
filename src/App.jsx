@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { CplProvider } from './context/CplContext';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
@@ -9,39 +9,12 @@ import { PackagingSection } from './components/PackagingSection';
 import { MacroCalculator } from './components/MacroCalculator';
 import { CorporateCatering } from './components/CorporateCatering';
 import { OrderModal } from './components/OrderModal';
-import { AdminDashboard } from './components/AdminDashboard';
+import { BrandGuidelineModal } from './components/BrandGuidelineModal';
 import { Footer } from './components/Footer';
 
 function MainApp() {
   const [orderOpen, setOrderOpen] = useState(false);
-  const [adminOpen, setAdminOpen] = useState(false);
-
-  // Check URL pathname for /admin routing
-  useEffect(() => {
-    const checkAdminRoute = () => {
-      const path = window.location.pathname;
-      const hash = window.location.hash;
-      if (path === '/admin' || hash === '#admin') {
-        setAdminOpen(true);
-      }
-    };
-
-    checkAdminRoute();
-    window.addEventListener('popstate', checkAdminRoute);
-    return () => window.removeEventListener('popstate', checkAdminRoute);
-  }, []);
-
-  const handleCloseAdmin = () => {
-    setAdminOpen(false);
-    if (window.location.pathname === '/admin' || window.location.hash === '#admin') {
-      window.history.pushState({}, '', '/');
-    }
-  };
-
-  const handleOpenAdminFromUrl = () => {
-    setAdminOpen(true);
-    window.history.pushState({}, '', '/admin');
-  };
+  const [guidelineOpen, setGuidelineOpen] = useState(false);
 
   const scrollToLabel = () => {
     const el = document.getElementById('label-generator');
@@ -94,7 +67,6 @@ function MainApp() {
       {/* Footer */}
       <Footer 
         onOpenOrder={() => setOrderOpen(true)}
-        onOpenAdmin={handleOpenAdminFromUrl}
       />
 
       {/* Order Inquiry Modal */}
@@ -103,20 +75,66 @@ function MainApp() {
         onClose={() => setOrderOpen(false)}
       />
 
-      {/* Admin CMS Dashboard Modal - Accessible via /admin URL */}
-      <AdminDashboard
-        isOpen={adminOpen}
-        onClose={handleCloseAdmin}
+      {/* Brand Guidelines Modal */}
+      <BrandGuidelineModal
+        isOpen={guidelineOpen}
+        onClose={() => setGuidelineOpen(false)}
       />
 
     </div>
   );
 }
 
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null, errorInfo: null };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error("CPL App Error caught:", error, errorInfo);
+    this.setState({ errorInfo });
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ padding: '30px', fontFamily: 'sans-serif', background: '#F5F2EA', color: '#1E1E1E', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyCenter: 'center' }}>
+          <div style={{ maxWidth: '600px', width: '100%', padding: '24px', background: '#FFFFFF', border: '2px solid #1E1E1E', boxShadow: '4px 4px 0px 0px #1E1E1E' }}>
+            <h2 style={{ fontSize: '20px', fontWeight: 'bold', color: '#647554', textTransform: 'uppercase', marginBottom: '8px' }}>
+              Clean Plate Lab • System Diagnostic
+            </h2>
+            <p style={{ fontSize: '14px', color: '#1E1E1E', fontWeight: 'bold', marginBottom: '12px' }}>
+              {this.state.error?.toString()}
+            </p>
+            <pre style={{ padding: '12px', background: '#EBF0E6', border: '1px solid #8A9C7A', fontSize: '11px', overflowX: 'auto', whiteSpace: 'pre-wrap', marginBottom: '16px', color: '#647554' }}>
+              {this.state.errorInfo?.componentStack || this.state.error?.stack}
+            </pre>
+            <button 
+              onClick={() => window.location.reload()} 
+              style={{ padding: '10px 20px', background: '#8A9C7A', color: '#FFFFFF', border: '2px solid #1E1E1E', fontWeight: 'bold', cursor: 'pointer', textTransform: 'uppercase' }}
+            >
+              Muat Ulang Halaman
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
 export default function App() {
   return (
-    <CplProvider>
-      <MainApp />
-    </CplProvider>
+    <ErrorBoundary>
+      <CplProvider>
+        <MainApp />
+      </CplProvider>
+    </ErrorBoundary>
   );
 }

@@ -17,9 +17,9 @@ export function BrandPillars() {
       subhead: t('pillar2Title'),
       description: t('pillar2Desc'),
       highlights: [
-        "Zero artificial preservatives or MSG",
-        "Cold-pressed olive oil & natural herbs",
-        "Fresh daily batch cooking"
+        t('pillar2H1'),
+        t('pillar2H2'),
+        t('pillar2H3')
       ]
     },
     {
@@ -30,9 +30,9 @@ export function BrandPillars() {
       subhead: t('pillar1Title'),
       description: t('pillar1Desc'),
       highlights: [
-        "Exact Protein, Carbs, Fat & Kcal on label",
-        "Unique batch tracking ID per meal",
-        "MyFitnessPal & MacroFactor ready"
+        t('pillar1H1'),
+        t('pillar1H2'),
+        t('pillar1H3')
       ]
     },
     {
@@ -43,9 +43,9 @@ export function BrandPillars() {
       subhead: t('pillar3Title'),
       description: t('pillar3Desc'),
       highlights: [
-        "35g - 60g protein target per serving",
-        "Balanced glycemic load for focus",
-        "Formulated by clinical dietitians"
+        t('pillar3H1'),
+        t('pillar3H2'),
+        t('pillar3H3')
       ]
     }
   ];

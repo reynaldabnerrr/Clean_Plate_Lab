@@ -90,3 +90,57 @@ body {
   height: 36px;
   width: 100%;
 }
+
+/* Continuous 3D Idle Floating & Sheen Sweep for Mobile & Desktop */
+@keyframes cpl-float-3d {
+  0% {
+    transform: rotateX(0deg) rotateY(0deg) translateY(0px);
+  }
+  25% {
+    transform: rotateX(6deg) rotateY(-8deg) translateY(-8px);
+  }
+  50% {
+    transform: rotateX(-5deg) rotateY(7deg) translateY(-14px);
+  }
+  75% {
+    transform: rotateX(5deg) rotateY(8deg) translateY(-6px);
+  }
+  100% {
+    transform: rotateX(0deg) rotateY(0deg) translateY(0px);
+  }
+}
+
+@keyframes cpl-gloss-sweep {
+  0% {
+    transform: translateX(-150%) rotate(25deg);
+  }
+  40% {
+    transform: translateX(250%) rotate(25deg);
+  }
+  100% {
+    transform: translateX(250%) rotate(25deg);
+  }
+}
+
+.cpl-3d-idle-float {
+  animation: cpl-float-3d 6s ease-in-out infinite;
+}
+
+.cpl-gloss-sheen {
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.05) 30%,
+    rgba(255, 255, 255, 0.38) 50%,
+    rgba(255, 255, 255, 0.05) 70%,
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 25;
+  animation: cpl-gloss-sweep 4.5s ease-in-out infinite;
+}
