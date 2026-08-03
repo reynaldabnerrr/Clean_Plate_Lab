@@ -36,13 +36,18 @@ export function CplPrimaryLogo({ className = "", size = "normal", inverted = fal
 }
 
 export function CplBadgeLogo({ size = 90, className = "" }) {
+  const hasCustomSize = className.includes('w-') || className.includes('h-');
+  const style = !hasCustomSize && size ? { width: size, height: size } : {};
+
   return (
-    <div className={`relative flex items-center justify-center select-none ${className}`}>
+    <div 
+      className={`relative flex items-center justify-center select-none rounded-full shrink-0 p-1.5 ${className}`}
+      style={style}
+    >
       <img 
         src={logoImg} 
         alt="Clean Plate Lab Circular Badge" 
-        className="object-contain"
-        style={{ width: size, height: size }}
+        className="w-full h-full object-contain"
       />
     </div>
   );

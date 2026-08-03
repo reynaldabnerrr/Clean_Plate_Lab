@@ -174,7 +174,7 @@ export function Hero({ onOpenOrder, onScrollToLabel }) {
 
               {/* Floating Badge (Positioned safely outside top-right to NEVER cover text) */}
               <div className="absolute -top-7 -right-5 sm:-top-9 sm:-right-7 z-30 pointer-events-none transition-transform duration-300 group-hover:scale-110">
-                <CplBadgeLogo size={75} color="#8A9C7A" className="bg-[var(--cpl-cream)] shadow-xl border-2 border-[#1E1E1E] rounded-full sm:w-[85px] sm:h-[85px]" />
+                <CplBadgeLogo className="bg-[var(--cpl-cream)] shadow-xl border-2 border-[#1E1E1E] rounded-full w-[75px] h-[75px] sm:w-[85px] sm:h-[85px]" />
               </div>
 
               {/* CPL Product Label Paper with Continuous 3D Motion & Gloss Sheen */}
