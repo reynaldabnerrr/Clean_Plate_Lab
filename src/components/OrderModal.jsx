@@ -118,10 +118,10 @@ export function OrderModal({ isOpen, onClose, initialProteinTier = 40, initialMe
     addonTotal: 'Total kustomisasi',
     fulfillment: 'Metode fulfillment',
     customerArranged: 'Kurir Diatur Pelanggan',
-    centralKitchen: 'Alamat Central Kitchen',
+    centralKitchen: 'Alamat Clean Plate Lab',
     deliveryDestination: 'Alamat tujuan',
-    pickupNote: 'Pesanan diambil dari alamat Central Kitchen berikut:',
-    arrangedNote: 'Pelanggan mengatur kurir untuk mengambil pesanan dari alamat Central Kitchen berikut:',
+    pickupNote: 'Pesanan diambil dari alamat Clean Plate Lab berikut:',
+    arrangedNote: 'Pelanggan mengatur kurir untuk mengambil pesanan dari alamat Clean Plate Lab berikut:',
     weeklyRotation: 'Rotasi menu mingguan',
     menuPlan: 'Menu plan',
     none: 'Tanpa add-on',
@@ -143,10 +143,10 @@ export function OrderModal({ isOpen, onClose, initialProteinTier = 40, initialMe
     addonTotal: 'Total customizations',
     fulfillment: 'Fulfillment method',
     customerArranged: 'Customer-arranged delivery',
-    centralKitchen: 'Central Kitchen address',
+    centralKitchen: 'Clean Plate Lab address',
     deliveryDestination: 'Delivery destination',
-    pickupNote: 'Collect the order from the following Central Kitchen address:',
-    arrangedNote: 'The customer arranges a courier to collect the order from the following Central Kitchen address:',
+    pickupNote: 'Collect the order from the following Clean Plate Lab address:',
+    arrangedNote: 'The customer arranges a courier to collect the order from the following Clean Plate Lab address:',
     weeklyRotation: 'Weekly menu rotation',
     menuPlan: 'Menu plan',
     none: 'No add-ons',
@@ -308,8 +308,8 @@ I would like to submit a catering meal plan order:
 *FULFILLMENT*
 • Method: *${fulfillment === 'Customer-arranged' ? orderCopy.customerArranged : fulfillment}*
 • Meal ready times: *${readyTimeMeal1}${mealsPerDay === 2 ? ` and ${readyTimeMeal2}` : ''}*
-• Central Kitchen: *${centralKitchenAddress}*
-${requiresDeliveryAddress ? `• Delivery destination: *${address || '-'}*` : '• Courier collection point: *Central Kitchen*'}
+• Clean Plate Lab: *${centralKitchenAddress}*
+${requiresDeliveryAddress ? `• Delivery destination: *${address || '-'}*` : '• Courier collection point: *Clean Plate Lab*'}
 
 *COST SUMMARY*
 • Base price: *Rp ${selectedPrice.toLocaleString('id-ID')} × ${totalBoxes} boxes = Rp ${(selectedPrice * totalBoxes).toLocaleString('id-ID')}*
@@ -345,8 +345,8 @@ Saya ingin mengajukan pemesanan katering meal plan dengan rincian berikut:
 *FULFILLMENT*
 • Metode: *${fulfillment === 'Customer-arranged' ? orderCopy.customerArranged : fulfillment}*
 • Waktu makanan siap: *${readyTimeMeal1}${mealsPerDay === 2 ? ` dan ${readyTimeMeal2}` : ''}*
-• Central Kitchen: *${centralKitchenAddress}*
-${requiresDeliveryAddress ? `• Alamat tujuan: *${address || '-'}*` : '• Titik pengambilan kurir: *Central Kitchen*'}
+• Clean Plate Lab: *${centralKitchenAddress}*
+${requiresDeliveryAddress ? `• Alamat tujuan: *${address || '-'}*` : '• Titik pengambilan kurir: *Clean Plate Lab*'}
 
 *RINGKASAN BIAYA*
 • Harga dasar: *Rp ${selectedPrice.toLocaleString('id-ID')} × ${totalBoxes} box = Rp ${(selectedPrice * totalBoxes).toLocaleString('id-ID')}*

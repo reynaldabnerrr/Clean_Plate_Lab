@@ -74,7 +74,7 @@ const INITIAL_MENU_ITEMS = [
     sodium: 1360.0,
     potassium: 370,
     kcal: 1059.5,
-    image: "/images/sate_padang_chicken.webp",
+    image: "/images/sate_padang.webp",
     tags_ID: ["Thursday / Kamis", "81.0g Protein", "1059.5 Kkal"],
     tags_EN: ["Thursday", "81.0g Protein", "1059.5 Kcal"],
     desc_ID: "Dada ayam empuk dengan kuah sate Padang kaya rempah khas, disajikan dengan spesifikasi nutrisi lengkap 81.0g protein, 122g karbo, 27.5g lemak, 1360mg sodium, dan 370mg kalium.",
