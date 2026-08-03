@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import {
+  AlertCircle,
   ArrowRight,
   CalendarDays,
   Check,
@@ -76,6 +77,7 @@ export function OrderModal({ isOpen, onClose }) {
   const [endDate, setEndDate] = useState(toDateInputValue(new Date(Date.now() + 4 * DAY_IN_MS)));
   const [address, setAddress] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [errors, setErrors] = useState({});
 
   const selectedTier = TIER_OPTIONS.find((option) => option.tier === proteinTier) || TIER_OPTIONS[0];
   const planString = `${selectedTier.tier}g Protein Plan - Rp ${selectedTier.price.toLocaleString('id-ID')} / porsi`;
@@ -90,12 +92,54 @@ export function OrderModal({ isOpen, onClose }) {
   const handleOpenChange = (open) => {
     if (!open) {
       setSubmitted(false);
+      setErrors({});
       onClose();
     }
   };
 
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!name.trim()) {
+      newErrors.name = t('orderNameReqError') || 'Nama lengkap wajib diisi';
+    }
+
+    const phoneDigits = phone.replace(/\D/g, '');
+    if (!phone.trim()) {
+      newErrors.phone = t('orderPhoneReqError') || 'Nomor WhatsApp wajib diisi';
+    } else if (phoneDigits.length < 10) {
+      newErrors.phone = t('orderPhoneMinError') || 'Nomor WhatsApp minimal 10 digit (contoh: 081234567890)';
+    }
+
+    if (!startDate) {
+      newErrors.startDate = t('orderStartDateError') || 'Tanggal mulai wajib dipilih';
+    }
+
+    if (!endDate) {
+      newErrors.endDate = t('orderEndDateError') || 'Tanggal selesai wajib dipilih';
+    } else if (startDate && endDate < startDate) {
+      newErrors.endDate = t('orderDateRangeError') || 'Tanggal selesai harus sama atau setelah tanggal mulai';
+    } else if (totalDays === 0) {
+      newErrors.endDate = t('orderDateRangeError') || 'Tanggal selesai harus sama atau setelah tanggal mulai';
+    }
+
+    if (!address.trim()) {
+      newErrors.address = t('orderAddressReqError') || 'Alamat pengiriman lengkap wajib diisi';
+    }
+
+    return newErrors;
+  };
+
   const handleSubmit = (event) => {
     event.preventDefault();
+
+    const validationErrors = validateForm();
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
+    setErrors({});
 
     addOrder({
       customerName: name,
@@ -154,17 +198,53 @@ Mohon konfirmasi ketersediaan jadwal, total akhir, dan petunjuk pembayaran. Teri
 
   const handleReset = () => {
     setSubmitted(false);
+    setErrors({});
     onClose();
+  };
+
+  const buildWhatsAppMessage = () => {
+    return `*CLEAN PLATE LAB MAKASSAR*
+_GOOD FOOD. CLEAR DATA. BETTER YOU._
+----------------------------------
+
+Halo Tim Clean Plate Lab,
+Saya ingin mengajukan pemesanan meal plan dengan rincian berikut:
+
+*DATA PEMESAN*
+• Nama: *${name}*
+• Nomor WhatsApp: *${phone}*
+
+*PILIHAN MEAL PLAN*
+• Target protein: *${selectedTier.tier}g per porsi*
+• Harga per porsi: *Rp ${selectedTier.price.toLocaleString('id-ID')}*
+• Periode pengiriman: *${formatOrderDate(startDate)} - ${formatOrderDate(endDate)}*
+• Total pesanan: *${totalDays} box (${totalDays} ${t('orderDaysUnit')})*
+• Hari layanan: *Senin-Sabtu (Minggu tidak dihitung)*
+
+*RINGKASAN BIAYA*
+• Estimasi total: *Rp ${totalCost.toLocaleString('id-ID')}*
+
+*ALAMAT PENGIRIMAN*
+${address}
+
+----------------------------------
+Mohon konfirmasi ketersediaan jadwal, total akhir, dan petunjuk pembayaran. Terima kasih.`;
+  };
+
+  const handleReopenWhatsApp = () => {
+    const message = buildWhatsAppMessage();
+    const whatsappUrl = `https://api.whatsapp.com/send?phone=628996727181&text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent
-        style={{ width: 'min(calc(100vw - 1rem), 56rem)', maxWidth: 'none' }}
+        style={{ width: 'min(calc(100vw - 1rem), 52rem)', maxWidth: 'none' }}
         className="max-h-[calc(100dvh-1.5rem)] overflow-x-hidden overflow-y-auto rounded-[28px] border border-black/10 bg-[#F7F5EF] p-0 text-[#1E1E1E] shadow-2xl sm:rounded-[32px] [&>button]:right-3 [&>button]:top-3 [&>button]:z-30 [&>button]:grid [&>button]:size-11 [&>button]:place-items-center [&>button]:rounded-full [&>button]:border-2 [&>button]:border-white/70 [&>button]:bg-white [&>button]:p-0 [&>button]:text-[#1E1E1E] [&>button]:opacity-100 [&>button]:shadow-[0_8px_24px_rgba(0,0,0,0.28)] [&>button]:transition-[transform,background-color,box-shadow] [&>button:hover]:scale-105 [&>button:hover]:bg-[#EBF0E6] [&>button:active]:scale-95 [&>button:focus-visible]:ring-2 [&>button:focus-visible]:ring-[#B8C8AA] [&>button:focus-visible]:ring-offset-2 [&>button:focus-visible]:ring-offset-[#1E1E1E] sm:[&>button]:right-4 sm:[&>button]:top-4"
       >
         {!submitted ? (
-          <form onSubmit={handleSubmit} className="min-w-0">
+          <form noValidate onSubmit={handleSubmit} className="min-w-0">
             <DialogHeader className="relative overflow-hidden border-0 bg-[#1E1E1E] py-5 pl-5 pr-16 text-left sm:py-6 sm:pl-7 sm:pr-20">
               <div className="absolute inset-y-0 right-0 hidden w-40 border-l border-white/10 sm:block" aria-hidden="true">
                 <div className="grid h-full grid-cols-5 opacity-20">
@@ -190,15 +270,15 @@ Mohon konfirmasi ketersediaan jadwal, total akhir, dan petunjuk pembayaran. Teri
               </DialogDescription>
             </DialogHeader>
 
-            <div className="grid min-w-0 gap-6 p-5 sm:p-7 md:grid-cols-2 md:gap-7">
+            <div className="grid min-w-0 gap-5 p-4 sm:p-7 md:grid-cols-2 md:gap-7">
               <div className="min-w-0 space-y-5">
                 <section aria-labelledby={`${fieldId}-contact-title`}>
                   <div className="mb-3 flex items-center gap-2.5">
-                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#1E1E1E] font-mono text-[10px] font-bold text-white">01</span>
-                    <h3 id={`${fieldId}-contact-title`} className="font-display text-xs font-extrabold uppercase">
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#1E1E1E] font-mono text-[10px] font-bold text-white">01</span>
+                    <h3 id={`${fieldId}-contact-title`} className="min-w-0 font-display text-xs font-extrabold uppercase">
                       {t('orderCustomerDetails')}
                     </h3>
-                    <span className="h-px flex-1 bg-[#1E1E1E]/15" />
+                    <span className="h-px flex-1 min-w-[8px] bg-[#1E1E1E]/15" />
                   </div>
 
                   <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
@@ -207,17 +287,35 @@ Mohon konfirmasi ketersediaan jadwal, total akhir, dan petunjuk pembayaran. Teri
                         {t('orderName')}
                       </label>
                       <div className="relative">
-                        <User size={15} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#647554]" />
+                        <User size={15} className={`pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 transition-colors ${errors.name ? 'text-[#C93B2B]' : 'text-[#647554]'}`} />
                         <Input
                           id={`${fieldId}-name`}
                           type="text"
-                          required
                           autoComplete="name"
                           value={name}
-                          onChange={(event) => setName(event.target.value)}
+                          onChange={(event) => {
+                            const val = event.target.value;
+                            setName(val);
+                            if (errors.name && val.trim()) {
+                              setErrors((prev) => ({ ...prev, name: undefined }));
+                            }
+                          }}
                           placeholder="Alex Pratama"
-                          className="h-11 min-w-0 rounded-lg border-[#1E1E1E]/25 bg-white pl-9 pr-3 font-sans text-xs font-semibold"
+                          className={`h-11 min-w-0 rounded-lg pl-9 pr-3 font-sans text-xs font-semibold transition-all duration-200 ${
+                            errors.name
+                              ? 'border-2 border-[#C93B2B] bg-[#FDF5F5] text-[#1E1E1E] focus-visible:ring-2 focus-visible:ring-[#C93B2B]/20'
+                              : 'border-[#1E1E1E]/25 bg-white'
+                          }`}
                         />
+                        {errors.name && (
+                          <div
+                            role="alert"
+                            className="absolute left-0 top-full z-20 mt-1.5 flex max-w-full items-center gap-1.5 rounded-lg border border-[#F4C4BF] bg-[#FFF5F4] px-3 py-1.5 font-sans text-[11px] font-bold text-[#8A1F17] shadow-[0_4px_16px_rgba(201,59,43,0.18)] animate-in fade-in slide-in-from-top-1"
+                          >
+                            <AlertCircle size={13} className="shrink-0 text-[#C93B2B]" />
+                            <span className="leading-tight">{errors.name}</span>
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -226,18 +324,36 @@ Mohon konfirmasi ketersediaan jadwal, total akhir, dan petunjuk pembayaran. Teri
                         {t('orderPhone')}
                       </label>
                       <div className="relative">
-                        <Phone size={15} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#647554]" />
+                        <Phone size={15} className={`pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 transition-colors ${errors.phone ? 'text-[#C93B2B]' : 'text-[#647554]'}`} />
                         <Input
                           id={`${fieldId}-phone`}
                           type="tel"
-                          required
                           autoComplete="tel"
                           inputMode="tel"
                           value={phone}
-                          onChange={(event) => setPhone(event.target.value)}
-                          placeholder="+62 812 3456 7890"
-                          className="h-11 min-w-0 rounded-lg border-[#1E1E1E]/25 bg-white pl-9 pr-3 font-sans text-xs font-semibold"
+                          onChange={(event) => {
+                            const val = event.target.value;
+                            setPhone(val);
+                            if (errors.phone && val.replace(/\D/g, '').length >= 10) {
+                              setErrors((prev) => ({ ...prev, phone: undefined }));
+                            }
+                          }}
+                          placeholder={t('orderPhonePlaceholder') || '0812 3456 7890'}
+                          className={`h-11 min-w-0 rounded-lg pl-9 pr-3 font-sans text-xs font-semibold transition-all duration-200 ${
+                            errors.phone
+                              ? 'border-2 border-[#C93B2B] bg-[#FDF5F5] text-[#1E1E1E] focus-visible:ring-2 focus-visible:ring-[#C93B2B]/20'
+                              : 'border-[#1E1E1E]/25 bg-white'
+                          }`}
                         />
+                        {errors.phone && (
+                          <div
+                            role="alert"
+                            className="absolute left-0 top-full z-20 mt-1.5 flex max-w-full items-center gap-1.5 rounded-lg border border-[#F4C4BF] bg-[#FFF5F4] px-3 py-1.5 font-sans text-[11px] font-bold text-[#8A1F17] shadow-[0_4px_16px_rgba(201,59,43,0.18)] animate-in fade-in slide-in-from-top-1"
+                          >
+                            <AlertCircle size={13} className="shrink-0 text-[#C93B2B]" />
+                            <span className="leading-tight">{errors.phone}</span>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -245,11 +361,11 @@ Mohon konfirmasi ketersediaan jadwal, total akhir, dan petunjuk pembayaran. Teri
 
                 <section aria-labelledby={`${fieldId}-protein-title`}>
                   <div className="mb-3 flex items-center gap-2.5">
-                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#1E1E1E] font-mono text-[10px] font-bold text-white">02</span>
-                    <h3 id={`${fieldId}-protein-title`} className="font-display text-xs font-extrabold uppercase">
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#1E1E1E] font-mono text-[10px] font-bold text-white">02</span>
+                    <h3 id={`${fieldId}-protein-title`} className="min-w-0 font-display text-xs font-extrabold uppercase">
                       {t('orderProteinTier')}
                     </h3>
-                    <span className="h-px flex-1 bg-[#1E1E1E]/15" />
+                    <span className="h-px flex-1 min-w-[8px] bg-[#1E1E1E]/15" />
                   </div>
 
                   <div className="grid grid-cols-2 gap-2.5" role="radiogroup" aria-label={t('orderProteinTier')}>
@@ -303,42 +419,80 @@ Mohon konfirmasi ketersediaan jadwal, total akhir, dan petunjuk pembayaran. Teri
 
               <section aria-labelledby={`${fieldId}-delivery-title`} className="min-w-0">
                 <div className="mb-3 flex items-center gap-2.5">
-                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#1E1E1E] font-mono text-[10px] font-bold text-white">03</span>
-                  <h3 id={`${fieldId}-delivery-title`} className="font-display text-xs font-extrabold uppercase">
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#1E1E1E] font-mono text-[10px] font-bold text-white">03</span>
+                  <h3 id={`${fieldId}-delivery-title`} className="min-w-0 font-display text-xs font-extrabold uppercase">
                     {t('orderDeliverySchedule')}
                   </h3>
-                  <span className="h-px flex-1 bg-[#1E1E1E]/15" />
+                  <span className="h-px flex-1 min-w-[8px] bg-[#1E1E1E]/15" />
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 min-[420px]:grid-cols-2 gap-3">
                   <div className="min-w-0 space-y-1.5">
-                    <label htmlFor={`${fieldId}-start`} className="block truncate font-display text-[10px] font-bold uppercase text-[#4D4D4D]">
+                    <label htmlFor={`${fieldId}-start`} className="block font-display text-[10px] font-bold uppercase text-[#4D4D4D]">
                       {t('orderStartDate')}
                     </label>
-                    <Input
-                      id={`${fieldId}-start`}
-                      type="date"
-                      required
-                      value={startDate}
-                      min={today}
-                      onChange={(event) => handleStartDateChange(event.target.value)}
-                      className="h-11 min-w-0 rounded-lg border-[#1E1E1E]/25 bg-white px-2 font-mono text-[10px]"
-                    />
+                    <div className="relative">
+                      <Input
+                        id={`${fieldId}-start`}
+                        type="date"
+                        value={startDate}
+                        min={today}
+                        onChange={(event) => {
+                          handleStartDateChange(event.target.value);
+                          if (errors.startDate || errors.endDate) {
+                            setErrors((prev) => ({ ...prev, startDate: undefined, endDate: undefined }));
+                          }
+                        }}
+                        className={`h-11 w-full min-w-0 rounded-lg px-3 font-sans text-xs font-semibold text-[#1E1E1E] transition-all duration-200 ${
+                          errors.startDate
+                            ? 'border-2 border-[#C93B2B] bg-[#FDF5F5] focus-visible:ring-2 focus-visible:ring-[#C93B2B]/20'
+                            : 'border-[#1E1E1E]/25 bg-white'
+                        }`}
+                      />
+                      {errors.startDate && (
+                        <div
+                          role="alert"
+                          className="absolute left-0 top-full z-20 mt-1.5 flex max-w-full items-center gap-1.5 rounded-lg border border-[#F4C4BF] bg-[#FFF5F4] px-3 py-1.5 font-sans text-[11px] font-bold text-[#8A1F17] shadow-[0_4px_16px_rgba(201,59,43,0.18)] animate-in fade-in slide-in-from-top-1"
+                        >
+                          <AlertCircle size={13} className="shrink-0 text-[#C93B2B]" />
+                          <span className="leading-tight">{errors.startDate}</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   <div className="min-w-0 space-y-1.5">
-                    <label htmlFor={`${fieldId}-end`} className="block truncate font-display text-[10px] font-bold uppercase text-[#4D4D4D]">
+                    <label htmlFor={`${fieldId}-end`} className="block font-display text-[10px] font-bold uppercase text-[#4D4D4D]">
                       {t('orderEndDate')}
                     </label>
-                    <Input
-                      id={`${fieldId}-end`}
-                      type="date"
-                      required
-                      value={endDate}
-                      min={startDate || today}
-                      onChange={(event) => setEndDate(event.target.value)}
-                      className="h-11 min-w-0 rounded-lg border-[#1E1E1E]/25 bg-white px-2 font-mono text-[10px]"
-                    />
+                    <div className="relative">
+                      <Input
+                        id={`${fieldId}-end`}
+                        type="date"
+                        value={endDate}
+                        min={startDate || today}
+                        onChange={(event) => {
+                          setEndDate(event.target.value);
+                          if (errors.endDate) {
+                            setErrors((prev) => ({ ...prev, endDate: undefined }));
+                          }
+                        }}
+                        className={`h-11 w-full min-w-0 rounded-lg px-3 font-sans text-xs font-semibold text-[#1E1E1E] transition-all duration-200 ${
+                          errors.endDate
+                            ? 'border-2 border-[#C93B2B] bg-[#FDF5F5] focus-visible:ring-2 focus-visible:ring-[#C93B2B]/20'
+                            : 'border-[#1E1E1E]/25 bg-white'
+                        }`}
+                      />
+                      {errors.endDate && (
+                        <div
+                          role="alert"
+                          className="absolute left-0 top-full z-20 mt-1.5 flex max-w-full items-center gap-1.5 rounded-lg border border-[#F4C4BF] bg-[#FFF5F4] px-3 py-1.5 font-sans text-[11px] font-bold text-[#8A1F17] shadow-[0_4px_16px_rgba(201,59,43,0.18)] animate-in fade-in slide-in-from-top-1"
+                        >
+                          <AlertCircle size={13} className="shrink-0 text-[#C93B2B]" />
+                          <span className="leading-tight">{errors.endDate}</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
 
@@ -347,21 +501,39 @@ Mohon konfirmasi ketersediaan jadwal, total akhir, dan petunjuk pembayaran. Teri
                     {t('orderAddress')}
                   </label>
                   <div className="relative">
-                    <MapPin size={15} className="pointer-events-none absolute left-3 top-3 text-[#647554]" />
+                    <MapPin size={15} className={`pointer-events-none absolute left-3 top-3 transition-colors ${errors.address ? 'text-[#C93B2B]' : 'text-[#647554]'}`} />
                     <textarea
                       id={`${fieldId}-address`}
-                      required
                       rows={2}
                       autoComplete="street-address"
                       value={address}
-                      onChange={(event) => setAddress(event.target.value)}
+                      onChange={(event) => {
+                        const val = event.target.value;
+                        setAddress(val);
+                        if (errors.address && val.trim()) {
+                          setErrors((prev) => ({ ...prev, address: undefined }));
+                        }
+                      }}
                       placeholder={t('orderAddressPlaceholder')}
-                      className="block h-20 w-full resize-none rounded-lg border border-[#1E1E1E]/25 bg-white py-3 pl-9 pr-3 font-sans text-xs font-semibold text-[#1E1E1E] outline-none placeholder:font-normal placeholder:text-gray-400 focus:ring-2 focus:ring-[#8A9C7A]"
+                      className={`block h-20 w-full resize-none rounded-lg py-3 pl-9 pr-3 font-sans text-xs font-semibold outline-none transition-all duration-200 placeholder:font-normal placeholder:text-gray-400 ${
+                        errors.address
+                          ? 'border-2 border-[#C93B2B] bg-[#FDF5F5] text-[#1E1E1E] focus:ring-2 focus:ring-[#C93B2B]/20'
+                          : 'border border-[#1E1E1E]/25 bg-white text-[#1E1E1E] focus:ring-2 focus:ring-[#8A9C7A]'
+                      }`}
                     />
+                    {errors.address && (
+                      <div
+                        role="alert"
+                        className="absolute left-0 top-full z-20 mt-1.5 flex max-w-full items-center gap-1.5 rounded-lg border border-[#F4C4BF] bg-[#FFF5F4] px-3 py-1.5 font-sans text-[11px] font-bold text-[#8A1F17] shadow-[0_4px_16px_rgba(201,59,43,0.18)] animate-in fade-in slide-in-from-top-1"
+                      >
+                        <AlertCircle size={13} className="shrink-0 text-[#C93B2B]" />
+                        <span className="leading-tight">{errors.address}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
 
-                <div className="mt-4 grid grid-cols-[1fr_auto] items-center gap-3 rounded-lg border-2 border-[#8A9C7A] bg-[#E7EEE1] p-4" aria-live="polite">
+                <div className="mt-4 grid grid-cols-1 min-[360px]:grid-cols-[1fr_auto] items-center gap-3 rounded-lg border-2 border-[#8A9C7A] bg-[#E7EEE1] p-3.5 sm:p-4" aria-live="polite">
                   <div className="min-w-0">
                     <p className="flex items-center gap-1.5 text-[10px] font-bold uppercase text-[#526049]">
                       <PackageCheck size={14} /> {t('orderSummary')}
@@ -396,32 +568,87 @@ Mohon konfirmasi ketersediaan jadwal, total akhir, dan petunjuk pembayaran. Teri
             </div>
           </form>
         ) : (
-          <div className="grid min-h-[340px] bg-[#F7F5EF] sm:grid-cols-[0.75fr_1.25fr]">
-            <div className="flex items-center justify-center bg-[#1E1E1E] p-5 text-white sm:p-8">
-              <div className="text-center">
-                <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-[#B8C8AA]/50 bg-[#8A9C7A]">
-                  <CheckCircle size={30} />
+          <div className="min-w-0 bg-[#F7F5EF] p-5 text-[#1E1E1E] sm:p-8">
+            <div className="relative mx-auto max-w-xl text-center">
+              <div className="relative mx-auto flex h-16 w-16 items-center justify-center rounded-full border-2 border-[#8A9C7A]/40 bg-[#E7EEE1] text-[#647554] shadow-md animate-in zoom-in-50 duration-300 sm:h-20 sm:w-20">
+                <CheckCircle size={38} strokeWidth={2.5} className="text-[#647554] sm:size-11" />
+                <span className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-[#1E1E1E] text-[#B8C8AA] shadow-sm">
+                  <MessageCircle size={13} />
                 </span>
-                <p className="mt-3 font-mono text-[8px] font-bold uppercase text-[#B8C8AA]">CPL order recorded</p>
               </div>
-            </div>
 
-            <div className="flex items-center p-5 sm:p-8">
-              <div className="w-full min-w-0">
-                <p className="font-display text-[8px] font-bold uppercase text-[#647554]">WhatsApp handoff</p>
-                <h3 className="mt-1 font-display text-lg font-black uppercase sm:text-2xl">{t('orderSuccessMsg')}</h3>
-                <p className="mt-2 text-[9px] leading-relaxed text-[#555] sm:text-xs">
-                  {t('orderSuccessDetail').replace('{name}', name).replace('{plan}', planString)}
+              <div className="mt-3 flex items-center justify-center gap-2">
+                <span className="h-2 w-2 rounded-full bg-[#647554] animate-pulse" />
+                <p className="font-display text-[10px] font-extrabold uppercase tracking-wider text-[#647554]">
+                  {t('orderSuccessBadge')}
                 </p>
+              </div>
 
-                <div className="mt-4 rounded-lg border border-[#1E1E1E]/20 bg-white p-3">
-                  <div className="flex items-center justify-between gap-3 text-[9px]">
-                    <span className="flex items-center gap-1"><CalendarDays size={12} /> {totalDays} {t('orderDaysUnit')}</span>
-                    <span className="font-display text-base font-black">Rp {totalCost.toLocaleString('id-ID')}</span>
+              <h3 className="mt-1 font-display text-xl font-black uppercase tracking-tight text-[#1E1E1E] sm:text-2xl">
+                {t('orderSuccessMsg')}
+              </h3>
+
+              <p className="mx-auto mt-2 max-w-md font-sans text-xs leading-relaxed text-[#526049]">
+                {t('orderSuccessDetail').replace('{name}', name).replace('{plan}', planString)}
+              </p>
+
+              <div className="mt-5 rounded-2xl border border-[#8A9C7A]/40 bg-[#E7EEE1] p-4 text-left shadow-xs sm:p-5">
+                <div className="flex items-center justify-between border-b border-[#8A9C7A]/25 pb-3">
+                  <span className="font-display text-[10px] font-extrabold uppercase tracking-wider text-[#33402B]">
+                    {t('orderTicketTitle')}
+                  </span>
+                  <span className="rounded-full border border-[#8A9C7A]/50 bg-[#647554] px-3 py-0.5 font-mono text-[10px] font-bold text-white">
+                    {selectedTier.tier}g Protein
+                  </span>
+                </div>
+
+                <div className="mt-3.5 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <div>
+                    <p className="font-display text-[9px] font-bold uppercase tracking-wider text-[#647554]">{t('orderName')}</p>
+                    <p className="mt-0.5 font-sans text-xs font-bold text-[#1E1E1E]">{name}</p>
+                  </div>
+
+                  <div>
+                    <p className="font-display text-[9px] font-bold uppercase tracking-wider text-[#647554]">{t('orderPhone')}</p>
+                    <p className="mt-0.5 font-sans text-xs font-bold text-[#1E1E1E]">{phone}</p>
+                  </div>
+
+                  <div>
+                    <p className="font-display text-[9px] font-bold uppercase tracking-wider text-[#647554]">{t('orderDeliveryPeriodLabel')}</p>
+                    <p className="mt-0.5 font-mono text-[10px] font-bold text-[#33402B]">
+                      {formatOrderDate(startDate)} – {formatOrderDate(endDate)}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="font-display text-[9px] font-bold uppercase tracking-wider text-[#647554]">{t('orderSummary')}</p>
+                    <p className="mt-0.5 font-mono text-[10px] font-bold text-[#1E1E1E]">
+                      {totalDays} {t('orderDaysUnit')} ({totalDays} Box)
+                    </p>
                   </div>
                 </div>
 
-                <Button variant="dark" onClick={handleReset} className="mt-4 rounded-lg px-5">
+                <div className="mt-4 flex items-center justify-between rounded-xl border border-[#1E1E1E]/15 bg-white px-4 py-3 shadow-xs">
+                  <span className="font-display text-xs font-bold uppercase tracking-wider text-[#526049]">{t('orderEstimatedTotal')}</span>
+                  <span className="font-display text-xl font-black text-[#1E1E1E] sm:text-2xl">Rp {totalCost.toLocaleString('id-ID')}</span>
+                </div>
+              </div>
+
+              <div className="mt-5 flex flex-col items-center justify-center gap-3 sm:flex-row">
+                <Button
+                  variant="dark"
+                  onClick={handleReopenWhatsApp}
+                  className="h-11 w-full rounded-xl bg-[#1E1E1E] px-6 text-xs font-bold text-white shadow-md transition-all hover:bg-[#647554] sm:w-auto"
+                >
+                  <MessageCircle size={17} />
+                  <span>{t('orderOpenWaCta')}</span>
+                </Button>
+
+                <Button
+                  variant="outline"
+                  onClick={handleReset}
+                  className="h-11 w-full rounded-xl border-[#1E1E1E]/25 bg-white px-6 text-xs font-bold text-[#1E1E1E] hover:bg-[#E7EEE1] sm:w-auto"
+                >
                   {t('orderBackBtn')}
                 </Button>
               </div>
