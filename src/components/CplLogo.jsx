@@ -1,12 +1,12 @@
 import React from 'react';
-import logoImg from '../assets/CPL_logo.jpg';
+import logoImg from '../assets/CPL_logo.png';
 
 export function CplLogoImage({ size = 42, className = "" }) {
   return (
     <img 
       src={logoImg} 
       alt="Clean Plate Lab Logo" 
-      className={`object-contain rounded-full border-2 border-[#8A9C7A] select-none shrink-0 shadow-sm ${className}`}
+      className={`object-contain select-none shrink-0 ${className}`}
       style={{ width: size, height: size }}
     />
   );
@@ -41,7 +41,7 @@ export function CplBadgeLogo({ size = 90, className = "" }) {
       <img 
         src={logoImg} 
         alt="Clean Plate Lab Circular Badge" 
-        className="object-contain rounded-full border-2 border-[#8A9C7A] shadow-md"
+        className="object-contain"
         style={{ width: size, height: size }}
       />
     </div>
