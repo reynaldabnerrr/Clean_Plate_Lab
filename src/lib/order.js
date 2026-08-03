@@ -4,6 +4,26 @@ import { getMealById } from '../data/meals.js';
 export const WHATSAPP_NUMBER = '6285111215704';
 export const WHATSAPP_DISPLAY = '+62 851-1121-5704';
 export const CONTACT_EMAIL = 'cleanplatelab.id@gmail.com';
+export const ORDER_TIME_ZONE = 'Asia/Makassar';
+
+export function getDateInputValueInTimeZone(date = new Date(), timeZone = ORDER_TIME_ZONE) {
+  const dateParts = new Intl.DateTimeFormat('en-US', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(date);
+  const values = Object.fromEntries(dateParts.map(({ type, value }) => [type, value]));
+
+  return `${values.year}-${values.month}-${values.day}`;
+}
+
+export function addDaysToDateInputValue(value, days) {
+  const [year, month, day] = value.split('-').map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day + days));
+
+  return date.toISOString().split('T')[0];
+}
 
 export function formatCurrency(value) {
   return new Intl.NumberFormat('id-ID', {

@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { CplContext } from './cpl-context';
+import { getDateInputValueInTimeZone } from '../lib/order';
 
 const INITIAL_MENU_ITEMS = [
   {
@@ -392,10 +393,10 @@ export function CplProvider({ children }) {
       orderProteinTier: "Pilih porsi protein",
       orderDeliveryHighlight: "1–2 box segar, setiap hari",
       orderDeliveryDetail: "Pilih 1 atau 2 porsi per hari. Pesanan disiapkan setiap Senin-Sabtu dan hari Minggu tidak dihitung.",
-      orderDeliverySchedule: "Periode katering & fulfillment",
+      orderDeliverySchedule: "Periode & jadwal katering",
       orderSummary: "Ringkasan pesanan",
       orderSelectedPlan: "Paket terpilih",
-      orderEstimatedTotal: "Total estimasi",
+      orderEstimatedTotal: "Total biaya",
       orderServingUnit: "porsi",
       orderDayUnit: "hari",
       orderSundayExcluded: "Hari Minggu tidak dihitung",
@@ -408,6 +409,10 @@ export function CplProvider({ children }) {
       orderPhoneReqError: "Nomor WhatsApp wajib diisi",
       orderPhoneMinError: "Nomor WhatsApp minimal 10 digit (contoh: 081234567890)",
       orderAddressReqError: "Alamat pengiriman lengkap wajib diisi",
+      orderMapsInvalidError: "Masukkan tautan Google Maps yang valid",
+      orderStartDateError: "Tanggal mulai wajib dipilih",
+      orderEndDateError: "Tanggal selesai wajib dipilih",
+      orderPastDateError: "Tanggal mulai tidak boleh sebelum hari ini (WITA)",
       orderDateRangeError: "Tanggal selesai harus sama atau setelah tanggal mulai",
       orderFormErrorNotice: "Mohon lengkapi data pemesanan yang bertanda merah",
       orderPlan: "Pilih Porsi Protein",
@@ -415,7 +420,7 @@ export function CplProvider({ children }) {
       orderDailyDeliveryNote: "💡 Pilih 1 atau 2 box per hari sesuai kebutuhan katering Anda",
       orderDeliveryPeriodLabel: "Periode Katering",
       orderDateRangeLabel: "Rentang Tanggal:",
-      orderEstimatedTotalCostLabel: "Total Estimasi Biaya",
+      orderEstimatedTotalCostLabel: "Total Biaya",
       orderPortionUnit: "/ porsi",
       orderPlanOpt1: "25g Protein Plan - mulai Rp 25.000 / porsi",
       orderPlanOpt2: "40g Protein Plan - mulai Rp 35.000 / porsi",
@@ -657,10 +662,10 @@ export function CplProvider({ children }) {
       orderProteinTier: "Choose protein portion",
       orderDeliveryHighlight: "1–2 fresh boxes, every day",
       orderDeliveryDetail: "Choose one or two servings per day. Meals are prepared Monday-Saturday; Sundays are excluded.",
-      orderDeliverySchedule: "Catering period & fulfillment",
+      orderDeliverySchedule: "Catering period & schedule",
       orderSummary: "Order summary",
       orderSelectedPlan: "Selected plan",
-      orderEstimatedTotal: "Estimated total",
+      orderEstimatedTotal: "Total cost",
       orderServingUnit: "serving",
       orderDayUnit: "day",
       orderSundayExcluded: "Sundays are excluded",
@@ -673,6 +678,10 @@ export function CplProvider({ children }) {
       orderPhoneReqError: "WhatsApp phone number is required",
       orderPhoneMinError: "WhatsApp number must be at least 10 digits (e.g. 081234567890)",
       orderAddressReqError: "Full delivery address is required",
+      orderMapsInvalidError: "Enter a valid Google Maps link",
+      orderStartDateError: "Catering start date is required",
+      orderEndDateError: "Catering end date is required",
+      orderPastDateError: "Start date cannot be before today in WITA",
       orderDateRangeError: "End date must be on or after start date",
       orderFormErrorNotice: "Please complete all highlighted fields correctly",
       orderPlan: "Select Protein Tier",
@@ -680,7 +689,7 @@ export function CplProvider({ children }) {
       orderDailyDeliveryNote: "💡 Choose one or two boxes per day for your catering plan",
       orderDeliveryPeriodLabel: "Catering Period",
       orderDateRangeLabel: "Date Range:",
-      orderEstimatedTotalCostLabel: "Total Estimated Cost",
+      orderEstimatedTotalCostLabel: "Total Cost",
       orderPortionUnit: "/ portion",
       orderPlanOpt1: "25g Protein Plan - from Rp 25,000 / portion",
       orderPlanOpt2: "40g Protein Plan - from Rp 35,000 / portion",
@@ -751,7 +760,7 @@ export function CplProvider({ children }) {
       ...orderData,
       id: `ord-${Date.now()}`,
       refCode: `CPL-SUB-2026-${Math.floor(10 + Math.random() * 90)}`,
-      date: new Date().toISOString().split('T')[0],
+      date: getDateInputValueInTimeZone(),
       status: "Pending"
     };
     setOrders(prev => [newOrder, ...prev]);

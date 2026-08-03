@@ -7,7 +7,11 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { addons, proteinTiers } from '../data/site';
 import { analytics } from '../lib/analytics';
-import { WHATSAPP_NUMBER } from '../lib/order';
+import {
+  addDaysToDateInputValue,
+  getDateInputValueInTimeZone,
+  WHATSAPP_NUMBER,
+} from '../lib/order';
 import {
   AlertCircle,
   ArrowRight,
@@ -27,12 +31,29 @@ import {
 } from 'lucide-react';
 
 const TIER_OPTIONS = proteinTiers.map(({ protein, prices }) => ({ tier: protein, prices }));
+const GOOGLE_MAPS_HOST_PATTERN = /(^|\.)google\.[a-z.]+$/i;
+const GOOGLE_MAPS_SHORT_LINK_HOSTS = new Set(['maps.app.goo.gl', 'goo.gl']);
 
-const DAY_IN_MS = 24 * 60 * 60 * 1000;
+function isValidGoogleMapsUrl(value) {
+  if (!value.trim()) return true;
 
-function toDateInputValue(date) {
-  const timezoneOffset = date.getTimezoneOffset() * 60 * 1000;
-  return new Date(date.getTime() - timezoneOffset).toISOString().split('T')[0];
+  try {
+    const url = new URL(value.trim());
+    const hostname = url.hostname.toLowerCase();
+    const isGoogleMapsHost = GOOGLE_MAPS_HOST_PATTERN.test(hostname)
+      && (hostname.startsWith('maps.') || url.pathname.startsWith('/maps'));
+    const isGoogleMapsShortLink = GOOGLE_MAPS_SHORT_LINK_HOSTS.has(hostname)
+      && (hostname !== 'goo.gl' || url.pathname.startsWith('/maps'));
+
+    return (url.protocol === 'https:' || url.protocol === 'http:')
+      && (isGoogleMapsHost || isGoogleMapsShortLink);
+  } catch {
+    return false;
+  }
+}
+
+function formatReadyTime(value) {
+  return value.replace(':', '.');
 }
 
 function calculateDeliveryDays(start, end) {
@@ -73,18 +94,19 @@ function getCateringPeriod(totalDays) {
 export function OrderModal({ isOpen, onClose, initialProteinTier = 40, initialMealsPerDay = 1 }) {
   const { addOrder, t, language } = useCpl();
   const fieldId = useId();
-  const today = toDateInputValue(new Date());
+  const [today, setToday] = useState(() => getDateInputValueInTimeZone());
 
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [proteinTier, setProteinTier] = useState(initialProteinTier);
   const [startDate, setStartDate] = useState(today);
-  const [endDate, setEndDate] = useState(toDateInputValue(new Date(Date.now() + 4 * DAY_IN_MS)));
+  const [endDate, setEndDate] = useState(() => addDaysToDateInputValue(today, 4));
   const [mealsPerDay, setMealsPerDay] = useState(initialMealsPerDay);
-  const readyTimeMeal1 = '12:00';
+  const [singleMealReadyTime, setSingleMealReadyTime] = useState('12:00');
+  const readyTimeMeal1 = mealsPerDay === 1 ? singleMealReadyTime : '12:00';
   const readyTimeMeal2 = '18:00';
   const [addonIds, setAddonIds] = useState([]);
-  const [fulfillment, setFulfillment] = useState('Pickup');
+  const [fulfillment, setFulfillment] = useState('Self-arranged');
   const [address, setAddress] = useState('');
   const [mapsUrl, setMapsUrl] = useState('');
   const [submitted, setSubmitted] = useState(false);
@@ -111,21 +133,23 @@ export function OrderModal({ isOpen, onClose, initialProteinTier = 40, initialMe
     oneServing: '1 porsi / hari',
     twoServings: '2 porsi / hari',
     sameMenu: 'Kedua porsi menggunakan menu harian yang sama.',
-    schedule: 'Waktu makanan siap',
-    scheduleNote: 'Meal 1 siap pukul 12.00. Jika memilih dua porsi, Meal 2 siap pukul 18.00.',
-    mealOne: 'Meal 1',
-    mealTwo: 'Meal 2',
+    singleSchedule: 'Jadwal makan pilihan',
+    dualSchedule: 'Jadwal makan siang & malam',
+    singleScheduleNote: 'Pilih jadwal makan siang atau makan malam.',
+    scheduleNote: 'Makan siang siap pukul 12.00 dan makan malam siap pukul 18.00.',
+    lunch: 'Makan siang',
+    dinner: 'Makan malam',
     ready: 'siap',
     addons: 'Kustomisasi menu',
     addonsHelp: 'Paket standar menggunakan nasi putih. Opsi Baby Potato + Jagung menggantikan nasi putih, bukan menambah karbo baru. Semua biaya dihitung per box.',
     addonTotal: 'Total kustomisasi',
-    fulfillment: 'Metode fulfillment',
-    customerArranged: 'Kurir Diatur Pelanggan',
+    fulfillment: 'Metode pengambilan / pengiriman',
+    onlineDelivery: 'Online Delivery',
+    selfArranged: 'Ambil Sendiri / Atur Kurir',
     centralKitchen: 'Alamat Clean Plate Lab',
     deliveryDestination: 'Alamat tujuan',
-    pickupNote: 'Pesanan diambil dari alamat Clean Plate Lab berikut:',
-    arrangedNote: 'Pelanggan mengatur kurir untuk mengambil pesanan dari alamat Clean Plate Lab berikut:',
-    weeklyRotation: 'Rotasi menu mingguan',
+    selfArrangedNote: 'Pesanan dapat diambil sendiri atau melalui kurir yang Anda atur dari alamat Clean Plate Lab berikut:',
+    weeklyRotation: 'Paket katering',
     menuPlan: 'Menu plan',
     none: 'Tanpa add-on',
     basePrice: 'Harga dasar',
@@ -136,21 +160,23 @@ export function OrderModal({ isOpen, onClose, initialProteinTier = 40, initialMe
     oneServing: '1 serving / day',
     twoServings: '2 servings / day',
     sameMenu: 'Both servings use the same daily menu.',
-    schedule: 'Meal ready times',
-    scheduleNote: 'Meal 1 is ready at 12:00. For two servings, Meal 2 is ready at 18:00.',
-    mealOne: 'Meal 1',
-    mealTwo: 'Meal 2',
+    singleSchedule: 'Selected meal schedule',
+    dualSchedule: 'Lunch & dinner schedule',
+    singleScheduleNote: 'Choose a lunch or dinner schedule.',
+    scheduleNote: 'Lunch is ready at 12:00 and dinner is ready at 18:00.',
+    lunch: 'Lunch',
+    dinner: 'Dinner',
     ready: 'ready',
     addons: 'Meal customizations',
     addonsHelp: 'The standard meal includes white rice. Baby Potato + Corn replaces the white rice—it is not an additional carb. All charges are calculated per box.',
     addonTotal: 'Total customizations',
-    fulfillment: 'Fulfillment method',
-    customerArranged: 'Customer-arranged delivery',
+    fulfillment: 'Pickup or delivery method',
+    onlineDelivery: 'Online Delivery',
+    selfArranged: 'Self-pickup / Arrange courier',
     centralKitchen: 'Clean Plate Lab address',
     deliveryDestination: 'Delivery destination',
-    pickupNote: 'Collect the order from the following Clean Plate Lab address:',
-    arrangedNote: 'The customer arranges a courier to collect the order from the following Clean Plate Lab address:',
-    weeklyRotation: 'Weekly menu rotation',
+    selfArrangedNote: 'Collect the order yourself or arrange a courier to collect it from the following Clean Plate Lab address:',
+    weeklyRotation: 'Catering plan',
     menuPlan: 'Menu plan',
     none: 'No add-ons',
     basePrice: 'Base price',
@@ -158,13 +184,15 @@ export function OrderModal({ isOpen, onClose, initialProteinTier = 40, initialMe
     courierNote: 'Courier fees are excluded and confirmed through WhatsApp.',
   };
   const fulfillmentOptions = [
-    { id: 'Pickup', label: 'Pickup' },
-    { id: 'Grab', label: 'Grab' },
-    { id: 'Gojek', label: 'Gojek' },
-    { id: 'Customer-arranged', label: orderCopy.customerArranged },
+    { id: 'Self-arranged', label: orderCopy.selfArranged },
+    { id: 'Online-delivery', label: orderCopy.onlineDelivery },
   ];
-  const requiresDeliveryAddress = fulfillment === 'Grab' || fulfillment === 'Gojek';
+  const requiresDeliveryAddress = fulfillment === 'Online-delivery';
+  const selectedFulfillmentLabel = fulfillmentOptions.find((option) => option.id === fulfillment)?.label || fulfillment;
   const selectedAddonNames = selectedAddons.map((addon) => isIndonesian ? addon.nameID : addon.name);
+  const scheduleLabel = mealsPerDay === 1 ? orderCopy.singleSchedule : orderCopy.dualSchedule;
+  const dayCountLabel = isIndonesian ? `${totalDays} hari` : `${totalDays} ${totalDays === 1 ? 'day' : 'days'}`;
+  const boxCountLabel = isIndonesian ? `${totalBoxes} box` : `${totalBoxes} ${totalBoxes === 1 ? 'box' : 'boxes'}`;
   const planString = `${selectedTier.tier}g Protein · ${periodLabel} · ${mealsPerDay}x ${isIndonesian ? 'per hari' : 'per day'} · Rp ${selectedPrice.toLocaleString('id-ID')} / ${isIndonesian ? 'porsi' : 'serving'}`;
 
   useEffect(() => {
@@ -174,9 +202,26 @@ export function OrderModal({ isOpen, onClose, initialProteinTier = 40, initialMe
     }
   }, [initialMealsPerDay, initialProteinTier, isOpen]);
 
+  useEffect(() => {
+    if (!isOpen) return undefined;
+
+    const syncWitaDate = () => {
+      const currentWitaDate = getDateInputValueInTimeZone();
+      setToday(currentWitaDate);
+      setStartDate((current) => current < currentWitaDate ? currentWitaDate : current);
+      setEndDate((current) => current < currentWitaDate ? currentWitaDate : current);
+    };
+
+    syncWitaDate();
+    const intervalId = window.setInterval(syncWitaDate, 30_000);
+
+    return () => window.clearInterval(intervalId);
+  }, [isOpen]);
+
   const handleStartDateChange = (value) => {
-    setStartDate(value);
-    if (endDate < value) setEndDate(value);
+    const nextStartDate = value < today ? today : value;
+    setStartDate(nextStartDate);
+    if (endDate < nextStartDate) setEndDate(nextStartDate);
   };
 
   const toggleAddon = (addonId) => {
@@ -209,6 +254,8 @@ export function OrderModal({ isOpen, onClose, initialProteinTier = 40, initialMe
 
     if (!startDate) {
       newErrors.startDate = t('orderStartDateError') || 'Tanggal mulai wajib dipilih';
+    } else if (startDate < today) {
+      newErrors.startDate = t('orderPastDateError') || 'Tanggal mulai tidak boleh sebelum hari ini (WITA)';
     }
 
     if (!endDate) {
@@ -221,6 +268,10 @@ export function OrderModal({ isOpen, onClose, initialProteinTier = 40, initialMe
 
     if (requiresDeliveryAddress && !address.trim()) {
       newErrors.address = t('orderAddressReqError') || 'Alamat pengiriman lengkap wajib diisi';
+    }
+
+    if (requiresDeliveryAddress && mapsUrl.trim() && !isValidGoogleMapsUrl(mapsUrl)) {
+      newErrors.mapsUrl = t('orderMapsInvalidError') || 'Masukkan tautan Google Maps yang valid';
     }
 
     return newErrors;
@@ -292,10 +343,8 @@ export function OrderModal({ isOpen, onClose, initialProteinTier = 40, initialMe
 • Total add-on: *Rp ${(addonsPerBox * totalBoxes).toLocaleString('id-ID')}*`
       : '• Add-on: *Tidak ada*';
     const fulfillmentSummary = requiresDeliveryAddress
-      ? fulfillment
-      : fulfillment === 'Customer-arranged'
-        ? 'Kurir diatur pelanggan · pengambilan di Clean Plate Lab'
-        : 'Pickup di Clean Plate Lab';
+      ? 'Online Delivery'
+      : 'Ambil sendiri / kurir diatur pelanggan · pengambilan di Clean Plate Lab';
     const deliveryLocationDetails = requiresDeliveryAddress
       ? `
 • Alamat lengkap: *${address || '-'}*${mapsUrl.trim() ? `
@@ -317,14 +366,15 @@ Halo Tim Clean Plate Lab, saya ingin memesan meal plan dengan rincian berikut:
 • Tanggal katering: *${formatOrderDate(startDate, 'id-ID')} – ${formatOrderDate(endDate, 'id-ID')}*
 • Jumlah: *${mealsPerDay} porsi/hari · ${totalBoxes} box (${totalDays} hari layanan)*
 • Jadwal layanan: *Senin–Sabtu, Minggu tidak dihitung*
+• Jadwal makan: *${mealsPerDay === 1 ? `${singleMealReadyTime === '12:00' ? 'Makan siang' : 'Makan malam'} pukul ${formatReadyTime(readyTimeMeal1)}` : `Makan siang pukul ${formatReadyTime(readyTimeMeal1)} · Makan malam pukul ${formatReadyTime(readyTimeMeal2)}`}*
 • Add-on: ${addonSummary}
-• Fulfillment: ${fulfillmentSummary}${deliveryLocationDetails}
+• Metode pengambilan/pengiriman: ${fulfillmentSummary}${deliveryLocationDetails}
 
-*ESTIMASI BIAYA*
+*RINCIAN BIAYA*
 • Harga paket: *Rp ${selectedPrice.toLocaleString('id-ID')} × ${totalBoxes} box = Rp ${(selectedPrice * totalBoxes).toLocaleString('id-ID')}*
 ${addonCostBreakdown}
 
-*ESTIMASI TOTAL: Rp ${totalCost.toLocaleString('id-ID')}*
+*TOTAL BIAYA: Rp ${totalCost.toLocaleString('id-ID')}*
 
 Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasih.`;
   };
@@ -343,7 +393,7 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
       >
         {!submitted ? (
           <form noValidate onSubmit={handleSubmit} className="min-w-0">
-            <DialogHeader className="relative overflow-hidden border-0 bg-[#1E1E1E] py-5 pl-5 pr-16 text-left sm:py-6 sm:pl-7 sm:pr-20">
+            <DialogHeader className="relative mx-3 mt-3 overflow-hidden rounded-[22px] border-0 bg-[#1E1E1E] py-5 pl-5 pr-16 text-left shadow-[0_14px_32px_rgba(30,30,30,0.18)] sm:mx-4 sm:mt-4 sm:rounded-[26px] sm:py-6 sm:pl-7 sm:pr-20">
               <div className="absolute inset-y-0 right-0 hidden w-40 border-l border-white/10 sm:block" aria-hidden="true">
                 <div className="grid h-full grid-cols-5 opacity-20">
                   {Array.from({ length: 15 }).map((_, index) => (
@@ -488,7 +538,12 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
                         >
                           <span className="flex items-center justify-between gap-1">
                             <strong className="font-display text-xl font-black leading-none">{option.tier}g</strong>
-                            {isSelected && <Check size={14} className="text-[#B8C8AA]" strokeWidth={3} />}
+                            {isSelected ? (
+                              <span className="flex items-center gap-0.5 rounded-full bg-[#B8C8AA] px-1.5 py-0.5 font-display text-[7px] font-extrabold uppercase text-[#1E1E1E]">
+                                <Check size={9} strokeWidth={3} />
+                                {isIndonesian ? 'Dipilih' : 'Selected'}
+                              </span>
+                            ) : null}
                           </span>
                           <span className={`mt-2 block font-mono text-[10px] font-bold ${isSelected ? 'text-[#B8C8AA]' : 'text-[#647554]'}`}>
                             Rp {option.prices[cateringPeriod].toLocaleString('id-ID')}
@@ -626,8 +681,12 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
                   </div>
                 </div>
 
-                <div className="mt-4">
-                  <p className="font-display text-[10px] font-bold uppercase text-[#4D4D4D]">{orderCopy.servingsPerDay}</p>
+                <div className="mt-5">
+                  <div className="mb-2 flex items-center gap-2.5">
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#1E1E1E] font-mono text-[10px] font-bold text-white">05</span>
+                    <p className="font-display text-[10px] font-extrabold uppercase">{orderCopy.servingsPerDay}</p>
+                    <span className="h-px min-w-[8px] flex-1 bg-[#1E1E1E]/15" />
+                  </div>
                   <div className="mt-2 grid grid-cols-2 gap-2" role="radiogroup" aria-label={orderCopy.servingsPerDay}>
                     <button type="button" role="radio" aria-checked={mealsPerDay === 1} onClick={() => setMealsPerDay(1)} className={`min-h-11 rounded-lg border-2 px-3 font-display text-[10px] font-extrabold uppercase ${mealsPerDay === 1 ? 'border-[#1E1E1E] bg-[#1E1E1E] text-white' : 'border-[#1E1E1E]/20 bg-white'}`}>{orderCopy.oneServing}</button>
                     <button type="button" role="radio" aria-checked={mealsPerDay === 2} onClick={() => setMealsPerDay(2)} className={`min-h-11 rounded-lg border-2 px-3 font-display text-[10px] font-extrabold uppercase ${mealsPerDay === 2 ? 'border-[#1E1E1E] bg-[#1E1E1E] text-white' : 'border-[#1E1E1E]/20 bg-white'}`}>{orderCopy.twoServings}</button>
@@ -636,22 +695,47 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
                 </div>
 
                 <div className="mt-4 rounded-lg border border-[#1E1E1E]/20 bg-white p-3">
-                  <p className="flex items-center gap-1.5 font-display text-[10px] font-bold uppercase text-[#4D4D4D]"><Clock3 size={13} className="text-[#647554]" />{orderCopy.schedule}</p>
-                  <div className={`mt-2 grid gap-2 ${mealsPerDay === 2 ? 'grid-cols-2' : ''}`}>
-                    <div className="flex items-center justify-between rounded-md bg-[var(--cpl-cream)] px-3 py-2"><span className="font-display text-[9px] font-bold uppercase text-[#647554]">{orderCopy.mealOne}</span><strong className="font-mono text-xs">12.00</strong></div>
-                    {mealsPerDay === 2 ? <div className="flex items-center justify-between rounded-md bg-[var(--cpl-cream)] px-3 py-2"><span className="font-display text-[9px] font-bold uppercase text-[#647554]">{orderCopy.mealTwo}</span><strong className="font-mono text-xs">18.00</strong></div> : null}
-                  </div>
-                  <p className="mt-2 text-[9px] leading-4 text-[#647554]">{orderCopy.scheduleNote}</p>
+                  <p className="flex items-center gap-1.5 font-display text-[10px] font-bold uppercase text-[#4D4D4D]"><Clock3 size={13} className="text-[#647554]" />{scheduleLabel}</p>
+                  {mealsPerDay === 1 ? (
+                    <div className="mt-2 grid grid-cols-2 gap-2" role="radiogroup" aria-label={orderCopy.singleScheduleNote}>
+                      {[
+                        { time: '12:00', label: orderCopy.lunch },
+                        { time: '18:00', label: orderCopy.dinner },
+                      ].map(({ time, label }) => {
+                        const isSelected = singleMealReadyTime === time;
+
+                        return (
+                          <button
+                            key={time}
+                            type="button"
+                            role="radio"
+                            aria-checked={isSelected}
+                            onClick={() => setSingleMealReadyTime(time)}
+                            className={`flex min-h-11 items-center justify-between rounded-lg border-2 px-3 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8A9C7A] ${isSelected ? 'border-[#1E1E1E] bg-[#1E1E1E] text-white' : 'border-[#1E1E1E]/15 bg-[var(--cpl-cream)] text-[#1E1E1E]'}`}
+                          >
+                            <span className={`font-display text-[9px] font-bold uppercase ${isSelected ? 'text-[#B8C8AA]' : 'text-[#647554]'}`}>{label}</span>
+                            <strong className="font-mono text-xs">{time.replace(':', '.')}</strong>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="mt-2 grid grid-cols-2 gap-2">
+                      <div className="flex items-center justify-between rounded-md bg-[var(--cpl-cream)] px-3 py-2"><span className="font-display text-[9px] font-bold uppercase text-[#647554]">{orderCopy.lunch}</span><strong className="font-mono text-xs">12.00</strong></div>
+                      <div className="flex items-center justify-between rounded-md bg-[var(--cpl-cream)] px-3 py-2"><span className="font-display text-[9px] font-bold uppercase text-[#647554]">{orderCopy.dinner}</span><strong className="font-mono text-xs">18.00</strong></div>
+                    </div>
+                  )}
+                  <p className="mt-2 text-[9px] leading-4 text-[#647554]">{mealsPerDay === 1 ? orderCopy.singleScheduleNote : orderCopy.scheduleNote}</p>
                 </div>
 
                 <div className="mt-4">
                   <div className="mb-2 flex items-center gap-2.5">
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#1E1E1E] font-mono text-[10px] font-bold text-white">05</span>
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#1E1E1E] font-mono text-[10px] font-bold text-white">06</span>
                     <p className="font-display text-[10px] font-extrabold uppercase">{orderCopy.fulfillment}</p>
                     <span className="h-px min-w-[8px] flex-1 bg-[#1E1E1E]/15" />
                   </div>
                   <div className="grid grid-cols-2 gap-2">
-                    {fulfillmentOptions.map((option) => <button key={option.id} type="button" aria-pressed={fulfillment === option.id} onClick={() => { setFulfillment(option.id); setErrors((current) => ({ ...current, address: undefined })); }} className={`min-h-11 rounded-lg border-2 px-2 font-display text-[9px] font-extrabold uppercase leading-tight ${fulfillment === option.id ? 'border-[#1E1E1E] bg-[#1E1E1E] text-white' : 'border-[#1E1E1E]/20 bg-white'}`}>{option.label}</button>)}
+                    {fulfillmentOptions.map((option) => <button key={option.id} type="button" aria-pressed={fulfillment === option.id} onClick={() => { setFulfillment(option.id); setErrors((current) => ({ ...current, address: undefined, mapsUrl: undefined })); }} className={`min-h-11 rounded-lg border-2 px-2 font-display text-[9px] font-extrabold uppercase leading-tight ${fulfillment === option.id ? 'border-[#1E1E1E] bg-[#1E1E1E] text-white' : 'border-[#1E1E1E]/20 bg-white'}`}>{option.label}</button>)}
                   </div>
                 </div>
 
@@ -705,46 +789,99 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
                         inputMode="url"
                         autoComplete="url"
                         value={mapsUrl}
-                        onChange={(event) => setMapsUrl(event.target.value)}
+                        aria-invalid={Boolean(errors.mapsUrl)}
+                        aria-describedby={`${fieldId}-maps-help`}
+                        onChange={(event) => {
+                          const value = event.target.value;
+                          setMapsUrl(value);
+                          if (errors.mapsUrl && (!value.trim() || isValidGoogleMapsUrl(value))) {
+                            setErrors((current) => ({ ...current, mapsUrl: undefined }));
+                          }
+                        }}
                         placeholder={t('orderMapsPlaceholder')}
-                        className="rounded-lg border-[#1E1E1E]/25 bg-white pl-9 font-sans font-semibold normal-case"
+                        className={`rounded-lg bg-white pl-9 font-sans font-semibold normal-case ${errors.mapsUrl ? 'border-2 border-[#C93B2B] focus-visible:ring-[#C93B2B]/20' : 'border-[#1E1E1E]/25'}`}
                       />
                     </div>
-                    <p className="text-[9px] leading-4 text-[#647554]">{t('orderMapsHelp')}</p>
+                    {errors.mapsUrl ? (
+                      <p id={`${fieldId}-maps-help`} role="alert" className="flex items-center gap-1.5 text-[10px] font-bold leading-4 text-[#8A1F17]"><AlertCircle size={12} className="shrink-0 text-[#C93B2B]" />{errors.mapsUrl}</p>
+                    ) : (
+                      <p id={`${fieldId}-maps-help`} className="text-[9px] leading-4 text-[#647554]">{t('orderMapsHelp')}</p>
+                    )}
                   </div>
                 </div> : <div className="mt-3 rounded-lg border border-[#8A9C7A]/40 bg-[#E7EEE1] px-3 py-2 text-[9px] font-semibold leading-4 text-[#526049]">
-                  <p>{fulfillment === 'Pickup' ? orderCopy.pickupNote : orderCopy.arrangedNote}</p>
+                  <p>{orderCopy.selfArrangedNote}</p>
                   <p className="mt-1.5 flex items-start gap-1.5 font-bold text-[#33402B]"><MapPin size={12} className="mt-0.5 shrink-0" /><span>{centralKitchenAddress}</span></p>
                 </div>}
 
-                <div className="mt-4 grid grid-cols-1 min-[360px]:grid-cols-[1fr_auto] items-center gap-3 rounded-lg border-2 border-[#8A9C7A] bg-[#E7EEE1] p-3.5 sm:p-4" aria-live="polite">
-                  <div className="min-w-0">
-                    <p className="flex items-center gap-1.5 text-[10px] font-bold uppercase text-[#526049]">
-                      <span className="grid h-6 w-6 place-items-center rounded-full bg-[#1E1E1E] font-mono text-[8px] text-white">06</span><PackageCheck size={14} /> {t('orderSummary')}
+                <div className="mt-5 overflow-hidden rounded-2xl border-2 border-[#8A9C7A] bg-[#E7EEE1]" aria-live="polite">
+                  <div className="flex items-center gap-3 border-b border-[#8A9C7A]/35 px-3.5 py-3 sm:px-4">
+                    <p className="flex min-w-0 items-center gap-2 font-display text-[10px] font-extrabold uppercase text-[#33402B]">
+                      <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-[#1E1E1E] font-mono text-[9px] text-white">07</span>
+                      <PackageCheck size={15} className="shrink-0" />
+                      <span>{t('orderSummary')}</span>
                     </p>
-                    <p className="mt-1 font-mono text-[10px] font-bold">
-                      {orderCopy.weeklyRotation} · {selectedTier.tier}g · {periodLabel}
-                    </p>
-                    <p className="mt-1 text-[9px] text-[#647554]">{totalDays} {t('orderDaysUnit')} · {mealsPerDay}x/{isIndonesian ? 'hari' : 'day'} · {totalBoxes} box · {t('orderSundayExcluded')}</p>
-                    <p className="mt-1 text-[9px] text-[#647554]">{orderCopy.fulfillment}: {fulfillment === 'Customer-arranged' ? orderCopy.customerArranged : fulfillment}</p>
-                    <p className="mt-1 flex items-start gap-1 text-[9px] text-[#647554]"><MapPin size={10} className="mt-0.5 shrink-0" /><span><strong>{requiresDeliveryAddress ? orderCopy.deliveryDestination : orderCopy.centralKitchen}:</strong> {requiresDeliveryAddress ? (address || '-') : centralKitchenAddress}</span></p>
-                    {requiresDeliveryAddress && mapsUrl.trim() ? <p className="mt-1 flex items-start gap-1 text-[9px] text-[#647554]"><Link2 size={10} className="mt-0.5 shrink-0" /><span className="min-w-0 break-all"><strong>{t('orderMapsSummary')}:</strong> {mapsUrl.trim()}</span></p> : null}
-                    <p className="mt-1 text-[9px] font-semibold text-[#526049]">{orderCopy.mealOne} {orderCopy.ready} {readyTimeMeal1}{mealsPerDay === 2 ? ` · ${orderCopy.mealTwo} ${orderCopy.ready} ${readyTimeMeal2} · ${orderCopy.sameMenu}` : ''}</p>
-                    <div className="mt-2 border-t border-[#8A9C7A]/30 pt-2 font-mono text-[8px] text-[#647554]">
-                      <div className="flex items-start justify-between gap-3"><span>{orderCopy.basePrice}: Rp {selectedPrice.toLocaleString('id-ID')} × {totalBoxes} box</span><strong className="whitespace-nowrap text-[#33402B]">Rp {(selectedPrice * totalBoxes).toLocaleString('id-ID')}</strong></div>
-                      <p className="mt-1.5 font-sans font-bold uppercase tracking-wide text-[#526049]">{orderCopy.addons}</p>
-                      {selectedAddons.length ? selectedAddons.map((addon) => (
-                        <div key={addon.id} className="mt-1 flex items-start justify-between gap-3">
-                          <span>{isIndonesian ? addon.nameID : addon.name}<br /><span className="opacity-75">Rp {addon.price.toLocaleString('id-ID')} / box × {totalBoxes}</span></span>
-                          <strong className="whitespace-nowrap text-[#33402B]">Rp {(addon.price * totalBoxes).toLocaleString('id-ID')}</strong>
-                        </div>
-                      )) : <p className="mt-1">{orderCopy.none}</p>}
-                      {selectedAddons.length ? <div className="mt-1.5 flex justify-between gap-3 border-t border-[#8A9C7A]/25 pt-1.5 font-bold text-[#33402B]"><span>{orderCopy.addonTotal}</span><span className="whitespace-nowrap">Rp {(addonsPerBox * totalBoxes).toLocaleString('id-ID')}</span></div> : null}
-                    </div>
                   </div>
-                  <div className="text-right">
-                    <p className="text-[9px] font-bold uppercase text-[#526049]">{t('orderEstimatedTotal')}</p>
-                    <p className="whitespace-nowrap font-display text-xl font-black">Rp {totalCost.toLocaleString('id-ID')}</p>
+
+                  <div className="space-y-2.5 p-3 sm:p-3.5">
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="rounded-xl border border-[#8A9C7A]/25 bg-white p-3">
+                        <p className="font-display text-[8px] font-bold uppercase tracking-wide text-[#647554]">{orderCopy.weeklyRotation}</p>
+                        <p className="mt-1 font-display text-xs font-black leading-tight text-[#1E1E1E] sm:text-sm">{selectedTier.tier}g Protein · {periodLabel}</p>
+                        <p className="mt-0.5 text-[9px] leading-4 text-[#647554]">{dayCountLabel} · {boxCountLabel}</p>
+                      </div>
+                      <div className="rounded-xl border border-[#8A9C7A]/25 bg-white p-3">
+                        <p className="font-display text-[8px] font-bold uppercase tracking-wide text-[#647554]">{orderCopy.servingsPerDay}</p>
+                        <p className="mt-1 font-display text-sm font-black text-[#1E1E1E]">{mealsPerDay}x / {isIndonesian ? 'hari' : 'day'}</p>
+                        <p className="mt-0.5 text-[9px] leading-4 text-[#647554]">{t('orderSundayExcluded')}</p>
+                      </div>
+                    </div>
+
+                    <div className="divide-y divide-[#1E1E1E]/10 rounded-xl border border-[#8A9C7A]/25 bg-white px-3">
+                      <div className="flex items-start gap-2.5 py-2.5">
+                        <Truck size={14} className="mt-0.5 shrink-0 text-[#647554]" />
+                        <div className="min-w-0">
+                          <p className="font-display text-[8px] font-bold uppercase tracking-wide text-[#647554]">{orderCopy.fulfillment}</p>
+                          <p className="mt-0.5 text-[10px] font-bold text-[#1E1E1E]">{selectedFulfillmentLabel}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-2.5 py-2.5">
+                        <MapPin size={14} className="mt-0.5 shrink-0 text-[#647554]" />
+                        <div className="min-w-0">
+                          <p className="font-display text-[8px] font-bold uppercase tracking-wide text-[#647554]">{requiresDeliveryAddress ? orderCopy.deliveryDestination : orderCopy.centralKitchen}</p>
+                          <p className="mt-0.5 break-words text-[9px] leading-4 text-[#1E1E1E]">{requiresDeliveryAddress ? (address || '-') : centralKitchenAddress}</p>
+                          {requiresDeliveryAddress && mapsUrl.trim() ? <p className="mt-1 flex min-w-0 items-start gap-1 text-[9px] text-[#647554]"><Link2 size={10} className="mt-0.5 shrink-0" /><span className="break-all">{mapsUrl.trim()}</span></p> : null}
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-2.5 py-2.5">
+                        <Clock3 size={14} className="mt-0.5 shrink-0 text-[#647554]" />
+                        <div className="min-w-0">
+                          <p className="font-display text-[8px] font-bold uppercase tracking-wide text-[#647554]">{scheduleLabel}</p>
+                          <p className="mt-0.5 text-[9px] font-semibold leading-4 text-[#1E1E1E]">{mealsPerDay === 1 ? `${singleMealReadyTime === '12:00' ? orderCopy.lunch : orderCopy.dinner} ${orderCopy.ready} ${formatReadyTime(readyTimeMeal1)}` : `${orderCopy.lunch} ${orderCopy.ready} ${formatReadyTime(readyTimeMeal1)} · ${orderCopy.dinner} ${orderCopy.ready} ${formatReadyTime(readyTimeMeal2)}`}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="overflow-hidden rounded-xl border border-[#8A9C7A]/25 bg-white font-mono text-[9px]">
+                      <div className="flex items-start justify-between gap-3 px-3 py-2.5">
+                        <span className="text-[#647554]">{orderCopy.basePrice}<br /><span>Rp {selectedPrice.toLocaleString('id-ID')} × {totalBoxes} box</span></span>
+                        <strong className="whitespace-nowrap text-[#33402B]">Rp {(selectedPrice * totalBoxes).toLocaleString('id-ID')}</strong>
+                      </div>
+                      <div className="border-t border-[#1E1E1E]/10 px-3 py-2.5">
+                        <p className="font-sans text-[8px] font-bold uppercase tracking-wide text-[#647554]">{orderCopy.addons}</p>
+                        {selectedAddons.length ? selectedAddons.map((addon) => (
+                          <div key={addon.id} className="mt-1.5 flex items-start justify-between gap-3">
+                            <span>{isIndonesian ? addon.nameID : addon.name}<br /><span className="text-[#647554]">Rp {addon.price.toLocaleString('id-ID')} / box × {totalBoxes}</span></span>
+                            <strong className="whitespace-nowrap text-[#33402B]">Rp {(addon.price * totalBoxes).toLocaleString('id-ID')}</strong>
+                          </div>
+                        )) : <p className="mt-1 font-sans text-[10px] font-semibold text-[#1E1E1E]">{orderCopy.none}</p>}
+                        {selectedAddons.length ? <div className="mt-2 flex justify-between gap-3 border-t border-[#1E1E1E]/10 pt-2 font-bold text-[#33402B]"><span>{orderCopy.addonTotal}</span><span className="whitespace-nowrap">Rp {(addonsPerBox * totalBoxes).toLocaleString('id-ID')}</span></div> : null}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between gap-3 rounded-xl bg-[#1E1E1E] px-3.5 py-3 text-white">
+                      <p className="font-display text-[9px] font-bold uppercase tracking-wide text-white/65">{t('orderEstimatedTotal')}</p>
+                      <p className="whitespace-nowrap font-display text-xl font-black">Rp {totalCost.toLocaleString('id-ID')}</p>
+                    </div>
                   </div>
                 </div>
                 <p className="mt-2 text-center text-[9px] leading-4 text-[#647554]">{orderCopy.courierNote}</p>
@@ -755,7 +892,7 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
                   disabled={totalDays === 0}
                   className="mt-4 h-auto min-h-12 w-full min-w-0 whitespace-normal rounded-lg bg-[#1E1E1E] px-4 py-3 text-center text-xs leading-tight text-white hover:bg-[#647554]"
                 >
-                  <MessageCircle size={18} />
+                  <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-white/15 font-mono text-[9px] font-bold text-white">08</span>
                   <span className="min-w-0 break-words">{t('orderSubmit')}</span>
                   <ArrowRight size={17} className="hidden min-[430px]:block" />
                 </Button>
@@ -793,12 +930,9 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
               </p>
 
               <div className="mt-5 rounded-2xl border border-[#8A9C7A]/40 bg-[#E7EEE1] p-4 text-left shadow-xs sm:p-5">
-                <div className="flex items-center justify-between border-b border-[#8A9C7A]/25 pb-3">
+                <div className="border-b border-[#8A9C7A]/25 pb-3">
                   <span className="font-display text-[10px] font-extrabold uppercase tracking-wider text-[#33402B]">
                     {t('orderTicketTitle')}
-                  </span>
-                  <span className="rounded-full border border-[#8A9C7A]/50 bg-[#647554] px-3 py-0.5 font-mono text-[10px] font-bold text-white">
-                    {selectedTier.tier}g Protein
                   </span>
                 </div>
 
@@ -821,14 +955,19 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
                   </div>
 
                   <div>
+                    <p className="font-display text-[9px] font-bold uppercase tracking-wider text-[#647554]">{orderCopy.weeklyRotation}</p>
+                    <p className="mt-0.5 font-mono text-[10px] font-bold text-[#1E1E1E]">{selectedTier.tier}g Protein · {periodLabel}</p>
+                  </div>
+
+                  <div className="sm:col-span-2">
                     <p className="font-display text-[9px] font-bold uppercase tracking-wider text-[#647554]">{t('orderSummary')}</p>
                     <p className="mt-0.5 font-mono text-[10px] font-bold text-[#1E1E1E]">
-                      {totalDays} {t('orderDaysUnit')} · {mealsPerDay}x/{isIndonesian ? 'hari' : 'day'} ({totalBoxes} Box)
+                      {dayCountLabel} · {mealsPerDay}x/{isIndonesian ? 'hari' : 'day'} · {boxCountLabel}
                     </p>
                   </div>
                   <div className="sm:col-span-2">
-                    <p className="font-display text-[9px] font-bold uppercase tracking-wider text-[#647554]">{orderCopy.schedule}</p>
-                    <p className="mt-0.5 font-mono text-[10px] font-bold text-[#1E1E1E]">{orderCopy.mealOne} {orderCopy.ready} {readyTimeMeal1}{mealsPerDay === 2 ? ` · ${orderCopy.mealTwo} ${orderCopy.ready} ${readyTimeMeal2} · ${orderCopy.sameMenu}` : ''}</p>
+                    <p className="font-display text-[9px] font-bold uppercase tracking-wider text-[#647554]">{scheduleLabel}</p>
+                    <p className="mt-0.5 font-mono text-[10px] font-bold text-[#1E1E1E]">{mealsPerDay === 1 ? `${singleMealReadyTime === '12:00' ? orderCopy.lunch : orderCopy.dinner} ${orderCopy.ready} ${formatReadyTime(readyTimeMeal1)}` : `${orderCopy.lunch} ${orderCopy.ready} ${formatReadyTime(readyTimeMeal1)} · ${orderCopy.dinner} ${orderCopy.ready} ${formatReadyTime(readyTimeMeal2)} · ${orderCopy.sameMenu}`}</p>
                   </div>
                   <div>
                     <p className="font-display text-[9px] font-bold uppercase tracking-wider text-[#647554]">{orderCopy.addons}</p>
@@ -836,8 +975,15 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
                   </div>
                   <div>
                     <p className="font-display text-[9px] font-bold uppercase tracking-wider text-[#647554]">{orderCopy.fulfillment}</p>
-                    <p className="mt-0.5 text-[10px] font-bold text-[#1E1E1E]">{fulfillment === 'Customer-arranged' ? orderCopy.customerArranged : fulfillment}</p>
+                    <p className="mt-0.5 text-[10px] font-bold text-[#1E1E1E]">{selectedFulfillmentLabel}</p>
                   </div>
+                  {requiresDeliveryAddress ? (
+                    <div className="sm:col-span-2">
+                      <p className="font-display text-[9px] font-bold uppercase tracking-wider text-[#647554]">{orderCopy.deliveryDestination}</p>
+                      <p className="mt-0.5 text-[10px] font-bold leading-4 text-[#1E1E1E]">{address}</p>
+                      {mapsUrl.trim() ? <a href={mapsUrl.trim()} target="_blank" rel="noopener noreferrer" className="mt-1 inline-flex items-start gap-1 break-all text-[9px] font-semibold text-[#526049] underline underline-offset-2"><Link2 size={10} className="mt-0.5 shrink-0" />{mapsUrl.trim()}</a> : null}
+                    </div>
+                  ) : null}
                 </div>
 
                 <div className="mt-4 flex items-center justify-between rounded-xl border border-[#1E1E1E]/15 bg-white px-4 py-3 shadow-xs">
