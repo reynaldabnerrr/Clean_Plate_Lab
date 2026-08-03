@@ -4,7 +4,7 @@ import { Badge } from './ui/badge';
 import { Card } from './ui/card';
 import { Slider } from './ui/slider';
 import { Select, SelectContent, SelectItem, SelectTrigger } from './ui/select';
-import { Calculator, Target, ArrowRight, Gauge } from 'lucide-react';
+import { Calculator, Target, ArrowRight } from 'lucide-react';
 import { useCpl } from '../hooks/useCpl';
 import { calculateMacroTargets } from '../lib/calculations';
 import { analytics } from '../lib/analytics';
@@ -152,9 +152,6 @@ export function MacroCalculator({ onOpenOrder }) {
               </label>
               <Select value={String(activity)} onValueChange={(value) => setActivity(Number(value))}>
                 <SelectTrigger aria-labelledby="activity-level-label" className="group min-h-16 rounded-2xl border-2 border-[#1E1E1E] bg-[var(--cpl-cream)] px-3 py-2.5 text-left hover:bg-[#E7EEE1]">
-                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[#1E1E1E] text-[#B8C8AA]">
-                    <Gauge size={17} aria-hidden="true" />
-                  </span>
                   <span className="min-w-0 flex-1">
                     <strong className="block truncate font-display text-[11px] font-extrabold uppercase text-[#1E1E1E]">{activeActivity.label}</strong>
                     <span className="mt-0.5 block font-mono text-[9px] font-bold uppercase tracking-wider text-[#647554]">Activity factor · {activity}×</span>
