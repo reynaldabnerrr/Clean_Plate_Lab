@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { CplContext } from './cpl-context';
 
 const INITIAL_MENU_ITEMS = [
@@ -65,7 +65,7 @@ const INITIAL_MENU_ITEMS = [
   {
     id: "m4",
     code: "CPL-THU",
-    name: "Sate Padang Chicken",
+    name: "Sate Padang",
     day: "Thursday / Kamis",
     category: "Lean Muscle",
     protein: 81.0,
@@ -165,7 +165,24 @@ export function CplProvider({ children }) {
   const [orders, setOrders] = useState(INITIAL_ORDERS);
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
   const [announcementText, setAnnouncementText] = useState("100% Lab Verified High Protein Meal Prep • Free Delivery Jabodetabek");
-  const [language, setLanguage] = useState("EN"); // 'EN' | 'ID'
+  const [storedLanguage] = useState(() => {
+    if (typeof window === 'undefined') return null;
+    const savedLanguage = window.localStorage.getItem('cpl-language');
+    return savedLanguage === 'ID' || savedLanguage === 'EN' ? savedLanguage : null;
+  });
+  const [language, setLanguageState] = useState(storedLanguage || 'EN');
+  const [hasSelectedLanguage, setHasSelectedLanguage] = useState(Boolean(storedLanguage));
+
+  const setLanguage = useCallback((nextLanguage) => {
+    if (nextLanguage !== 'ID' && nextLanguage !== 'EN') return;
+    setLanguageState(nextLanguage);
+    setHasSelectedLanguage(true);
+    window.localStorage.setItem('cpl-language', nextLanguage);
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.lang = language === 'ID' ? 'id' : 'en';
+  }, [language]);
 
   // Comprehensive i18n Translation dictionary
   const translations = {
@@ -192,15 +209,17 @@ export function CplProvider({ children }) {
       heroTitle1: "GOOD FOOD.",
       heroTitle2: "CLEAR DATA.",
       heroTitle3: "BETTER YOU.",
-      heroSubtitle: "Clean Plate Lab adalah katering sehat harian TINGGI PROTEIN & CUSTOMIZABLE PROTEIN di Makassar. Bebas pilih porsi protein harianmu (25g, 60g, 80g, hingga 100g) dalam olahan rumahan (homemade) segar rendah kalori.",
+      heroSubtitle: "Makanan tinggi protein yang dibuat dengan ilmu pangan, data nutrisi yang jelas, dan rasa yang benar-benar ingin kamu nikmati.",
       heroAvgProtein: "Customizable Protein",
-      heroAvgProteinDesc: "Bebas Pilih 25g, 60g, 80g & 100g",
+      heroAvgProteinDesc: "Bebas Pilih 25g, 40g, 60g, 80g & 100g",
       heroWholeFood: "Formulasi Tinggi Protein",
       heroWholeFoodDesc: "Nutrisi Makro Terhitung Presisi",
-      heroMacroAcc: "Pengiriman Harian",
-      heroMacroAccDesc: "Dimasak & dikirim segar setiap hari",
-      heroCtaPrimary: "Pesan Katering Harian",
-      heroCtaSecondary: "Inspeksi Label Nutrisi",
+      heroDeliveryBadge: "TERJADWAL",
+      heroDeliveryValue: "1–2x/Hari",
+      heroMacroAcc: "Jadwal Makanan Harian",
+      heroMacroAccDesc: "Meal 1 siap pukul 12.00 dan Meal 2 siap pukul 18.00",
+      heroCtaPrimary: "Pilih Paket Katering",
+      heroCtaSecondary: "Jelajahi Menu",
       heroFeature1: "Tinggi Protein Harian",
       heroFeature2: "Custom Porsi 25g - 100g",
       heroFeature3: "100% Homemade Fresh",
@@ -229,10 +248,10 @@ export function CplProvider({ children }) {
       pillar1Title: "Formulasi Tinggi Protein",
       pillar1Desc: "Setiap porsi katering didesain khusus tinggi protein (hingga 100g per porsi) untuk mendukung pembentukan otot kering dan metabolisme harian.",
       pillar2Title: "Customizable Protein Tiers",
-      pillar2Desc: "Pilih tingkat protein harianmu secara bebas: 25g, 60g, 80g, atau 100g protein sesuai target energi dan fitness unik Anda.",
+      pillar2Desc: "Pilih tingkat protein harianmu secara bebas: 25g, 40g, 60g, 80g, atau 100g protein sesuai target energi dan fitness unik Anda.",
       pillar3Title: "100% Olahan Rumahan (Homemade)",
       pillar3Desc: "Setiap hidangan dikemas dalam wadah food-grade khusus yang terjamin kebersihan, higiene, dan aman dipanaskan.",
-      pillar1H1: "Pilihan 25g, 60g, 80g & 100g Protein",
+      pillar1H1: "Pilihan 25g, 40g, 60g, 80g & 100g Protein",
       pillar1H2: "Formulasi Tinggi Protein & Rendah Kalori",
       pillar1H3: "Dimasak Segar secara Rumahan Setiap Hari",
       pillar2H1: "Bebas Pengawet Buatan & Bebas Minyak Berlebih",
@@ -333,7 +352,7 @@ export function CplProvider({ children }) {
       calcMealsPerDay: "Makan / Hari",
       calcRecSummary: "Target: {protein}g protein. Direkomendasikan: {plan} ({meals} box makanan segar harian).",
       calcSubscribeBtn: "Pesan {plan}",
-      calcProteinTargetDesc: "• Target Protein: {ratio}g / kg berat badan.",
+      calcProteinTargetDesc: "• Hingga {ratio}g protein / kg berat badan.",
       calcBmrEstimate: "• Estimasi BMR:",
       calcFactor: "Faktor:",
 
@@ -371,9 +390,9 @@ export function CplProvider({ children }) {
       orderModalSub: "Pilih tingkat protein dan lengkapi data untuk memesan via WhatsApp.",
       orderCustomerDetails: "Data pemesan",
       orderProteinTier: "Pilih porsi protein",
-      orderDeliveryHighlight: "1 box segar, setiap hari",
-      orderDeliveryDetail: "Pesanan disiapkan dan diantar 1x sehari setiap Senin-Sabtu. Hari Minggu tidak dihitung.",
-      orderDeliverySchedule: "Jadwal & lokasi pengiriman",
+      orderDeliveryHighlight: "1–2 box segar, setiap hari",
+      orderDeliveryDetail: "Pilih 1 atau 2 porsi per hari. Pesanan disiapkan setiap Senin-Sabtu dan hari Minggu tidak dihitung.",
+      orderDeliverySchedule: "Periode katering & fulfillment",
       orderSummary: "Ringkasan pesanan",
       orderSelectedPlan: "Paket terpilih",
       orderEstimatedTotal: "Total estimasi",
@@ -393,21 +412,22 @@ export function CplProvider({ children }) {
       orderFormErrorNotice: "Mohon lengkapi data pemesanan yang bertanda merah",
       orderPlan: "Pilih Porsi Protein",
       orderSelectProteinLabel: "Pilih Porsi Protein Katering:",
-      orderDailyDeliveryNote: "💡 Pengiriman katering harian dikirim 1x sehari (1 Box Makanan / Hari)",
-      orderDeliveryPeriodLabel: "Periode Pengiriman",
+      orderDailyDeliveryNote: "💡 Pilih 1 atau 2 box per hari sesuai kebutuhan katering Anda",
+      orderDeliveryPeriodLabel: "Periode Katering",
       orderDateRangeLabel: "Rentang Tanggal:",
       orderEstimatedTotalCostLabel: "Total Estimasi Biaya",
       orderPortionUnit: "/ porsi",
-      orderPlanOpt1: "25g Protein Plan - Rp 25.000 / porsi",
-      orderPlanOpt2: "60g Protein Plan - Rp 40.000 / porsi",
-      orderPlanOpt3: "80g Protein Plan - Rp 50.000 / porsi",
-      orderPlanOpt4: "100g Protein Plan - Rp 60.000 / porsi",
-      orderPlanOpt5: "Inquiry Katering Perusahaan / B2B Makassar",
+      orderPlanOpt1: "25g Protein Plan - mulai Rp 25.000 / porsi",
+      orderPlanOpt2: "40g Protein Plan - mulai Rp 35.000 / porsi",
+      orderPlanOpt3: "60g Protein Plan - mulai Rp 45.000 / porsi",
+      orderPlanOpt4: "80g Protein Plan - mulai Rp 55.000 / porsi",
+      orderPlanOpt5: "100g Protein Plan - mulai Rp 65.000 / porsi",
+      orderPlanOpt6: "Inquiry Katering Perusahaan / B2B Makassar",
       orderAddress: "Alamat Pengiriman Lengkap (Makassar)",
       orderAddressPlaceholder: "Jl. G. Bulusaraung, nama gedung, atau alamat lengkap Anda...",
-      orderStartDate: "Tanggal Mulai Delivery",
-      orderEndDate: "Tanggal Selesai Delivery",
-      orderTotalDays: "Total Hari Delivery",
+      orderStartDate: "Tanggal Mulai Katering",
+      orderEndDate: "Tanggal Selesai Katering",
+      orderTotalDays: "Total Hari Katering",
       orderTotalCost: "Total Biaya (Total Hari × Harga)",
       orderDaysUnit: "Hari",
       orderSubmit: "Kirim Pemesanan via WhatsApp",
@@ -450,15 +470,17 @@ export function CplProvider({ children }) {
       heroTitle1: "GOOD FOOD.",
       heroTitle2: "CLEAR DATA.",
       heroTitle3: "BETTER YOU.",
-      heroSubtitle: "Clean Plate Lab is Makassar’s premier HIGH PROTEIN & CUSTOMIZABLE PROTEIN daily healthy catering service. Choose your daily protein level (25g, 60g, 80g, up to 100g) in fresh homemade low calorie meals.",
+      heroSubtitle: "High-protein meals made with food science, clear nutrition data, and food you actually want to eat.",
       heroAvgProtein: "Customizable Protein",
-      heroAvgProteinDesc: "Select 25g, 60g, 80g & 100g",
+      heroAvgProteinDesc: "Select 25g, 40g, 60g, 80g & 100g",
       heroWholeFood: "High Protein Density",
       heroWholeFoodDesc: "Calculated Macro Precision",
-      heroMacroAcc: "Fresh Daily Delivery",
-      heroMacroAccDesc: "Cooked & delivered fresh daily",
-      heroCtaPrimary: "Order Daily Catering",
-      heroCtaSecondary: "Inspect Nutrition Label",
+      heroDeliveryBadge: "SCHEDULED",
+      heroDeliveryValue: "1–2x/Day",
+      heroMacroAcc: "Scheduled Daily Meals",
+      heroMacroAccDesc: "Meal 1 is ready at 12:00 and Meal 2 is ready at 18:00",
+      heroCtaPrimary: "Build Your Meal",
+      heroCtaSecondary: "Explore Menu",
       heroFeature1: "High Daily Protein",
       heroFeature2: "Custom 25g - 100g Tiers",
       heroFeature3: "100% Fresh Homemade",
@@ -487,16 +509,16 @@ export function CplProvider({ children }) {
       pillar1Title: "High Protein Formulations",
       pillar1Desc: "Every meal portion is specially engineered to deliver high protein density (up to 100g per meal) for lean muscle growth and metabolic support.",
       pillar2Title: "Customizable Protein Tiers",
-      pillar2Desc: "Tailor your daily protein intake: select 25g, 60g, 80g, or 100g protein to match your specific energy and fitness goals.",
+      pillar2Desc: "Tailor your daily protein intake: select 25g, 40g, 60g, 80g, or 100g protein to match your specific energy and fitness goals.",
       pillar3Title: "100% Fresh Homemade Prep",
       pillar3Desc: "Every meal is packed in food-grade safe containers ensuring cleanliness, safety, and reheating convenience.",
-      pillar1H1: "Choose 25g, 60g, 80g & 100g Protein",
+      pillar1H1: "Choose 25g, 40g, 60g, 80g & 100g Protein",
       pillar1H2: "High Protein & Low Calorie Balance",
       pillar1H3: "Fresh Homemade Batch Cooking Daily",
       pillar2H1: "Zero artificial preservatives or excess oil",
       pillar2H2: "Low calorie formulation for fat loss & fitness",
       pillar2H3: "Cooked & delivered fresh every day",
-      pillar3H1: "Custom 25g, 60g, 80g & 100g Protein options",
+      pillar3H1: "Custom 25g, 40g, 60g, 80g & 100g Protein options",
       pillar3H2: "Low calorie balanced glycemic load",
       pillar3H3: "Formulated by clinical dietitians",
 
@@ -591,7 +613,7 @@ export function CplProvider({ children }) {
       calcMealsPerDay: "Meals / Day",
       calcRecSummary: "Target: {protein}g protein. Recommended: {plan} ({meals} fresh meal boxes daily).",
       calcSubscribeBtn: "Order {plan}",
-      calcProteinTargetDesc: "• Protein target: {ratio}g / kg body weight.",
+      calcProteinTargetDesc: "• Up to {ratio}g protein / kg body weight.",
       calcBmrEstimate: "• Estimated BMR:",
       calcFactor: "Factor:",
 
@@ -629,9 +651,9 @@ export function CplProvider({ children }) {
       orderModalSub: "Choose your protein tier and fill details to order via WhatsApp.",
       orderCustomerDetails: "Customer details",
       orderProteinTier: "Choose protein portion",
-      orderDeliveryHighlight: "1 fresh box, every day",
-      orderDeliveryDetail: "Your meal is prepared and delivered once daily, Monday-Saturday. Sundays are excluded.",
-      orderDeliverySchedule: "Delivery schedule & location",
+      orderDeliveryHighlight: "1–2 fresh boxes, every day",
+      orderDeliveryDetail: "Choose one or two servings per day. Meals are prepared Monday-Saturday; Sundays are excluded.",
+      orderDeliverySchedule: "Catering period & fulfillment",
       orderSummary: "Order summary",
       orderSelectedPlan: "Selected plan",
       orderEstimatedTotal: "Estimated total",
@@ -651,21 +673,22 @@ export function CplProvider({ children }) {
       orderFormErrorNotice: "Please complete all highlighted fields correctly",
       orderPlan: "Select Protein Tier",
       orderSelectProteinLabel: "Select Catering Protein Portion:",
-      orderDailyDeliveryNote: "💡 Daily catering delivery is sent 1x daily (1 Meal Box / Day)",
-      orderDeliveryPeriodLabel: "Delivery Period",
+      orderDailyDeliveryNote: "💡 Choose one or two boxes per day for your catering plan",
+      orderDeliveryPeriodLabel: "Catering Period",
       orderDateRangeLabel: "Date Range:",
       orderEstimatedTotalCostLabel: "Total Estimated Cost",
       orderPortionUnit: "/ portion",
-      orderPlanOpt1: "25g Protein Plan - Rp 25,000 / portion",
-      orderPlanOpt2: "60g Protein Plan - Rp 40,000 / portion",
-      orderPlanOpt3: "80g Protein Plan - Rp 50,000 / portion",
-      orderPlanOpt4: "100g Protein Plan - Rp 60,000 / portion",
-      orderPlanOpt5: "Corporate / B2B Catering Inquiry Makassar",
+      orderPlanOpt1: "25g Protein Plan - from Rp 25,000 / portion",
+      orderPlanOpt2: "40g Protein Plan - from Rp 35,000 / portion",
+      orderPlanOpt3: "60g Protein Plan - from Rp 45,000 / portion",
+      orderPlanOpt4: "80g Protein Plan - from Rp 55,000 / portion",
+      orderPlanOpt5: "100g Protein Plan - from Rp 65,000 / portion",
+      orderPlanOpt6: "Corporate / B2B Catering Inquiry Makassar",
       orderAddress: "Full Delivery Address (Makassar)",
       orderAddressPlaceholder: "Street address, building name, unit number in Makassar...",
-      orderStartDate: "Delivery Start Date",
-      orderEndDate: "Delivery End Date",
-      orderTotalDays: "Total Delivery Days",
+      orderStartDate: "Catering Start Date",
+      orderEndDate: "Catering End Date",
+      orderTotalDays: "Total Catering Days",
       orderTotalCost: "Total Cost (Total Days × Price)",
       orderDaysUnit: "Days",
       orderSubmit: "Submit Order via WhatsApp",
@@ -746,6 +769,7 @@ export function CplProvider({ children }) {
       setAnnouncementText,
       language,
       setLanguage,
+      hasSelectedLanguage,
       t
     }}>
       {children}

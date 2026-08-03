@@ -14,7 +14,7 @@ const PROTEIN_TIERS = [
 ];
 
 export function LabelGenerator({ onOpenOrder }) {
-  const { language, t } = useCpl();
+  const { t } = useCpl();
   const [protein, setProtein] = useState(60);
   const [carbs, setCarbs] = useState(127.7);
   const [fat, setFat] = useState(28.2);
@@ -256,4 +256,3 @@ export function LabelGenerator({ onOpenOrder }) {
     </section>
   );
 }
-

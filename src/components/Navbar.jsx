@@ -3,11 +3,13 @@ import { CplPrimaryLogo } from './CplLogo';
 import { Button } from './ui/button';
 import { Menu, X, ArrowRight, Globe } from 'lucide-react';
 import { useCpl } from '../hooks/useCpl';
+import { useSiteCopy } from '../hooks/useSiteCopy';
 
 export function Navbar({ onOpenOrder }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { language, setLanguage, t } = useCpl();
+  const copy = useSiteCopy();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -39,11 +41,12 @@ export function Navbar({ onOpenOrder }) {
   }, [mobileMenuOpen]);
 
   const navItems = [
-    { label: t('pillars'), href: "#pillars" },
-    { label: t('labelInspector'), href: "#label-generator" },
-    { label: t('weeklyMenu'), href: "#menu" },
-    { label: t('macroCalculator'), href: "#calculator" },
-    { label: t('b2bCatering'), href: "#catering" },
+    { label: copy.nav.protein, href: "#protein-tiers" },
+    { label: copy.nav.how, href: "#how-it-works" },
+    { label: copy.nav.menu, href: "#menu" },
+    { label: copy.nav.standard, href: "#our-standard" },
+    { label: copy.nav.calculator, href: "#calculator" },
+    { label: copy.nav.faq, href: "#faq" },
   ];
 
   return (
@@ -65,8 +68,9 @@ export function Navbar({ onOpenOrder }) {
         />
       )}
 
+      <div aria-hidden="true" className="h-[74px] sm:h-[78px]" />
       <header
-        className={`sticky top-0 z-50 transition-all duration-300 ${
+        className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
           mobileMenuOpen
             ? 'bg-[#F5F2EA] shadow-md border-b border-[#1E1E1E]/15 py-3'
             : scrolled
@@ -78,7 +82,7 @@ export function Navbar({ onOpenOrder }) {
           
           {/* Brand Logo */}
           <a 
-            href="#" 
+            href="#main-content"
             className="flex items-center shrink-0 hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8A9C7A] rounded-lg"
             aria-label="Clean Plate Lab Home"
           >
@@ -142,7 +146,7 @@ export function Navbar({ onOpenOrder }) {
               onClick={onOpenOrder}
               className="hidden md:flex items-center gap-2 rounded-full bg-[#8A9C7A] hover:bg-[#647554] active:scale-[0.98] text-white font-extrabold text-xs shadow-md hover:shadow-lg transition-all transform hover:scale-[1.02] min-h-[40px] px-4.5 shrink-0 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-[#8A9C7A]"
             >
-              <span>{t('orderMealPlan')}</span>
+              <span>{copy.nav.build}</span>
               <ArrowRight size={14} />
             </Button>
 
@@ -221,7 +225,7 @@ export function Navbar({ onOpenOrder }) {
                 onClick={() => { setMobileMenuOpen(false); onOpenOrder(); }} 
                 className="w-full flex items-center justify-center gap-2 rounded-full bg-[#8A9C7A] hover:bg-[#647554] text-white font-extrabold text-xs py-3.5 shadow-md active:scale-[0.98] transition-transform"
               >
-                <span>{t('orderMealPlan')}</span>
+                <span>{copy.nav.build}</span>
                 <ArrowRight size={16} />
               </Button>
             </div>

@@ -5,9 +5,15 @@ import { Card } from './ui/card';
 import { Slider } from './ui/slider';
 import { Calculator, Target, ArrowRight } from 'lucide-react';
 import { useCpl } from '../hooks/useCpl';
+import { calculateMacroTargets } from '../lib/calculations';
+import { analytics } from '../lib/analytics';
+import { useSiteCopy } from '../hooks/useSiteCopy';
+import { proteinTiers } from '../data/site';
+import { formatCurrency } from '../lib/order';
 
 export function MacroCalculator({ onOpenOrder }) {
-  const { t } = useCpl();
+  const { t, language } = useCpl();
+  const copy = useSiteCopy();
   const [weight, setWeight] = useState(70);
   const [height, setHeight] = useState(175);
   const [age, setAge] = useState(28);
@@ -15,39 +21,24 @@ export function MacroCalculator({ onOpenOrder }) {
   const [activity, setActivity] = useState(1.55);
   const [goal, setGoal] = useState("muscle");
 
-  // Revised Harris-Benedict BMR formula calculation
-  const bmr = gender === "male"
-    ? 88.362 + (13.397 * weight) + (4.799 * height) - (5.677 * age)
-    : 447.593 + (9.247 * weight) + (3.098 * height) - (4.330 * age);
+  const result = calculateMacroTargets({ weight, height, age, gender, activity, goal });
+  const {
+    bmr,
+    estimatedCalories: targetCalories,
+    estimatedProtein: targetProteinGrams,
+    estimatedCarbs: targetCarbGrams,
+    estimatedFat: targetFatGrams,
+    proteinPerKg: proteinRatio,
+    recommendedProteinTier,
+  } = result;
 
-  const tdee = Math.round(bmr * activity);
-
-  let targetCalories = tdee;
-  let proteinRatio = 2.2;
-  if (goal === "cut") {
-    targetCalories = Math.round(tdee * 0.82);
-    proteinRatio = 2.4;
-  } else if (goal === "muscle") {
-    targetCalories = Math.round(tdee * 1.12);
-    proteinRatio = 2.2;
-  }
-
-  const targetProteinGrams = Math.round(weight * proteinRatio);
-  const proteinKcal = targetProteinGrams * 4;
-  const fatKcal = Math.round(targetCalories * 0.25);
-  const targetFatGrams = Math.round(fatKcal / 9);
-  const carbKcal = Math.max(0, targetCalories - proteinKcal - fatKcal);
-  const targetCarbGrams = Math.round(carbKcal / 4);
-
-  const recommendedMealsPerDay = 1;
-  const recommendedPlanName = goal === "muscle" 
-    ? t('calcPlanAthlete') 
-    : goal === "cut" 
-      ? t('calcPlanCut') 
-      : t('calcPlanWellness');
+  const recommendedMealsPerDay = 2;
+  const recommendedTierData = proteinTiers.find((tier) => tier.protein === recommendedProteinTier) || proteinTiers[0];
+  const recommendedPlanName = `${recommendedProteinTier}g ${language === 'ID' ? 'Protein' : 'Protein Plan'} (${formatCurrency(recommendedTierData.prices.daily)})`;
+  const upToLabel = language === 'ID' ? 'Hingga' : 'Up to';
 
   return (
-    <section id="calculator" className="overflow-x-clip border-b border-[var(--cpl-border)] bg-(--cpl-cream) py-16 sm:py-24">
+    <section id="calculator" className="overflow-x-clip border-b border-[var(--cpl-border)] bg-[var(--cpl-cream)] py-16 sm:py-24">
       <div className="mx-auto min-w-0 max-w-7xl px-4 sm:px-6 lg:px-8">
         
         {/* Header */}
@@ -174,27 +165,27 @@ export function MacroCalculator({ onOpenOrder }) {
                   size="sm"
                   variant={goal === "cut" ? "dark" : "outline"}
                   onClick={() => setGoal("cut")}
-                  className={`min-h-[40px] rounded-xl ${goal === "cut" ? "bg-[#1E1E1E] text-white font-extrabold" : ""}`}
+                  className={`min-h-[52px] flex-col gap-0.5 rounded-xl ${goal === "cut" ? "bg-[#1E1E1E] text-white font-extrabold" : ""}`}
                 >
-                  {t('calcGoalCut')}
+                  <span>{t('calcGoalCut')}</span><span className="text-[8px] font-medium opacity-65">{upToLabel} 2.2g/kg</span>
                 </Button>
                 <Button
                   type="button"
                   size="sm"
                   variant={goal === "maintain" ? "dark" : "outline"}
                   onClick={() => setGoal("maintain")}
-                  className={`min-h-[40px] rounded-xl ${goal === "maintain" ? "bg-[#1E1E1E] text-white font-extrabold" : ""}`}
+                  className={`min-h-[52px] flex-col gap-0.5 rounded-xl ${goal === "maintain" ? "bg-[#1E1E1E] text-white font-extrabold" : ""}`}
                 >
-                  {t('calcGoalMaintain')}
+                  <span>{t('calcGoalMaintain')}</span><span className="text-[8px] font-medium opacity-65">{upToLabel} 1.4g/kg</span>
                 </Button>
                 <Button
                   type="button"
                   size="sm"
                   variant={goal === "muscle" ? "dark" : "outline"}
                   onClick={() => setGoal("muscle")}
-                  className={`min-h-[40px] rounded-xl ${goal === "muscle" ? "bg-[#1E1E1E] text-white font-extrabold" : ""}`}
+                  className={`min-h-[52px] flex-col gap-0.5 rounded-xl ${goal === "muscle" ? "bg-[#1E1E1E] text-white font-extrabold" : ""}`}
                 >
-                  {t('calcGoalMuscle')}
+                  <span>{t('calcGoalMuscle')}</span><span className="text-[8px] font-medium opacity-65">{upToLabel} 2.4g/kg</span>
                 </Button>
               </div>
             </div>
@@ -261,7 +252,7 @@ export function MacroCalculator({ onOpenOrder }) {
                   {recommendedPlanName}
                 </h4>
                 <Badge variant="solid" className="bg-[#8A9C7A] text-white w-fit">
-                  {recommendedMealsPerDay} {t('calcMealsPerDay')}
+                  {recommendedProteinTier}g tier
                 </Badge>
               </div>
 
@@ -269,13 +260,25 @@ export function MacroCalculator({ onOpenOrder }) {
                 {t('calcRecSummary').replace('{protein}', targetProteinGrams).replace('{plan}', recommendedPlanName).replace('{meals}', recommendedMealsPerDay)}
               </p>
 
+              <p className="rounded-xl border border-[var(--cpl-sage)]/35 bg-white/70 p-3 text-[11px] leading-relaxed text-[var(--cpl-dark-muted)]">
+                {copy.calculatorDisclaimer}
+              </p>
+
               <Button
                 variant="default"
                 size="lg"
-                onClick={onOpenOrder}
+                onClick={() => {
+                  analytics.calculatorUsed({
+                    estimated_calories: targetCalories,
+                    estimated_protein: targetProteinGrams,
+                    recommended_protein_tier: recommendedProteinTier,
+                    goal,
+                  });
+                  onOpenOrder(recommendedProteinTier);
+                }}
                 className="flex h-auto min-h-12 w-full items-center justify-center gap-2 whitespace-normal bg-[#8A9C7A] px-4 py-3 text-center text-xs font-extrabold leading-tight text-white hover:bg-[#647554]"
               >
-                <span>{t('calcSubscribeBtn').replace('{plan}', recommendedPlanName)}</span>
+                <span>{copy.calculatorCta.replace('{tier}', recommendedProteinTier)}</span>
                 <ArrowRight size={16} />
               </Button>
             </Card>

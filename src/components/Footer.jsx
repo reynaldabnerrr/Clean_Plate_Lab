@@ -2,6 +2,7 @@ import React from 'react';
 import { CplPrimaryLogo } from './CplLogo';
 import { Mail, MapPin, Phone, ArrowUp } from 'lucide-react';
 import { useCpl } from '../hooks/useCpl';
+import { useSiteCopy } from '../hooks/useSiteCopy';
 
 const InstagramIcon = ({ size = 18, className = "" }) => (
   <svg 
@@ -23,6 +24,7 @@ const InstagramIcon = ({ size = 18, className = "" }) => (
 
 export function Footer() {
   const { t } = useCpl();
+  const copy = useSiteCopy();
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -37,7 +39,7 @@ export function Footer() {
           
           {/* Col 1: Brand Logo & Mission */}
           <div className="md:col-span-5 space-y-6">
-            <CplPrimaryLogo size="large" />
+            <CplPrimaryLogo size="large" inverted />
             
             <p className="text-xs text-gray-400 font-light leading-relaxed max-w-md">
               {t('footerDesc')}
@@ -58,11 +60,11 @@ export function Footer() {
               {t('footerQuickLinks')}
             </h4>
             <ul className="space-y-2.5 text-xs font-display uppercase tracking-wider text-gray-400">
-              <li><a href="#pillars" className="hover:text-white transition-colors">{t('pillars')}</a></li>
-              <li><a href="#label-generator" className="hover:text-white transition-colors">{t('labelInspector')}</a></li>
-              <li><a href="#menu" className="hover:text-white transition-colors">{t('weeklyMenu')}</a></li>
-              <li><a href="#calculator" className="hover:text-white transition-colors">{t('macroCalculator')}</a></li>
-              <li><a href="#catering" className="hover:text-white transition-colors">{t('b2bCatering')}</a></li>
+              <li><a href="#protein-tiers" className="hover:text-white transition-colors">{copy.nav.protein}</a></li>
+              <li><a href="#how-it-works" className="hover:text-white transition-colors">{copy.nav.how}</a></li>
+              <li><a href="#menu" className="hover:text-white transition-colors">{copy.nav.menu}</a></li>
+              <li><a href="#calculator" className="hover:text-white transition-colors">{copy.nav.calculator}</a></li>
+              <li><a href="#faq" className="hover:text-white transition-colors">{copy.nav.faq}</a></li>
             </ul>
           </div>
 

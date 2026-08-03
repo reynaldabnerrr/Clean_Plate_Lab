@@ -1,10 +1,12 @@
-import React, { useId, useState } from 'react';
+import React, { useEffect, useId, useState } from 'react';
 import confetti from 'canvas-confetti';
 import { useCpl } from '../hooks/useCpl';
 import { CplLogoImage } from './CplLogo';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from './ui/dialog';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
+import { addons, proteinTiers } from '../data/site';
+import { analytics } from '../lib/analytics';
 import {
   AlertCircle,
   ArrowRight,
@@ -22,12 +24,7 @@ import {
   UtensilsCrossed,
 } from 'lucide-react';
 
-const TIER_OPTIONS = [
-  { tier: 25, price: 25000 },
-  { tier: 60, price: 40000 },
-  { tier: 80, price: 50000 },
-  { tier: 100, price: 60000 },
-];
+const TIER_OPTIONS = proteinTiers.map(({ protein, prices }) => ({ tier: protein, prices }));
 
 const DAY_IN_MS = 24 * 60 * 60 * 1000;
 
@@ -54,10 +51,10 @@ function calculateDeliveryDays(start, end) {
   return deliveryDays;
 }
 
-function formatOrderDate(value) {
+function formatOrderDate(value, locale = 'id-ID') {
   if (!value) return '-';
 
-  return new Intl.DateTimeFormat('id-ID', {
+  return new Intl.DateTimeFormat(locale, {
     day: '2-digit',
     month: 'long',
     year: 'numeric',
@@ -65,28 +62,124 @@ function formatOrderDate(value) {
   }).format(new Date(`${value}T00:00:00+08:00`));
 }
 
-export function OrderModal({ isOpen, onClose }) {
-  const { addOrder, t } = useCpl();
+function getCateringPeriod(totalDays) {
+  if (totalDays >= 24) return 'monthly';
+  if (totalDays >= 6) return 'weekly';
+  return 'daily';
+}
+
+export function OrderModal({ isOpen, onClose, initialProteinTier = 40, initialMealsPerDay = 1 }) {
+  const { addOrder, t, language } = useCpl();
   const fieldId = useId();
   const today = toDateInputValue(new Date());
 
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
-  const [proteinTier, setProteinTier] = useState(60);
+  const [proteinTier, setProteinTier] = useState(initialProteinTier);
   const [startDate, setStartDate] = useState(today);
   const [endDate, setEndDate] = useState(toDateInputValue(new Date(Date.now() + 4 * DAY_IN_MS)));
+  const [mealsPerDay, setMealsPerDay] = useState(initialMealsPerDay);
+  const readyTimeMeal1 = '12:00';
+  const readyTimeMeal2 = '18:00';
+  const [addonIds, setAddonIds] = useState([]);
+  const [fulfillment, setFulfillment] = useState('Pickup');
   const [address, setAddress] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState({});
 
-  const selectedTier = TIER_OPTIONS.find((option) => option.tier === proteinTier) || TIER_OPTIONS[0];
-  const planString = `${selectedTier.tier}g Protein Plan - Rp ${selectedTier.price.toLocaleString('id-ID')} / porsi`;
   const totalDays = calculateDeliveryDays(startDate, endDate);
-  const totalCost = totalDays * selectedTier.price;
+  const cateringPeriod = getCateringPeriod(totalDays);
+  const selectedTier = TIER_OPTIONS.find((option) => option.tier === proteinTier) || TIER_OPTIONS[0];
+  const selectedPrice = selectedTier.prices[cateringPeriod];
+  const selectedAddons = addons.filter((addon) => addonIds.includes(addon.id));
+  const addonsPerBox = selectedAddons.reduce((sum, addon) => sum + addon.price, 0);
+  const pricePerBox = selectedPrice + addonsPerBox;
+  const totalBoxes = totalDays * mealsPerDay;
+  const totalCost = totalBoxes * pricePerBox;
+  const isIndonesian = language === 'ID';
+  const locale = isIndonesian ? 'id-ID' : 'en-GB';
+  const centralKitchenAddress = t('footerCentralKitchen');
+  const periodLabels = isIndonesian
+    ? { daily: 'Harian', weekly: 'Mingguan', monthly: 'Bulanan' }
+    : { daily: 'Daily', weekly: 'Weekly', monthly: 'Monthly' };
+  const periodLabel = periodLabels[cateringPeriod];
+  const orderCopy = isIndonesian ? {
+    servingsPerDay: 'Porsi per hari',
+    oneServing: '1 porsi / hari',
+    twoServings: '2 porsi / hari',
+    sameMenu: 'Kedua porsi menggunakan menu harian yang sama.',
+    schedule: 'Waktu makanan siap',
+    scheduleNote: 'Meal 1 siap pukul 12.00. Jika memilih dua porsi, Meal 2 siap pukul 18.00.',
+    mealOne: 'Meal 1',
+    mealTwo: 'Meal 2',
+    ready: 'siap',
+    addons: 'Kustomisasi menu',
+    addonsHelp: 'Paket standar menggunakan nasi putih. Opsi Baby Potato + Jagung menggantikan nasi putih, bukan menambah karbo baru. Semua biaya dihitung per box.',
+    addonTotal: 'Total kustomisasi',
+    fulfillment: 'Metode fulfillment',
+    customerArranged: 'Kurir Diatur Pelanggan',
+    centralKitchen: 'Alamat Central Kitchen',
+    deliveryDestination: 'Alamat tujuan',
+    pickupNote: 'Pesanan diambil dari alamat Central Kitchen berikut:',
+    arrangedNote: 'Pelanggan mengatur kurir untuk mengambil pesanan dari alamat Central Kitchen berikut:',
+    weeklyRotation: 'Rotasi menu mingguan',
+    menuPlan: 'Menu plan',
+    none: 'Tanpa add-on',
+    basePrice: 'Harga dasar',
+    addonsPrice: 'Add-on per box',
+    courierNote: 'Biaya kurir belum termasuk dan dikonfirmasi melalui WhatsApp.',
+  } : {
+    servingsPerDay: 'Servings per day',
+    oneServing: '1 serving / day',
+    twoServings: '2 servings / day',
+    sameMenu: 'Both servings use the same daily menu.',
+    schedule: 'Meal ready times',
+    scheduleNote: 'Meal 1 is ready at 12:00. For two servings, Meal 2 is ready at 18:00.',
+    mealOne: 'Meal 1',
+    mealTwo: 'Meal 2',
+    ready: 'ready',
+    addons: 'Meal customizations',
+    addonsHelp: 'The standard meal includes white rice. Baby Potato + Corn replaces the white rice—it is not an additional carb. All charges are calculated per box.',
+    addonTotal: 'Total customizations',
+    fulfillment: 'Fulfillment method',
+    customerArranged: 'Customer-arranged delivery',
+    centralKitchen: 'Central Kitchen address',
+    deliveryDestination: 'Delivery destination',
+    pickupNote: 'Collect the order from the following Central Kitchen address:',
+    arrangedNote: 'The customer arranges a courier to collect the order from the following Central Kitchen address:',
+    weeklyRotation: 'Weekly menu rotation',
+    menuPlan: 'Menu plan',
+    none: 'No add-ons',
+    basePrice: 'Base price',
+    addonsPrice: 'Add-ons per box',
+    courierNote: 'Courier fees are excluded and confirmed through WhatsApp.',
+  };
+  const fulfillmentOptions = [
+    { id: 'Pickup', label: 'Pickup' },
+    { id: 'Grab', label: 'Grab' },
+    { id: 'Gojek', label: 'Gojek' },
+    { id: 'Customer-arranged', label: orderCopy.customerArranged },
+  ];
+  const requiresDeliveryAddress = fulfillment === 'Grab' || fulfillment === 'Gojek';
+  const selectedAddonNames = selectedAddons.map((addon) => isIndonesian ? addon.nameID : addon.name);
+  const planString = `${selectedTier.tier}g Protein · ${periodLabel} · ${mealsPerDay}x ${isIndonesian ? 'per hari' : 'per day'} · Rp ${selectedPrice.toLocaleString('id-ID')} / ${isIndonesian ? 'porsi' : 'serving'}`;
+
+  useEffect(() => {
+    if (isOpen && TIER_OPTIONS.some((option) => option.tier === initialProteinTier)) {
+      setProteinTier(initialProteinTier);
+      setMealsPerDay(initialMealsPerDay === 2 ? 2 : 1);
+    }
+  }, [initialMealsPerDay, initialProteinTier, isOpen]);
 
   const handleStartDateChange = (value) => {
     setStartDate(value);
     if (endDate < value) setEndDate(value);
+  };
+
+  const toggleAddon = (addonId) => {
+    setAddonIds((current) => current.includes(addonId)
+      ? current.filter((id) => id !== addonId)
+      : [...current, addonId]);
   };
 
   const handleOpenChange = (open) => {
@@ -123,7 +216,7 @@ export function OrderModal({ isOpen, onClose }) {
       newErrors.endDate = t('orderDateRangeError') || 'Tanggal selesai harus sama atau setelah tanggal mulai';
     }
 
-    if (!address.trim()) {
+    if (requiresDeliveryAddress && !address.trim()) {
       newErrors.address = t('orderAddressReqError') || 'Alamat pengiriman lengkap wajib diisi';
     }
 
@@ -148,38 +241,21 @@ export function OrderModal({ isOpen, onClose }) {
       startDate,
       endDate,
       totalDays,
+      mealsPerDay,
+      totalBoxes,
+      readyTimeMeal1,
+      readyTimeMeal2: mealsPerDay === 2 ? readyTimeMeal2 : null,
+      addonIds,
+      addons: selectedAddonNames,
+      fulfillment,
       address,
       amount: totalCost,
     });
 
     setSubmitted(true);
+    analytics.whatsappClicked({ proteinTier, cateringPeriod, totalDays, mealsPerDay, totalBoxes, totalCost });
 
-    const message = `*CLEAN PLATE LAB MAKASSAR*
-_GOOD FOOD. CLEAR DATA. BETTER YOU._
-----------------------------------
-
-Halo Tim Clean Plate Lab,
-Saya ingin mengajukan pemesanan meal plan dengan rincian berikut:
-
-*DATA PEMESAN*
-• Nama: *${name}*
-• Nomor WhatsApp: *${phone}*
-
-*PILIHAN MEAL PLAN*
-• Target protein: *${selectedTier.tier}g per porsi*
-• Harga per porsi: *Rp ${selectedTier.price.toLocaleString('id-ID')}*
-• Periode pengiriman: *${formatOrderDate(startDate)} - ${formatOrderDate(endDate)}*
-• Total pesanan: *${totalDays} box (${totalDays} ${t('orderDaysUnit')})*
-• Hari layanan: *Senin-Sabtu (Minggu tidak dihitung)*
-
-*RINGKASAN BIAYA*
-• Estimasi total: *Rp ${totalCost.toLocaleString('id-ID')}*
-
-*ALAMAT PENGIRIMAN*
-${address}
-
-----------------------------------
-Mohon konfirmasi ketersediaan jadwal, total akhir, dan petunjuk pembayaran. Terima kasih.`;
+    const message = buildWhatsAppMessage();
 
     const whatsappUrl = `https://api.whatsapp.com/send?phone=628996727181&text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
@@ -203,29 +279,80 @@ Mohon konfirmasi ketersediaan jadwal, total akhir, dan petunjuk pembayaran. Teri
   };
 
   const buildWhatsAppMessage = () => {
+    const addonCostDetails = selectedAddons.length
+      ? selectedAddons.map((addon) => `• ${isIndonesian ? addon.nameID : addon.name}: *Rp ${addon.price.toLocaleString('id-ID')} × ${totalBoxes} box = Rp ${(addon.price * totalBoxes).toLocaleString('id-ID')}*`).join('\n')
+      : `• ${orderCopy.addons}: *${orderCopy.none}*`;
+
+    if (!isIndonesian) {
+      return `*CLEAN PLATE LAB MAKASSAR*
+_GOOD FOOD. CLEAR DATA. BETTER YOU._
+----------------------------------
+
+Hello Clean Plate Lab Team,
+I would like to submit a catering meal plan order:
+
+*CUSTOMER DETAILS*
+• Name: *${name}*
+• WhatsApp number: *${phone}*
+
+*MEAL PLAN*
+• Menu: *${orderCopy.weeklyRotation}*
+• Protein target: *${selectedTier.tier}g per serving*
+• Pricing period: *${periodLabel}*
+• Price per serving: *Rp ${selectedPrice.toLocaleString('id-ID')}*
+• Catering period: *${formatOrderDate(startDate, locale)} - ${formatOrderDate(endDate, locale)}*
+• Servings per day: *${mealsPerDay} (${mealsPerDay === 2 ? 'same daily menu' : 'one serving'})*
+• Total order: *${totalBoxes} boxes (${totalDays} service days)*
+• Service days: *Monday-Saturday (Sundays excluded)*
+
+*FULFILLMENT*
+• Method: *${fulfillment === 'Customer-arranged' ? orderCopy.customerArranged : fulfillment}*
+• Meal ready times: *${readyTimeMeal1}${mealsPerDay === 2 ? ` and ${readyTimeMeal2}` : ''}*
+• Central Kitchen: *${centralKitchenAddress}*
+${requiresDeliveryAddress ? `• Delivery destination: *${address || '-'}*` : '• Courier collection point: *Central Kitchen*'}
+
+*COST SUMMARY*
+• Base price: *Rp ${selectedPrice.toLocaleString('id-ID')} × ${totalBoxes} boxes = Rp ${(selectedPrice * totalBoxes).toLocaleString('id-ID')}*
+${addonCostDetails}
+• Total add-ons: *Rp ${(addonsPerBox * totalBoxes).toLocaleString('id-ID')}*
+• Estimated total: *Rp ${totalCost.toLocaleString('id-ID')}*
+
+----------------------------------
+Please confirm schedule availability, final total, and payment instructions. Thank you.`;
+    }
+
     return `*CLEAN PLATE LAB MAKASSAR*
 _GOOD FOOD. CLEAR DATA. BETTER YOU._
 ----------------------------------
 
 Halo Tim Clean Plate Lab,
-Saya ingin mengajukan pemesanan meal plan dengan rincian berikut:
+Saya ingin mengajukan pemesanan katering meal plan dengan rincian berikut:
 
 *DATA PEMESAN*
 • Nama: *${name}*
 • Nomor WhatsApp: *${phone}*
 
 *PILIHAN MEAL PLAN*
+• Menu: *${orderCopy.weeklyRotation}*
 • Target protein: *${selectedTier.tier}g per porsi*
-• Harga per porsi: *Rp ${selectedTier.price.toLocaleString('id-ID')}*
-• Periode pengiriman: *${formatOrderDate(startDate)} - ${formatOrderDate(endDate)}*
-• Total pesanan: *${totalDays} box (${totalDays} ${t('orderDaysUnit')})*
+• Periode harga: *${periodLabel}*
+• Harga per porsi: *Rp ${selectedPrice.toLocaleString('id-ID')}*
+• Periode katering: *${formatOrderDate(startDate, locale)} - ${formatOrderDate(endDate, locale)}*
+• Porsi per hari: *${mealsPerDay} (${mealsPerDay === 2 ? 'menu harian yang sama' : 'satu porsi'})*
+• Total pesanan: *${totalBoxes} box (${totalDays} hari layanan)*
 • Hari layanan: *Senin-Sabtu (Minggu tidak dihitung)*
 
-*RINGKASAN BIAYA*
-• Estimasi total: *Rp ${totalCost.toLocaleString('id-ID')}*
+*FULFILLMENT*
+• Metode: *${fulfillment === 'Customer-arranged' ? orderCopy.customerArranged : fulfillment}*
+• Waktu makanan siap: *${readyTimeMeal1}${mealsPerDay === 2 ? ` dan ${readyTimeMeal2}` : ''}*
+• Central Kitchen: *${centralKitchenAddress}*
+${requiresDeliveryAddress ? `• Alamat tujuan: *${address || '-'}*` : '• Titik pengambilan kurir: *Central Kitchen*'}
 
-*ALAMAT PENGIRIMAN*
-${address}
+*RINGKASAN BIAYA*
+• Harga dasar: *Rp ${selectedPrice.toLocaleString('id-ID')} × ${totalBoxes} box = Rp ${(selectedPrice * totalBoxes).toLocaleString('id-ID')}*
+${addonCostDetails}
+• Total add-on: *Rp ${(addonsPerBox * totalBoxes).toLocaleString('id-ID')}*
+• Estimasi total: *Rp ${totalCost.toLocaleString('id-ID')}*
 
 ----------------------------------
 Mohon konfirmasi ketersediaan jadwal, total akhir, dan petunjuk pembayaran. Terima kasih.`;
@@ -368,7 +495,7 @@ Mohon konfirmasi ketersediaan jadwal, total akhir, dan petunjuk pembayaran. Teri
                     <span className="h-px flex-1 min-w-[8px] bg-[#1E1E1E]/15" />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-2.5" role="radiogroup" aria-label={t('orderProteinTier')}>
+                  <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3" role="radiogroup" aria-label={t('orderProteinTier')}>
                     {TIER_OPTIONS.map((option) => {
                       const isSelected = proteinTier === option.tier;
 
@@ -378,8 +505,11 @@ Mohon konfirmasi ketersediaan jadwal, total akhir, dan petunjuk pembayaran. Teri
                           type="button"
                           role="radio"
                           aria-checked={isSelected}
-                          onClick={() => setProteinTier(option.tier)}
-                          className={`min-h-20 min-w-0 rounded-lg border-2 p-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8A9C7A] ${
+                          onClick={() => {
+                            setProteinTier(option.tier);
+                            analytics.proteinTierSelected(option.tier);
+                          }}
+                          className={`min-h-24 min-w-0 rounded-lg border-2 p-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8A9C7A] ${
                             isSelected
                               ? 'border-[#1E1E1E] bg-[#1E1E1E] text-white'
                               : 'border-[#1E1E1E]/15 bg-white text-[#1E1E1E] hover:border-[#8A9C7A]'
@@ -390,11 +520,18 @@ Mohon konfirmasi ketersediaan jadwal, total akhir, dan petunjuk pembayaran. Teri
                             {isSelected && <Check size={14} className="text-[#B8C8AA]" strokeWidth={3} />}
                           </span>
                           <span className={`mt-2 block font-mono text-[10px] font-bold ${isSelected ? 'text-[#B8C8AA]' : 'text-[#647554]'}`}>
-                            Rp {option.price.toLocaleString('id-ID')}
+                            Rp {option.prices[cateringPeriod].toLocaleString('id-ID')}
                           </span>
+                          <span className={`mt-1 block text-[8px] font-bold uppercase tracking-wide ${isSelected ? 'text-white/55' : 'text-black/40'}`}>{periodLabel}</span>
                         </button>
                       );
                     })}
+                  </div>
+
+                  <div className="mt-3 grid grid-cols-3 border border-[#1E1E1E]/20 bg-white text-center font-mono text-[9px] font-bold uppercase">
+                    <div className={`p-2 ${cateringPeriod === 'daily' ? 'bg-[#1E1E1E] text-white' : ''}`}>{periodLabels.daily}<span className="mt-0.5 block font-sans text-[8px] font-normal normal-case opacity-65">1–5 {isIndonesian ? 'hari' : 'days'}</span></div>
+                    <div className={`border-x border-[#1E1E1E]/20 p-2 ${cateringPeriod === 'weekly' ? 'bg-[#1E1E1E] text-white' : ''}`}>{periodLabels.weekly}<span className="mt-0.5 block font-sans text-[8px] font-normal normal-case opacity-65">6–23 {isIndonesian ? 'hari' : 'days'}</span></div>
+                    <div className={`p-2 ${cateringPeriod === 'monthly' ? 'bg-[#1E1E1E] text-white' : ''}`}>{periodLabels.monthly}<span className="mt-0.5 block font-sans text-[8px] font-normal normal-case opacity-65">24+ {isIndonesian ? 'hari' : 'days'}</span></div>
                   </div>
 
                   <div className="mt-3 flex min-w-0 items-start gap-3 rounded-lg border border-[#8A9C7A]/50 bg-[#E7EEE1] p-3.5">
@@ -403,23 +540,43 @@ Mohon konfirmasi ketersediaan jadwal, total akhir, dan petunjuk pembayaran. Teri
                     </span>
                     <div className="min-w-0 flex-1">
                       <p className="font-display text-[11px] font-extrabold uppercase text-[#33402B]">
-                        {t('orderDeliveryHighlight')}
+                        {mealsPerDay} {isIndonesian ? `box segar setiap hari` : `fresh ${mealsPerDay === 1 ? 'box' : 'boxes'} every day`}
                       </p>
                       <p className="mt-1 text-[10px] leading-relaxed text-[#526049]">
-                        {t('orderDeliveryDetail')}
+                        {mealsPerDay === 2 ? orderCopy.sameMenu : t('orderDeliveryDetail')}
                       </p>
                     </div>
                     <div className="hidden shrink-0 flex-col gap-1 font-mono text-[8px] font-bold uppercase text-[#647554] sm:flex">
-                      <span className="inline-flex items-center gap-1"><Clock3 size={10} /> 1x / day</span>
-                      <span className="inline-flex items-center gap-1"><UtensilsCrossed size={10} /> 1 box / day</span>
+                      <span className="inline-flex items-center gap-1"><Clock3 size={10} /> {mealsPerDay}x / day</span>
+                      <span className="inline-flex items-center gap-1"><UtensilsCrossed size={10} /> {mealsPerDay} {mealsPerDay === 1 ? 'box' : 'boxes'} / day</span>
                     </div>
                   </div>
+                </section>
+
+                <section aria-labelledby={`${fieldId}-addons-title`}>
+                  <div className="mb-3 flex items-center gap-2.5">
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#1E1E1E] font-mono text-[10px] font-bold text-white">03</span>
+                    <h3 id={`${fieldId}-addons-title`} className="min-w-0 font-display text-xs font-extrabold uppercase">{orderCopy.addons}</h3>
+                    <span className="h-px min-w-[8px] flex-1 bg-[#1E1E1E]/15" />
+                  </div>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    {addons.map((addon) => {
+                      const selected = addonIds.includes(addon.id);
+                      return (
+                        <button key={addon.id} type="button" aria-pressed={selected} onClick={() => toggleAddon(addon.id)} className={`flex min-h-16 items-center justify-between gap-3 rounded-lg border-2 p-3 text-left transition-colors ${selected ? 'border-[#1E1E1E] bg-[#1E1E1E] text-white' : 'border-[#1E1E1E]/15 bg-white hover:border-[#8A9C7A]'}`}>
+                          <span className="min-w-0"><strong className="block font-display text-[10px] font-extrabold uppercase leading-tight">{isIndonesian ? addon.nameID : addon.name}</strong><span className={`mt-1 block font-mono text-[9px] font-bold ${selected ? 'text-[#B8C8AA]' : 'text-[#647554]'}`}>+ Rp {addon.price.toLocaleString('id-ID')} / box</span></span>
+                          {selected ? <Check size={16} className="shrink-0 text-[#B8C8AA]" /> : null}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <p className="mt-2 text-[9px] leading-4 text-[#647554]">{orderCopy.addonsHelp}</p>
                 </section>
               </div>
 
               <section aria-labelledby={`${fieldId}-delivery-title`} className="min-w-0">
                 <div className="mb-3 flex items-center gap-2.5">
-                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#1E1E1E] font-mono text-[10px] font-bold text-white">03</span>
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#1E1E1E] font-mono text-[10px] font-bold text-white">04</span>
                   <h3 id={`${fieldId}-delivery-title`} className="min-w-0 font-display text-xs font-extrabold uppercase">
                     {t('orderDeliverySchedule')}
                   </h3>
@@ -498,7 +655,36 @@ Mohon konfirmasi ketersediaan jadwal, total akhir, dan petunjuk pembayaran. Teri
                   </div>
                 </div>
 
-                <div className="mt-4 space-y-1.5">
+                <div className="mt-4">
+                  <p className="font-display text-[10px] font-bold uppercase text-[#4D4D4D]">{orderCopy.servingsPerDay}</p>
+                  <div className="mt-2 grid grid-cols-2 gap-2" role="radiogroup" aria-label={orderCopy.servingsPerDay}>
+                    <button type="button" role="radio" aria-checked={mealsPerDay === 1} onClick={() => setMealsPerDay(1)} className={`min-h-11 rounded-lg border-2 px-3 font-display text-[10px] font-extrabold uppercase ${mealsPerDay === 1 ? 'border-[#1E1E1E] bg-[#1E1E1E] text-white' : 'border-[#1E1E1E]/20 bg-white'}`}>{orderCopy.oneServing}</button>
+                    <button type="button" role="radio" aria-checked={mealsPerDay === 2} onClick={() => setMealsPerDay(2)} className={`min-h-11 rounded-lg border-2 px-3 font-display text-[10px] font-extrabold uppercase ${mealsPerDay === 2 ? 'border-[#1E1E1E] bg-[#1E1E1E] text-white' : 'border-[#1E1E1E]/20 bg-white'}`}>{orderCopy.twoServings}</button>
+                  </div>
+                  {mealsPerDay === 2 ? <p className="mt-2 rounded-lg border border-[#8A9C7A]/40 bg-[#E7EEE1] px-3 py-2 text-[10px] font-semibold leading-4 text-[#526049]">{orderCopy.sameMenu}</p> : null}
+                </div>
+
+                <div className="mt-4 rounded-lg border border-[#1E1E1E]/20 bg-white p-3">
+                  <p className="flex items-center gap-1.5 font-display text-[10px] font-bold uppercase text-[#4D4D4D]"><Clock3 size={13} className="text-[#647554]" />{orderCopy.schedule}</p>
+                  <div className={`mt-2 grid gap-2 ${mealsPerDay === 2 ? 'grid-cols-2' : ''}`}>
+                    <div className="flex items-center justify-between rounded-md bg-[var(--cpl-cream)] px-3 py-2"><span className="font-display text-[9px] font-bold uppercase text-[#647554]">{orderCopy.mealOne}</span><strong className="font-mono text-xs">12.00</strong></div>
+                    {mealsPerDay === 2 ? <div className="flex items-center justify-between rounded-md bg-[var(--cpl-cream)] px-3 py-2"><span className="font-display text-[9px] font-bold uppercase text-[#647554]">{orderCopy.mealTwo}</span><strong className="font-mono text-xs">18.00</strong></div> : null}
+                  </div>
+                  <p className="mt-2 text-[9px] leading-4 text-[#647554]">{orderCopy.scheduleNote}</p>
+                </div>
+
+                <div className="mt-4">
+                  <div className="mb-2 flex items-center gap-2.5">
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#1E1E1E] font-mono text-[10px] font-bold text-white">05</span>
+                    <p className="font-display text-[10px] font-extrabold uppercase">{orderCopy.fulfillment}</p>
+                    <span className="h-px min-w-[8px] flex-1 bg-[#1E1E1E]/15" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    {fulfillmentOptions.map((option) => <button key={option.id} type="button" aria-pressed={fulfillment === option.id} onClick={() => { setFulfillment(option.id); setErrors((current) => ({ ...current, address: undefined })); }} className={`min-h-11 rounded-lg border-2 px-2 font-display text-[9px] font-extrabold uppercase leading-tight ${fulfillment === option.id ? 'border-[#1E1E1E] bg-[#1E1E1E] text-white' : 'border-[#1E1E1E]/20 bg-white'}`}>{option.label}</button>)}
+                  </div>
+                </div>
+
+                {requiresDeliveryAddress ? <div className="mt-4 space-y-1.5">
                   <label htmlFor={`${fieldId}-address`} className="block font-display text-[10px] font-bold uppercase text-[#4D4D4D]">
                     {t('orderAddress')}
                   </label>
@@ -533,23 +719,41 @@ Mohon konfirmasi ketersediaan jadwal, total akhir, dan petunjuk pembayaran. Teri
                       </div>
                     )}
                   </div>
-                </div>
+                </div> : <div className="mt-3 rounded-lg border border-[#8A9C7A]/40 bg-[#E7EEE1] px-3 py-2 text-[9px] font-semibold leading-4 text-[#526049]">
+                  <p>{fulfillment === 'Pickup' ? orderCopy.pickupNote : orderCopy.arrangedNote}</p>
+                  <p className="mt-1.5 flex items-start gap-1.5 font-bold text-[#33402B]"><MapPin size={12} className="mt-0.5 shrink-0" /><span>{centralKitchenAddress}</span></p>
+                </div>}
 
                 <div className="mt-4 grid grid-cols-1 min-[360px]:grid-cols-[1fr_auto] items-center gap-3 rounded-lg border-2 border-[#8A9C7A] bg-[#E7EEE1] p-3.5 sm:p-4" aria-live="polite">
                   <div className="min-w-0">
                     <p className="flex items-center gap-1.5 text-[10px] font-bold uppercase text-[#526049]">
-                      <PackageCheck size={14} /> {t('orderSummary')}
+                      <span className="grid h-6 w-6 place-items-center rounded-full bg-[#1E1E1E] font-mono text-[8px] text-white">06</span><PackageCheck size={14} /> {t('orderSummary')}
                     </p>
                     <p className="mt-1 font-mono text-[10px] font-bold">
-                      {selectedTier.tier}g · {totalDays} {t('orderDaysUnit')} · {totalDays} box
+                      {orderCopy.weeklyRotation} · {selectedTier.tier}g · {periodLabel}
                     </p>
-                    <p className="mt-1 text-[9px] text-[#647554]">{t('orderSundayExcluded')}</p>
+                    <p className="mt-1 text-[9px] text-[#647554]">{totalDays} {t('orderDaysUnit')} · {mealsPerDay}x/{isIndonesian ? 'hari' : 'day'} · {totalBoxes} box · {t('orderSundayExcluded')}</p>
+                    <p className="mt-1 text-[9px] text-[#647554]">{orderCopy.fulfillment}: {fulfillment === 'Customer-arranged' ? orderCopy.customerArranged : fulfillment}</p>
+                    <p className="mt-1 flex items-start gap-1 text-[9px] text-[#647554]"><MapPin size={10} className="mt-0.5 shrink-0" /><span><strong>{requiresDeliveryAddress ? orderCopy.deliveryDestination : orderCopy.centralKitchen}:</strong> {requiresDeliveryAddress ? (address || '-') : centralKitchenAddress}</span></p>
+                    <p className="mt-1 text-[9px] font-semibold text-[#526049]">{orderCopy.mealOne} {orderCopy.ready} {readyTimeMeal1}{mealsPerDay === 2 ? ` · ${orderCopy.mealTwo} ${orderCopy.ready} ${readyTimeMeal2} · ${orderCopy.sameMenu}` : ''}</p>
+                    <div className="mt-2 border-t border-[#8A9C7A]/30 pt-2 font-mono text-[8px] text-[#647554]">
+                      <div className="flex items-start justify-between gap-3"><span>{orderCopy.basePrice}: Rp {selectedPrice.toLocaleString('id-ID')} × {totalBoxes} box</span><strong className="whitespace-nowrap text-[#33402B]">Rp {(selectedPrice * totalBoxes).toLocaleString('id-ID')}</strong></div>
+                      <p className="mt-1.5 font-sans font-bold uppercase tracking-wide text-[#526049]">{orderCopy.addons}</p>
+                      {selectedAddons.length ? selectedAddons.map((addon) => (
+                        <div key={addon.id} className="mt-1 flex items-start justify-between gap-3">
+                          <span>{isIndonesian ? addon.nameID : addon.name}<br /><span className="opacity-75">Rp {addon.price.toLocaleString('id-ID')} / box × {totalBoxes}</span></span>
+                          <strong className="whitespace-nowrap text-[#33402B]">Rp {(addon.price * totalBoxes).toLocaleString('id-ID')}</strong>
+                        </div>
+                      )) : <p className="mt-1">{orderCopy.none}</p>}
+                      {selectedAddons.length ? <div className="mt-1.5 flex justify-between gap-3 border-t border-[#8A9C7A]/25 pt-1.5 font-bold text-[#33402B]"><span>{orderCopy.addonTotal}</span><span className="whitespace-nowrap">Rp {(addonsPerBox * totalBoxes).toLocaleString('id-ID')}</span></div> : null}
+                    </div>
                   </div>
                   <div className="text-right">
                     <p className="text-[9px] font-bold uppercase text-[#526049]">{t('orderEstimatedTotal')}</p>
                     <p className="whitespace-nowrap font-display text-xl font-black">Rp {totalCost.toLocaleString('id-ID')}</p>
                   </div>
                 </div>
+                <p className="mt-2 text-center text-[9px] leading-4 text-[#647554]">{orderCopy.courierNote}</p>
 
                 <Button
                   type="submit"
@@ -618,15 +822,27 @@ Mohon konfirmasi ketersediaan jadwal, total akhir, dan petunjuk pembayaran. Teri
                   <div>
                     <p className="font-display text-[9px] font-bold uppercase tracking-wider text-[#647554]">{t('orderDeliveryPeriodLabel')}</p>
                     <p className="mt-0.5 font-mono text-[10px] font-bold text-[#33402B]">
-                      {formatOrderDate(startDate)} – {formatOrderDate(endDate)}
+                      {formatOrderDate(startDate, locale)} – {formatOrderDate(endDate, locale)}
                     </p>
                   </div>
 
                   <div>
                     <p className="font-display text-[9px] font-bold uppercase tracking-wider text-[#647554]">{t('orderSummary')}</p>
                     <p className="mt-0.5 font-mono text-[10px] font-bold text-[#1E1E1E]">
-                      {totalDays} {t('orderDaysUnit')} ({totalDays} Box)
+                      {totalDays} {t('orderDaysUnit')} · {mealsPerDay}x/{isIndonesian ? 'hari' : 'day'} ({totalBoxes} Box)
                     </p>
+                  </div>
+                  <div className="sm:col-span-2">
+                    <p className="font-display text-[9px] font-bold uppercase tracking-wider text-[#647554]">{orderCopy.schedule}</p>
+                    <p className="mt-0.5 font-mono text-[10px] font-bold text-[#1E1E1E]">{orderCopy.mealOne} {orderCopy.ready} {readyTimeMeal1}{mealsPerDay === 2 ? ` · ${orderCopy.mealTwo} ${orderCopy.ready} ${readyTimeMeal2} · ${orderCopy.sameMenu}` : ''}</p>
+                  </div>
+                  <div>
+                    <p className="font-display text-[9px] font-bold uppercase tracking-wider text-[#647554]">{orderCopy.addons}</p>
+                    <p className="mt-0.5 text-[10px] font-bold text-[#1E1E1E]">{selectedAddonNames.length ? selectedAddonNames.join(', ') : orderCopy.none}</p>
+                  </div>
+                  <div>
+                    <p className="font-display text-[9px] font-bold uppercase tracking-wider text-[#647554]">{orderCopy.fulfillment}</p>
+                    <p className="mt-0.5 text-[10px] font-bold text-[#1E1E1E]">{fulfillment === 'Customer-arranged' ? orderCopy.customerArranged : fulfillment}</p>
                   </div>
                 </div>
 

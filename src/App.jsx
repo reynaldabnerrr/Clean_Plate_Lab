@@ -1,124 +1,70 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { CplProvider } from './context/CplContext';
 import { Navbar } from './components/Navbar';
-import { Hero } from './components/Hero';
-import { BrandPillars } from './components/BrandPillars';
-import { LabelGenerator } from './components/LabelGenerator';
-import { MenuSection } from './components/MenuSection';
-import { MacroCalculator } from './components/MacroCalculator';
-import { CorporateCatering } from './components/CorporateCatering';
-import { OrderModal } from './components/OrderModal';
 import { Footer } from './components/Footer';
-
-function MainApp() {
-  const [orderOpen, setOrderOpen] = useState(false);
-
-  const scrollToLabel = () => {
-    const el = document.getElementById('label-generator');
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
-  return (
-    <div className="min-h-screen bg-[var(--cpl-cream)] text-[var(--cpl-dark)] font-sans">
-      
-      {/* Clean Navigation Bar */}
-      <Navbar 
-        onOpenOrder={() => setOrderOpen(true)}
-      />
-
-      {/* Hero Section */}
-      <Hero 
-        onOpenOrder={() => setOrderOpen(true)}
-        onScrollToLabel={scrollToLabel}
-      />
-
-      {/* Brand 3 Core Pillars Section */}
-      <BrandPillars />
-
-      {/* Interactive CPL Product Label & Macro Inspector */}
-      <LabelGenerator 
-        onOpenOrder={() => setOrderOpen(true)}
-      />
-
-      {/* High Protein Weekly Menu Showcase */}
-      <MenuSection 
-        onSelectMeal={() => setOrderOpen(true)}
-      />
-
-      {/* Harris-Benedict Clinical Macro Calculator */}
-      <MacroCalculator 
-        onOpenOrder={() => setOrderOpen(true)}
-      />
-
-      {/* B2B & Office Corporate Catering Estimator */}
-      <CorporateCatering 
-        onOpenOrder={() => setOrderOpen(true)}
-      />
-
-      {/* Footer */}
-      <Footer />
-
-      {/* Order Inquiry Modal */}
-      <OrderModal 
-        isOpen={orderOpen}
-        onClose={() => setOrderOpen(false)}
-      />
-
-    </div>
-  );
-}
+import { OrderModal } from './components/OrderModal';
+import { LanguageWelcomeModal } from './components/LanguageWelcomeModal';
+import HomePage from './pages/HomePage';
+import { analytics, trackEvent } from './lib/analytics';
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { hasError: false, error: null, errorInfo: null };
+    this.state = { hasError: false };
   }
 
-  static getDerivedStateFromError(error) {
-    return { hasError: true, error };
+  static getDerivedStateFromError() {
+    return { hasError: true };
   }
 
   componentDidCatch(error, errorInfo) {
-    console.error("CPL App Error caught:", error, errorInfo);
-    this.setState({ errorInfo });
+    console.error('Clean Plate Lab application error:', error, errorInfo);
   }
 
   render() {
     if (this.state.hasError) {
       return (
-        <div style={{ padding: '30px', fontFamily: 'sans-serif', background: '#F5F2EA', color: '#1E1E1E', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyCenter: 'center' }}>
-          <div style={{ maxWidth: '600px', width: '100%', padding: '24px', background: '#FFFFFF', border: '2px solid #1E1E1E', boxShadow: '4px 4px 0px 0px #1E1E1E' }}>
-            <h2 style={{ fontSize: '20px', fontWeight: 'bold', color: '#647554', textTransform: 'uppercase', marginBottom: '8px' }}>
-              Clean Plate Lab • System Diagnostic
-            </h2>
-            <p style={{ fontSize: '14px', color: '#1E1E1E', fontWeight: 'bold', marginBottom: '12px' }}>
-              {this.state.error?.toString()}
-            </p>
-            <pre style={{ padding: '12px', background: '#EBF0E6', border: '1px solid #8A9C7A', fontSize: '11px', overflowX: 'auto', whiteSpace: 'pre-wrap', marginBottom: '16px', color: '#647554' }}>
-              {this.state.errorInfo?.componentStack || this.state.error?.stack}
-            </pre>
-            <button 
-              onClick={() => window.location.reload()} 
-              style={{ padding: '10px 20px', background: '#8A9C7A', color: '#FFFFFF', border: '2px solid #1E1E1E', fontWeight: 'bold', cursor: 'pointer', textTransform: 'uppercase' }}
-            >
-              Muat Ulang Halaman
-            </button>
+        <main className="grid min-h-screen place-items-center bg-[#F5F2EA] p-6 text-center">
+          <div className="max-w-lg border-2 border-[#1E1E1E] bg-white p-8 shadow-[6px_6px_0_#1E1E1E]">
+            <p className="font-mono text-[10px] font-bold uppercase tracking-widest text-[#647554]">System notice</p>
+            <h1 className="mt-4 font-display text-3xl font-extrabold uppercase">This page could not be displayed.</h1>
+            <button type="button" onClick={() => window.location.reload()} className="mt-7 min-h-12 bg-[#1E1E1E] px-6 text-xs font-bold uppercase tracking-wider text-white">Reload page</button>
           </div>
-        </div>
+        </main>
       );
     }
-
     return this.props.children;
   }
 }
 
 export default function App() {
+  const [orderModalOpen, setOrderModalOpen] = React.useState(false);
+  const [initialProteinTier, setInitialProteinTier] = React.useState(40);
+  const [initialMealsPerDay, setInitialMealsPerDay] = React.useState(1);
+
+  React.useEffect(() => {
+    trackEvent('page_view', { page_path: '/' });
+  }, []);
+
+  const handleBuild = (source, proteinTier, mealsPerDay = 1) => {
+    analytics.builderOpened(source);
+    if (proteinTier) setInitialProteinTier(proteinTier);
+    setInitialMealsPerDay(mealsPerDay);
+    setOrderModalOpen(true);
+  };
+
   return (
     <ErrorBoundary>
       <CplProvider>
-        <MainApp />
+        <div className="min-h-screen bg-[var(--cpl-cream)] text-[var(--cpl-dark)]">
+          <LanguageWelcomeModal />
+          <Navbar onOpenOrder={() => handleBuild('navigation')} />
+          <main id="main-content" tabIndex="-1" className="outline-none">
+            <HomePage onBuild={handleBuild} />
+          </main>
+          <Footer />
+          <OrderModal isOpen={orderModalOpen} onClose={() => setOrderModalOpen(false)} initialProteinTier={initialProteinTier} initialMealsPerDay={initialMealsPerDay} />
+        </div>
       </CplProvider>
     </ErrorBoundary>
   );

@@ -46,8 +46,8 @@ export function Hero({ onOpenOrder, onScrollToLabel }) {
       icon: Leaf,
     },
     {
-      badge: 'DAILY',
-      value: '1x/Hari',
+      badge: t('heroDeliveryBadge'),
+      value: t('heroDeliveryValue'),
       title: t('heroMacroAcc'),
       description: t('heroMacroAccDesc'),
       icon: Truck,
@@ -95,34 +95,34 @@ export function Hero({ onOpenOrder, onScrollToLabel }) {
               {t('heroSubtitle')}
             </p>
 
-            {/* Compact on mobile, data cards from tablet upward */}
-            <div className="grid grid-cols-1 gap-2.5 pt-1 sm:grid-cols-3 sm:gap-3">
+            {/* Compact three-column summary on mobile, full specification from tablet upward */}
+            <div className="grid grid-cols-3 gap-2 pt-1 sm:gap-3">
               {metrics.map((metric) => {
                 const MetricIcon = metric.icon;
 
                 return (
                   <div
                     key={metric.badge}
-                    className="group grid min-h-0 grid-cols-[32px_86px_minmax(0,1fr)] items-center gap-3 border border-[#1E1E1E]/20 bg-white p-3 shadow-[3px_3px_0px_0px_#1E1E1E] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[4px_4px_0px_0px_#8A9C7A] sm:block sm:min-h-[154px] sm:border-2 sm:p-4"
+                    className="group flex min-h-[118px] min-w-0 flex-col items-start border-2 border-[#1E1E1E] bg-white p-2.5 shadow-[2px_2px_0px_0px_#1E1E1E] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[4px_4px_0px_0px_#8A9C7A] sm:min-h-[168px] sm:p-4"
                   >
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full border border-[#8A9C7A]/40 bg-[#EBF0E6] text-[#647554] transition-colors group-hover:bg-[#8A9C7A] group-hover:text-white">
-                      <MetricIcon size={15} />
+                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-[#8A9C7A]/40 bg-[#EBF0E6] text-[#647554] transition-colors group-hover:bg-[#8A9C7A] group-hover:text-white sm:h-8 sm:w-8">
+                      <MetricIcon size={14} />
                     </div>
 
-                    <div className="font-display text-lg font-black text-[#1E1E1E] sm:mt-3 sm:text-2xl">
+                    <div className="mt-3 whitespace-nowrap font-display text-[15px] font-black leading-none tracking-tight text-[#1E1E1E] sm:text-2xl">
                       {metric.value}
                     </div>
 
-                    <div className="min-w-0">
-                      <div className="flex items-center justify-between gap-2">
-                        <p className="truncate font-display text-[10px] font-extrabold uppercase text-[#1E1E1E] sm:text-[11px]">
+                    <div className="mt-2 min-w-0 w-full">
+                      <div className="flex items-start justify-between gap-2">
+                        <p className="line-clamp-2 font-display text-[8px] font-extrabold uppercase leading-tight text-[#1E1E1E] sm:text-[11px]">
                           {metric.title}
                         </p>
                         <span className="hidden rounded bg-[#8A9C7A]/15 px-1.5 py-0.5 font-mono text-[8px] font-extrabold text-[#647554] sm:inline-flex">
                           {metric.badge}
                         </span>
                       </div>
-                      <p className="mt-0.5 line-clamp-2 text-[9px] leading-snug text-gray-500 sm:text-[10px]">
+                      <p className="mt-2 hidden line-clamp-3 text-[10px] leading-snug text-gray-500 sm:block">
                         {metric.description}
                       </p>
                     </div>

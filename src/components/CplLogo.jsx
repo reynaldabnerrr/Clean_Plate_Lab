@@ -16,7 +16,7 @@ export function CplIcon({ size = 32, className = "" }) {
   return <CplLogoImage size={size} className={className} />;
 }
 
-export function CplPrimaryLogo({ className = "", size = "normal" }) {
+export function CplPrimaryLogo({ className = "", size = "normal", inverted = false }) {
   const isLarge = size === "large";
   const imgSize = isLarge ? 50 : 38;
 
@@ -24,10 +24,10 @@ export function CplPrimaryLogo({ className = "", size = "normal" }) {
     <div className={`flex items-center gap-3 select-none ${className}`}>
       <CplLogoImage size={imgSize} />
       <div className="flex flex-col justify-center leading-none">
-        <div className={`font-display font-black tracking-tighter uppercase text-[#1E1E1E] ${isLarge ? 'text-2xl' : 'text-lg sm:text-xl'}`}>
+        <div className={`font-display font-black tracking-tighter uppercase ${inverted ? 'text-white' : 'text-[#1E1E1E]'} ${isLarge ? 'text-2xl' : 'text-lg sm:text-xl'}`}>
           CLEAN PLATE LAB
         </div>
-        <div className={`font-display font-bold uppercase tracking-widest mt-1 text-[#647554] ${isLarge ? 'text-xs' : 'text-[10px]'}`}>
+        <div className={`font-display font-bold uppercase tracking-widest mt-1 ${inverted ? 'text-[#B8C8AA]' : 'text-[#647554]'} ${isLarge ? 'text-xs' : 'text-[10px]'}`}>
           GOOD FOOD. CLEAR DATA. BETTER YOU.
         </div>
       </div>
