@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { CplPrimaryLogo } from './CplLogo';
 import { Button } from './ui/button';
-import { Menu, X, ArrowRight, Globe, Sparkles } from 'lucide-react';
+import { Menu, X, ArrowRight, Globe } from 'lucide-react';
 import { useCpl } from '../hooks/useCpl';
 
-export function Navbar({ onOpenOrder, onOpenGuideline }) {
+export function Navbar({ onOpenOrder }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { language, setLanguage, t } = useCpl();
@@ -56,6 +56,15 @@ export function Navbar({ onOpenOrder, onOpenGuideline }) {
         {t('skipContent')}
       </a>
 
+      {/* Mobile Backdrop Overlay (Layered behind z-50 header & drawer) */}
+      {mobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 xl:hidden animate-cpl-fade-in"
+          onClick={() => setMobileMenuOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
       <header
         className={`sticky top-0 z-50 transition-all duration-300 ${
           mobileMenuOpen
@@ -81,7 +90,7 @@ export function Navbar({ onOpenOrder, onOpenGuideline }) {
           {/* Desktop Navigation Links */}
           <nav 
             aria-label="Main Navigation"
-            className="hidden lg:flex items-center justify-center gap-6 xl:gap-8 text-xs font-display font-bold uppercase tracking-wider text-[#1E1E1E]"
+            className="hidden xl:flex items-center justify-center gap-6 xl:gap-8 text-xs font-display font-bold uppercase tracking-wider text-[#1E1E1E]"
           >
             {navItems.map((item) => (
               <a 
@@ -137,13 +146,13 @@ export function Navbar({ onOpenOrder, onOpenGuideline }) {
               <ArrowRight size={14} />
             </Button>
 
-            {/* Mobile Menu Toggle Button (Touch Area 44x44px) */}
+            {/* Mobile / Tablet Menu Toggle Button (Touch Area 44x44px) */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-expanded={mobileMenuOpen}
               aria-controls="mobile-menu-drawer"
               aria-label={mobileMenuOpen ? "Close Menu" : "Open Navigation Menu"}
-              className="lg:hidden w-11 h-11 flex items-center justify-center rounded-xl bg-[#1E1E1E]/5 hover:bg-[#1E1E1E]/10 border border-[#1E1E1E]/15 text-[#1E1E1E] transition-colors shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8A9C7A]"
+              className="xl:hidden w-11 h-11 flex items-center justify-center rounded-xl bg-[#1E1E1E]/5 hover:bg-[#1E1E1E]/10 border border-[#1E1E1E]/15 text-[#1E1E1E] transition-colors shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8A9C7A]"
             >
               {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
             </button>
@@ -153,89 +162,70 @@ export function Navbar({ onOpenOrder, onOpenGuideline }) {
 
         {/* Mobile / Tablet Full-Featured Drawer */}
         {mobileMenuOpen && (
-          <>
-            <div 
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
-              onClick={() => setMobileMenuOpen(false)}
-              aria-hidden="true"
-            />
-            
-            <div 
-              id="mobile-menu-drawer"
-              className="absolute top-full left-0 right-0 z-50 lg:hidden bg-[#F5F2EA] border-b-2 border-[#1E1E1E] px-5 py-6 space-y-5 font-display text-xs font-bold uppercase tracking-wider text-[#1E1E1E] shadow-2xl max-h-[calc(100vh-80px)] overflow-y-auto animate-in slide-in-from-top-2 duration-200"
-            >
-              {/* Language Switcher Row in Drawer */}
-              <div className="flex items-center justify-between py-3 px-4 rounded-xl bg-white border border-[#1E1E1E]/15 shadow-sm">
-                <span className="flex items-center gap-2 text-xs text-[#1E1E1E] font-extrabold">
-                  <Globe size={16} className="text-[#8A9C7A]" />
-                  <span>{t('switchLanguage')}</span>
-                </span>
+          <div 
+            id="mobile-menu-drawer"
+            className="absolute top-full left-0 right-0 z-50 xl:hidden bg-[#F5F2EA] border-b-2 border-[#1E1E1E] px-5 py-6 space-y-5 font-display text-xs font-bold uppercase tracking-wider text-[#1E1E1E] shadow-2xl max-h-[calc(100vh-80px)] overflow-y-auto animate-cpl-slide-down origin-top"
+          >
+            {/* Language Switcher Row in Drawer */}
+            <div className="flex items-center justify-between py-3 px-4 rounded-xl bg-white border border-[#1E1E1E]/15 shadow-sm">
+              <span className="flex items-center gap-2 text-xs text-[#1E1E1E] font-extrabold">
+                <Globe size={16} className="text-[#8A9C7A]" />
+                <span>{t('switchLanguage')}</span>
+              </span>
 
-                <div className="flex items-center bg-[#1E1E1E]/8 p-1 rounded-full border border-[#1E1E1E]/15">
-                  <button
-                    type="button"
-                    onClick={() => setLanguage('ID')}
-                    className={`px-3 py-1 text-xs font-black rounded-full transition-all ${
-                      language === 'ID'
-                        ? 'bg-[#8A9C7A] text-white shadow-sm'
-                        : 'text-[#1E1E1E]/70 hover:text-[#1E1E1E]'
-                    }`}
-                  >
-                    ID
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setLanguage('EN')}
-                    className={`px-3 py-1 text-xs font-black rounded-full transition-all ${
-                      language === 'EN'
-                        ? 'bg-[#8A9C7A] text-white shadow-sm'
-                        : 'text-[#1E1E1E]/70 hover:text-[#1E1E1E]'
-                    }`}
-                  >
-                    EN
-                  </button>
-                </div>
-              </div>
-
-              {/* Mobile Navigation Links */}
-              <nav aria-label="Mobile Navigation" className="space-y-2">
-                {navItems.map((item) => (
-                  <a
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center justify-between py-3 px-4 rounded-xl bg-white/80 hover:bg-white border border-[#1E1E1E]/10 hover:border-[#8A9C7A]/40 text-[#1E1E1E] hover:text-[#647554] font-extrabold text-sm transition-all shadow-sm active:scale-[0.99]"
-                  >
-                    <span>{item.label}</span>
-                    <ArrowRight size={16} className="text-[#8A9C7A]" />
-                  </a>
-                ))}
-              </nav>
-              
-              {/* Drawer Action Buttons */}
-              <div className="pt-3 border-t border-[#1E1E1E]/15 space-y-2.5">
-                {onOpenGuideline && (
-                  <Button 
-                    variant="secondary"
-                    onClick={() => { setMobileMenuOpen(false); onOpenGuideline(); }} 
-                    className="w-full flex items-center justify-center gap-2 rounded-full border border-[#8A9C7A]/40 bg-[#EBF0E6] text-[#647554] font-extrabold text-xs py-3"
-                  >
-                    <Sparkles size={15} />
-                    <span>Brand Specs</span>
-                  </Button>
-                )}
-
-                <Button 
-                  variant="default" 
-                  onClick={() => { setMobileMenuOpen(false); onOpenOrder(); }} 
-                  className="w-full flex items-center justify-center gap-2 rounded-full bg-[#8A9C7A] hover:bg-[#647554] text-white font-extrabold text-xs py-3.5 shadow-md active:scale-[0.98] transition-transform"
+              <div className="flex items-center bg-[#1E1E1E]/8 p-1 rounded-full border border-[#1E1E1E]/15">
+                <button
+                  type="button"
+                  onClick={() => setLanguage('ID')}
+                  className={`px-3 py-1 text-xs font-black rounded-full transition-all ${
+                    language === 'ID'
+                      ? 'bg-[#8A9C7A] text-white shadow-sm'
+                      : 'text-[#1E1E1E]/70 hover:text-[#1E1E1E]'
+                  }`}
                 >
-                  <span>{t('orderMealPlan')}</span>
-                  <ArrowRight size={16} />
-                </Button>
+                  ID
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLanguage('EN')}
+                  className={`px-3 py-1 text-xs font-black rounded-full transition-all ${
+                    language === 'EN'
+                      ? 'bg-[#8A9C7A] text-white shadow-sm'
+                      : 'text-[#1E1E1E]/70 hover:text-[#1E1E1E]'
+                  }`}
+                >
+                  EN
+                </button>
               </div>
             </div>
-          </>
+
+            {/* Mobile Navigation Links */}
+            <nav aria-label="Mobile Navigation" className="space-y-2">
+              {navItems.map((item) => (
+                <a
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between py-3 px-4 rounded-xl bg-white/80 hover:bg-white border border-[#1E1E1E]/10 hover:border-[#8A9C7A]/40 text-[#1E1E1E] hover:text-[#647554] font-extrabold text-sm transition-all shadow-sm active:scale-[0.99]"
+                >
+                  <span>{item.label}</span>
+                  <ArrowRight size={16} className="text-[#8A9C7A]" />
+                </a>
+              ))}
+            </nav>
+            
+            {/* Drawer Action Buttons */}
+            <div className="pt-3 border-t border-[#1E1E1E]/15 space-y-2.5">
+              <Button 
+                variant="default" 
+                onClick={() => { setMobileMenuOpen(false); onOpenOrder(); }} 
+                className="w-full flex items-center justify-center gap-2 rounded-full bg-[#8A9C7A] hover:bg-[#647554] text-white font-extrabold text-xs py-3.5 shadow-md active:scale-[0.98] transition-transform"
+              >
+                <span>{t('orderMealPlan')}</span>
+                <ArrowRight size={16} />
+              </Button>
+            </div>
+          </div>
         )}
       </header>
     </>

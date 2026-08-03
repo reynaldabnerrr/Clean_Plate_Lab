@@ -212,4 +212,31 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   opacity: 1;
 }
 
+/* Mobile Navbar Drawer Slide Down Animation */
+@keyframes cpl-slide-down {
+  0% {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
+@keyframes cpl-fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.animate-cpl-slide-down {
+  animation: cpl-slide-down 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-cpl-fade-in {
+  animation: cpl-fade-in 0.25s ease-out forwards;
+}

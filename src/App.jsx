@@ -8,12 +8,10 @@ import { MenuSection } from './components/MenuSection';
 import { MacroCalculator } from './components/MacroCalculator';
 import { CorporateCatering } from './components/CorporateCatering';
 import { OrderModal } from './components/OrderModal';
-import { BrandGuidelineModal } from './components/BrandGuidelineModal';
 import { Footer } from './components/Footer';
 
 function MainApp() {
   const [orderOpen, setOrderOpen] = useState(false);
-  const [guidelineOpen, setGuidelineOpen] = useState(false);
 
   const scrollToLabel = () => {
     const el = document.getElementById('label-generator');
@@ -28,7 +26,6 @@ function MainApp() {
       {/* Clean Navigation Bar */}
       <Navbar 
         onOpenOrder={() => setOrderOpen(true)}
-        onOpenGuideline={() => setGuidelineOpen(true)}
       />
 
       {/* Hero Section */}
@@ -67,12 +64,6 @@ function MainApp() {
       <OrderModal 
         isOpen={orderOpen}
         onClose={() => setOrderOpen(false)}
-      />
-
-      {/* Brand Guidelines Modal */}
-      <BrandGuidelineModal
-        isOpen={guidelineOpen}
-        onClose={() => setGuidelineOpen(false)}
       />
 
     </div>
