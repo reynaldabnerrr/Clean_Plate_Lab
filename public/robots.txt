@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://cleanplatelab.id/sitemap.xml
+Sitemap: https://cleanplatelab.online/sitemap.xml

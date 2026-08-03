@@ -1,13 +1,13 @@
 import { useEffect } from 'react';
 
-const SITE_URL = 'https://cleanplatelab.id';
+const SITE_URL = 'https://cleanplatelab.online';
 
 function setMeta(selector, attribute, value) {
   const element = document.head.querySelector(selector);
   if (element) element.setAttribute(attribute, value);
 }
 
-export function Seo({ title, description, image = `${SITE_URL}/CPL_logo.png`, path = '/' }) {
+export function Seo({ title, description, image = `${SITE_URL}/CPL_logo_white.webp`, path = '/' }) {
   useEffect(() => {
     const fullTitle = title.includes('Clean Plate Lab') ? title : `${title} | Clean Plate Lab`;
     const canonicalUrl = `${SITE_URL}${path}`;
