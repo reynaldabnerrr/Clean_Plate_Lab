@@ -3,7 +3,8 @@ import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Card } from './ui/card';
 import { Slider } from './ui/slider';
-import { Calculator, Target, ArrowRight } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger } from './ui/select';
+import { Calculator, Target, ArrowRight, Gauge } from 'lucide-react';
 import { useCpl } from '../hooks/useCpl';
 import { calculateMacroTargets } from '../lib/calculations';
 import { analytics } from '../lib/analytics';
@@ -36,6 +37,14 @@ export function MacroCalculator({ onOpenOrder }) {
   const recommendedTierData = proteinTiers.find((tier) => tier.protein === recommendedProteinTier) || proteinTiers[0];
   const recommendedPlanName = `${recommendedProteinTier}g ${language === 'ID' ? 'Protein' : 'Protein Plan'} (${formatCurrency(recommendedTierData.prices.daily)})`;
   const upToLabel = language === 'ID' ? 'Hingga' : 'Up to';
+  const activityOptions = [
+    { value: 1.2, label: t('calcActivitySedentary') },
+    { value: 1.375, label: t('calcActivityLight') },
+    { value: 1.55, label: t('calcActivityModerate') },
+    { value: 1.725, label: t('calcActivityHeavy') },
+    { value: 1.9, label: t('calcActivityAthlete') },
+  ];
+  const activeActivity = activityOptions.find((option) => option.value === activity) || activityOptions[2];
 
   return (
     <section id="calculator" className="overflow-x-clip border-b border-[var(--cpl-border)] bg-[var(--cpl-cream)] py-16 sm:py-24">
@@ -138,20 +147,30 @@ export function MacroCalculator({ onOpenOrder }) {
 
             {/* Activity Level Selector */}
             <div>
-              <label className="block text-xs font-display font-bold uppercase tracking-widest text-[var(--cpl-dark-muted)] mb-2">
+              <label id="activity-level-label" className="mb-2 block font-display text-xs font-bold uppercase tracking-widest text-[var(--cpl-dark-muted)]">
                 {t('calcActivity')}
               </label>
-              <select
-                value={activity}
-                onChange={(e) => setActivity(Number(e.target.value))}
-                className="h-11 w-full min-w-0 max-w-full truncate rounded-xl border border-[var(--cpl-dark)] bg-[var(--cpl-cream)] p-3 font-display text-xs font-bold text-[var(--cpl-dark)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cpl-sage)]"
-              >
-                <option value={1.2}>{t('calcActivitySedentary')}</option>
-                <option value={1.375}>{t('calcActivityLight')}</option>
-                <option value={1.55}>{t('calcActivityModerate')}</option>
-                <option value={1.725}>{t('calcActivityHeavy')}</option>
-                <option value={1.9}>{t('calcActivityAthlete')}</option>
-              </select>
+              <Select value={String(activity)} onValueChange={(value) => setActivity(Number(value))}>
+                <SelectTrigger aria-labelledby="activity-level-label" className="group min-h-16 rounded-2xl border-2 border-[#1E1E1E] bg-[var(--cpl-cream)] px-3 py-2.5 text-left hover:bg-[#E7EEE1]">
+                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[#1E1E1E] text-[#B8C8AA]">
+                    <Gauge size={17} aria-hidden="true" />
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <strong className="block truncate font-display text-[11px] font-extrabold uppercase text-[#1E1E1E]">{activeActivity.label}</strong>
+                    <span className="mt-0.5 block font-mono text-[9px] font-bold uppercase tracking-wider text-[#647554]">Activity factor · {activity}×</span>
+                  </span>
+                </SelectTrigger>
+                <SelectContent aria-label={t('calcActivity')}>
+                  {activityOptions.map((option) => (
+                    <SelectItem key={option.value} value={String(option.value)}>
+                      <span className="flex w-full items-center justify-between gap-3">
+                        <span className="min-w-0 font-display text-[10px] font-extrabold uppercase leading-4">{option.label}</span>
+                        <span className="shrink-0 rounded-full border border-current/20 px-2 py-1 font-mono text-[8px] font-bold">{option.value}×</span>
+                      </span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             {/* Fitness Goal */}
