@@ -3,87 +3,24 @@ import { CplFlaskIcon } from './CplLogo';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Card } from './ui/card';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from './ui/tabs';
 import { Copy, Check, Info } from 'lucide-react';
 import { useCpl } from '../hooks/useCpl';
 
-const PRESET_MEALS = [
-  {
-    code: "CPL-MON",
-    name: "JAPANESE YAKITORI CHICKEN",
-    protein: 45,
-    carbs: 42,
-    fat: 14,
-    kcal: 474,
-    batch: "MON-01",
-    ingredients_ID: "Dada ayam panggang saus yakitori, nasi putih, telur mata sapi, biji wijen.",
-    ingredients_EN: "Grilled chicken breast with yakitori sauce, white rice, fried egg, sesame seeds.",
-  },
-  {
-    code: "CPL-TUE",
-    name: "CRISPY CHILI GARLIC CHICKEN",
-    protein: 44,
-    carbs: 40,
-    fat: 15,
-    kcal: 471,
-    batch: "TUE-02",
-    ingredients_ID: "Ayam cabai garam renyah, bawang putih cincang, nasi putih, telur, sambal tempe buatan.",
-    ingredients_EN: "Crispy garlic chili chicken, minced garlic, white rice, egg, homemade sambal tempe.",
-  },
-  {
-    code: "CPL-WED",
-    name: "JAPANESE CHICKEN NANBAN",
-    protein: 46,
-    carbs: 44,
-    fat: 16,
-    kcal: 504,
-    batch: "WED-03",
-    ingredients_ID: "Ayam airfried renyah, saus nanban khas Jepang, nasi putih, telur, irisan daun bawang.",
-    ingredients_EN: "Crispy airfried chicken, Japanese nanban sauce, white rice, egg, sliced scallions.",
-  },
-  {
-    code: "CPL-THU",
-    name: "OYSTER GLAZED CHICKEN",
-    protein: 45,
-    carbs: 38,
-    fat: 14,
-    kcal: 458,
-    batch: "THU-04",
-    ingredients_ID: "Dada ayam empuk saus tiram, nasi putih, telur, tempe bakar gurih.",
-    ingredients_EN: "Tender chicken in oyster sauce glaze, white rice, egg, grilled savory tempe.",
-  },
-  {
-    code: "CPL-FRI",
-    name: "CREAMY CURRY CHICKEN",
-    protein: 43,
-    carbs: 45,
-    fat: 17,
-    kcal: 505,
-    batch: "FRI-05",
-    ingredients_ID: "Dada ayam empuk kari creamy, rempah rempah khas, nasi putih, telur mata sapi.",
-    ingredients_EN: "Tender chicken simmered in rich creamy curry sauce, spices, white rice, egg.",
-  },
-  {
-    code: "CPL-SAT",
-    name: "CRISPY GARLIC CHICKEN",
-    protein: 45,
-    carbs: 42,
-    fat: 15,
-    kcal: 483,
-    batch: "SAT-06",
-    ingredients_ID: "Ayam goreng renyah keemasan, bawang putih gurih, nasi putih, telur, tempe orek.",
-    ingredients_EN: "Golden crispy garlic chicken, fragrant garlic, white rice, egg, sweet savory tempe orek.",
-  }
+const PROTEIN_TIERS = [
+  { g: 25, price: "Rp 25.000", label: "25g Protein Plan", carbs: 35, fat: 10, sodium: 400, potassium: 120, kcal: 330 },
+  { g: 60, price: "Rp 40.000", label: "60g Protein Plan", carbs: 127.7, fat: 28.2, sodium: 1344.1, potassium: 340, kcal: 1111.3, recommended: true },
+  { g: 80, price: "Rp 50.000", label: "80g Protein Plan", carbs: 145, fat: 30, sodium: 1450, potassium: 380, kcal: 1170 },
+  { g: 100, price: "Rp 60.000", label: "100g Protein Plan", carbs: 160, fat: 32, sodium: 1650, potassium: 420, kcal: 1328 },
 ];
 
 export function LabelGenerator({ onOpenOrder }) {
   const { language, t } = useCpl();
-  const [activeTab, setActiveTab] = useState("custom");
-  const [selectedPreset, setSelectedPreset] = useState(PRESET_MEALS[0]);
-  const [customName, setCustomName] = useState("25g Protein Meal Box");
-  const [protein, setProtein] = useState(25);
-  const [carbs, setCarbs] = useState(35);
-  const [fat, setFat] = useState(10);
+  const [protein, setProtein] = useState(60);
+  const [carbs, setCarbs] = useState(127.7);
+  const [fat, setFat] = useState(28.2);
+  const [sodium, setSodium] = useState(1344.1);
+  const [potassium, setPotassium] = useState(340);
+  const [customName, setCustomName] = useState("60g Protein Meal Box");
   const [copied, setCopied] = useState(false);
 
   const [labelTilt, setLabelTilt] = useState({ x: 0, y: 0 });
@@ -109,20 +46,21 @@ export function LabelGenerator({ onOpenOrder }) {
     setIsLabelHovered(true);
   };
 
-  const isCustomMode = activeTab === "custom";
-  const calculatedKcal = isCustomMode ? (protein * 4 + carbs * 4 + fat * 9) : selectedPreset.kcal;
-  const currentCode = isCustomMode ? `CPL-${protein}G` : selectedPreset.code;
-  const currentTitle = isCustomMode ? (customName.toUpperCase() || "CUSTOM HIGH-PROTEIN MEAL") : selectedPreset.name;
+  const calculatedKcal = (protein === 60 && carbs === 127.7) ? 1111.3 : Math.round(protein * 4 + carbs * 4 + fat * 9);
+  const currentCode = `CPL-${Math.round(protein)}G`;
+  const currentTitle = customName.toUpperCase() || "CUSTOM HIGH-PROTEIN MEAL";
 
-  const handleSelectPreset = (meal) => {
-    setSelectedPreset(meal);
-    setProtein(meal.protein);
-    setCarbs(meal.carbs);
-    setFat(meal.fat);
+  const handleSelectTier = (tier) => {
+    setProtein(tier.g);
+    setCarbs(tier.carbs);
+    setFat(tier.fat);
+    setSodium(tier.sodium);
+    setPotassium(tier.potassium);
+    setCustomName(`${tier.g}g Protein Meal Box`);
   };
 
   const handleCopySpec = () => {
-    const text = `${t('labelSpecTitle')}\nItem: ${currentTitle} (${currentCode})\nProtein: ${protein}g | Carbs: ${carbs}g | Fat: ${fat}g | Calories: ${calculatedKcal} Kcal\n${t('labelStandardStr')}`;
+    const text = `${t('labelSpecTitle')}\nItem: ${currentTitle} (${currentCode})\nProtein: ${protein}g | Carbs: ${carbs}g | Fat: ${fat}g | Sodium: ${sodium}mg | Kalium: ${potassium}mg | Calories: ${calculatedKcal} Kcal\n${t('labelStandardStr')}`;
     navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -150,74 +88,38 @@ export function LabelGenerator({ onOpenOrder }) {
           {/* Left Controls */}
           <div className="lg:col-span-6 space-y-6">
             
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid grid-cols-2 w-full rounded-2xl p-1 bg-[#F0EAE1]">
-                <TabsTrigger value="custom" className="rounded-xl font-extrabold">{t('labelCustomBuilder')}</TabsTrigger>
-                <TabsTrigger value="preset" className="rounded-xl font-extrabold">{t('labelSelectMeal')}</TabsTrigger>
-              </TabsList>
+            <Card className="p-4 sm:p-5 bg-[var(--cpl-white)] border border-[var(--cpl-border-muted)] space-y-4 rounded-2xl shadow-sm">
+              <div className="flex justify-between items-center">
+                <span className="text-xs font-display font-extrabold uppercase text-[var(--cpl-dark)]">
+                  {t('labelCustomBuilder')}
+                </span>
+                <Badge variant="solid" className="bg-[#8A9C7A] text-white rounded-full px-3 py-1">
+                  {t('labelMainTierBadge')}
+                </Badge>
+              </div>
 
-              <TabsContent value="preset" className="space-y-3 mt-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {PRESET_MEALS.map((meal) => {
-                    const isSelected = selectedPreset.code === meal.code;
-                    return (
-                      <Card
-                        key={meal.code}
-                        onClick={() => handleSelectPreset(meal)}
-                        className={`p-3.5 sm:p-4 cursor-pointer transition-all rounded-xl ${
-                          isSelected
-                            ? 'border-2 border-[var(--cpl-sage)] bg-[var(--cpl-sage-light)] shadow-md'
-                            : 'border border-[var(--cpl-border-muted)] bg-[var(--cpl-white)] hover:border-[var(--cpl-dark)]'
-                        }`}
-                      >
-                        <div className="flex justify-between items-center text-xs font-display font-extrabold text-[var(--cpl-sage-dark)]">
-                          <span>{meal.code}</span>
-                          <span className="text-[var(--cpl-dark-muted)] text-[10px] font-mono">{meal.kcal} KCAL</span>
-                        </div>
-                        <h4 className="font-display font-extrabold text-sm uppercase text-[var(--cpl-dark)] mt-1">{meal.name}</h4>
-                        <div className="flex gap-2 text-xs font-bold text-[var(--cpl-dark-muted)] mt-2 pt-2 border-t border-[var(--cpl-border-light)]">
-                          <span className="text-[var(--cpl-sage-dark)] font-extrabold">{meal.protein}g Protein</span>
-                        </div>
-                      </Card>
-                    );
-                  })}
-                </div>
-              </TabsContent>
-
-              <TabsContent value="custom" className="space-y-4 mt-4">
-                <Card className="p-4 sm:p-5 bg-[var(--cpl-white)] border border-[var(--cpl-border-muted)] space-y-4 rounded-2xl shadow-sm">
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs font-display font-extrabold uppercase text-[var(--cpl-dark)]">Pilih Porsi Protein Resmi CPL</span>
-                    <Badge variant="solid" className="bg-[#8A9C7A] text-white rounded-full px-3 py-1">4 Paket Porsi</Badge>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-2.5">
-                    {[
-                      { g: 25, price: "Rp 25.000", label: "25g Protein Plan" },
-                      { g: 60, price: "Rp 40.000", label: "60g Protein Plan" },
-                      { g: 80, price: "Rp 50.000", label: "80g Protein Plan" },
-                      { g: 100, price: "Rp 60.000", label: "100g Protein Plan" },
-                    ].map((tier) => (
-                      <Card
-                        key={tier.g}
-                        onClick={() => {
-                          setProtein(tier.g);
-                          setCustomName(`${tier.g}g Protein Meal Box`);
-                        }}
-                        className={`p-3.5 cursor-pointer transition-all border-2 text-center rounded-xl ${
-                          protein === tier.g
-                            ? 'border-[#1E1E1E] bg-[#EBF0E6] shadow-[2px_2px_0px_0px_#1E1E1E]'
-                            : 'border-gray-200 bg-white hover:border-[#8A9C7A]'
-                        }`}
-                      >
-                        <div className="text-sm font-display font-black text-[#1E1E1E]">{tier.g}g Protein</div>
-                        <div className="text-xs font-extrabold text-[#647554] mt-0.5">{tier.price}</div>
-                      </Card>
-                    ))}
-                  </div>
-                </Card>
-              </TabsContent>
-            </Tabs>
+              <div className="grid grid-cols-2 gap-2.5">
+                {PROTEIN_TIERS.map((tier) => (
+                  <Card
+                    key={tier.g}
+                    onClick={() => handleSelectTier(tier)}
+                    className={`p-3.5 cursor-pointer transition-all border-2 text-center rounded-xl relative ${
+                      protein === tier.g
+                        ? 'border-[#1E1E1E] bg-[#EBF0E6] shadow-[2px_2px_0px_0px_#1E1E1E]'
+                        : 'border-gray-200 bg-white hover:border-[#8A9C7A]'
+                    }`}
+                  >
+                    {tier.recommended && (
+                      <span className="absolute -top-2.5 right-2 bg-[#8A9C7A] text-white text-[9px] font-black uppercase px-2 py-0.5 rounded-full shadow-xs">
+                        {t('labelRecommended')}
+                      </span>
+                    )}
+                    <div className="text-sm font-display font-black text-[#1E1E1E]">{tier.g}g Protein</div>
+                    <div className="text-xs font-extrabold text-[#647554] mt-0.5">{tier.price}</div>
+                  </Card>
+                ))}
+              </div>
+            </Card>
 
             <Card className="p-4 sm:p-5 bg-[var(--cpl-white)] border border-[var(--cpl-border-muted)] space-y-2 rounded-2xl text-xs shadow-sm">
               <div className="font-display font-bold uppercase tracking-wider text-[var(--cpl-dark)] flex items-center gap-1.5">
@@ -225,9 +127,7 @@ export function LabelGenerator({ onOpenOrder }) {
                 <span>{t('labelIngredients')}</span>
               </div>
               <p className="text-[var(--cpl-dark-muted)] leading-relaxed font-normal">
-                {!isCustomMode 
-                  ? (language === 'ID' ? selectedPreset.ingredients_ID : selectedPreset.ingredients_EN) 
-                  : t('labelCustomDesc')}
+                {t('labelCustomDesc')}
               </p>
             </Card>
 
@@ -293,19 +193,27 @@ export function LabelGenerator({ onOpenOrder }) {
 
                 {/* Macro Table Grid */}
                 <div className="border-2 border-[#1E1E1E] mb-5 sm:mb-6 text-xs sm:text-sm font-bold bg-white/80">
-                  <div className="grid grid-cols-2 border-b border-[#1E1E1E] p-2.5 sm:p-3">
+                  <div className="grid grid-cols-2 border-b border-[#1E1E1E] p-2 sm:p-2.5">
                     <span className="text-gray-700">{t('heroProtein')}</span>
                     <span className="text-right text-[#8A9C7A] font-black text-sm sm:text-base">{protein}g</span>
                   </div>
-                  <div className="grid grid-cols-2 border-b border-[#1E1E1E] p-2.5 sm:p-3 bg-white/60">
+                  <div className="grid grid-cols-2 border-b border-[#1E1E1E] p-2 sm:p-2.5 bg-white/60">
                     <span className="text-gray-700">{t('heroCarbs')}</span>
                     <span className="text-right font-extrabold">{carbs}g</span>
                   </div>
-                  <div className="grid grid-cols-2 border-b border-[#1E1E1E] p-2.5 sm:p-3">
+                  <div className="grid grid-cols-2 border-b border-[#1E1E1E] p-2 sm:p-2.5">
                     <span className="text-gray-700">{t('heroFat')}</span>
                     <span className="text-right font-extrabold">{fat}g</span>
                   </div>
-                  <div className="grid grid-cols-2 p-2.5 sm:p-3 bg-[#8A9C7A]/20">
+                  <div className="grid grid-cols-2 border-b border-[#1E1E1E] p-2 sm:p-2.5 bg-white/60">
+                    <span className="text-gray-700">{t('heroSodium')}</span>
+                    <span className="text-right font-extrabold">{sodium} mg</span>
+                  </div>
+                  <div className="grid grid-cols-2 border-b border-[#1E1E1E] p-2 sm:p-2.5">
+                    <span className="text-gray-700">{t('heroPotassium')}</span>
+                    <span className="text-right font-extrabold">{potassium} mg</span>
+                  </div>
+                  <div className="grid grid-cols-2 p-2 sm:p-2.5 bg-[#8A9C7A]/20">
                     <span className="text-[#1E1E1E] font-black">{t('heroCalories')}</span>
                     <span className="text-right font-black text-sm sm:text-base text-[#1E1E1E]">{calculatedKcal} KCAL</span>
                   </div>
@@ -348,3 +256,4 @@ export function LabelGenerator({ onOpenOrder }) {
     </section>
   );
 }
+

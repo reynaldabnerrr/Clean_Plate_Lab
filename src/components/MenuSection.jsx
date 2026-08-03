@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useCpl } from '../hooks/useCpl';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
@@ -7,57 +7,27 @@ import { ArrowRight } from 'lucide-react';
 
 export function MenuSection({ onSelectMeal }) {
   const { menuItems, language, t } = useCpl();
-  const [activeCategory, setActiveCategory] = useState("All");
-
-  const categories = [
-    { id: "All", label: t('menuFilterAll') },
-    { id: "High Protein", label: t('menuFilterHighProtein') },
-    { id: "Lean Muscle", label: t('menuFilterLean') },
-    { id: "Plant Power", label: t('menuFilterPlant') },
-    { id: "Keto / Low Carb", label: t('menuFilterKeto') },
-  ];
-
-  const filteredItems = activeCategory === "All" 
-    ? menuItems 
-    : menuItems.filter(item => item.category === activeCategory);
 
   return (
     <section id="menu" className="py-16 sm:py-24 bg-[var(--cpl-white)] border-b border-[var(--cpl-border-muted)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 sm:mb-12">
-          <div>
-            <Badge variant="default" className="mb-3">
-              <span>{t('menuEyebrow')}</span>
-            </Badge>
-            <h2 className="font-display text-3xl sm:text-6xl font-extrabold uppercase tracking-tight text-[var(--cpl-dark)]">
-              {t('menuTitle')}
-            </h2>
-            <p className="text-base sm:text-lg text-[var(--cpl-dark-muted)] font-light mt-2 max-w-xl">
-              {t('menuSubtitle')}
-            </p>
-          </div>
-
-          {/* Category Filter Tabs with horizontal scroll on mobile */}
-          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none flex-nowrap sm:flex-wrap max-w-full">
-            {categories.map((cat) => (
-              <Button
-                key={cat.id}
-                size="sm"
-                variant={activeCategory === cat.id ? "default" : "outline"}
-                onClick={() => setActiveCategory(cat.id)}
-                className={`whitespace-nowrap shrink-0 ${activeCategory === cat.id ? "bg-[#8A9C7A] text-white font-extrabold" : ""}`}
-              >
-                {cat.label}
-              </Button>
-            ))}
-          </div>
+        <div className="mb-10 sm:mb-12">
+          <Badge variant="default" className="mb-3">
+            <span>{t('menuEyebrow')}</span>
+          </Badge>
+          <h2 className="font-display text-3xl sm:text-6xl font-extrabold uppercase tracking-tight text-[var(--cpl-dark)]">
+            {t('menuTitle')}
+          </h2>
+          <p className="text-base sm:text-lg text-[var(--cpl-dark-muted)] font-light mt-2 max-w-xl">
+            {t('menuSubtitle')}
+          </p>
         </div>
 
         {/* Menu Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-          {filteredItems.map((meal) => {
+          {menuItems.map((meal) => {
             const rawTags = language === 'ID' ? (meal.tags_ID || meal.tags) : (meal.tags_EN || meal.tags);
             const tags = Array.isArray(rawTags) ? rawTags : (rawTags ? [rawTags] : []);
             const description = language === 'ID' ? (meal.desc_ID || meal.desc || '') : (meal.desc_EN || meal.desc || '');
@@ -109,23 +79,40 @@ export function MenuSection({ onSelectMeal }) {
                     ))}
                   </div>
 
-                  <div className="mt-auto pt-5">
-                    <div className="grid grid-cols-4 rounded-lg border border-[var(--cpl-border-muted)] bg-[var(--cpl-cream)] py-3 text-center font-display text-xs">
-                      <div className="border-r border-[var(--cpl-border-muted)] px-1">
-                        <div className="text-[9px] font-bold uppercase text-gray-500">{t('heroProtein')}</div>
-                        <div className="font-extrabold text-[var(--cpl-sage-dark)]">{meal.protein}g</div>
+                  <div className="mt-auto pt-4">
+                    {/* Spacious 2-Row Nutrition Facts Box */}
+                    <div className="rounded-xl border border-[#1E1E1E]/20 bg-[#F5F2EA]/70 p-3 text-xs space-y-2">
+                      <div className="flex items-center justify-between border-b border-[#1E1E1E]/15 pb-1.5 font-mono text-[9px] font-black uppercase tracking-wider text-[#647554]">
+                        <span>NUTRITION FACTS</span>
+                        <span>LAB SPECS</span>
                       </div>
-                      <div className="border-r border-[var(--cpl-border-muted)] px-1">
-                        <div className="text-[9px] font-bold uppercase text-gray-500">{t('heroCarbs')}</div>
-                        <div className="font-extrabold text-[var(--cpl-dark)]">{meal.carbs}g</div>
+
+                      {/* Row 1: Primary Macros (3 Equal Columns) */}
+                      <div className="grid grid-cols-3 gap-2 text-center font-display">
+                        <div className="rounded-lg border border-gray-200/90 bg-white p-2 shadow-2xs">
+                          <div className="text-[9px] font-bold uppercase text-gray-500 tracking-tight">{t('heroProtein')}</div>
+                          <div className="text-xs sm:text-sm font-black text-[#647554] mt-0.5">{meal.protein}g</div>
+                        </div>
+                        <div className="rounded-lg border border-gray-200/90 bg-white p-2 shadow-2xs">
+                          <div className="text-[9px] font-bold uppercase text-gray-500 tracking-tight">{t('heroCarbs')}</div>
+                          <div className="text-xs sm:text-sm font-extrabold text-[#1E1E1E] mt-0.5">{meal.carbs}g</div>
+                        </div>
+                        <div className="rounded-lg border border-gray-200/90 bg-white p-2 shadow-2xs">
+                          <div className="text-[9px] font-bold uppercase text-gray-500 tracking-tight">{t('heroFat')}</div>
+                          <div className="text-xs sm:text-sm font-extrabold text-[#1E1E1E] mt-0.5">{meal.fat}g</div>
+                        </div>
                       </div>
-                      <div className="border-r border-[var(--cpl-border-muted)] px-1">
-                        <div className="text-[9px] font-bold uppercase text-gray-500">{t('heroFat')}</div>
-                        <div className="font-extrabold text-[var(--cpl-dark)]">{meal.fat}g</div>
-                      </div>
-                      <div className="px-1">
-                        <div className="text-[9px] font-bold uppercase text-gray-500">KCAL</div>
-                        <div className="font-extrabold text-[var(--cpl-dark)]">{meal.kcal}</div>
+
+                      {/* Row 2: Micros (2 Wide Flex Cards) */}
+                      <div className="grid grid-cols-2 gap-2 font-display text-xs">
+                        <div className="rounded-lg border border-gray-200/90 bg-white px-2.5 py-1.5 shadow-2xs flex items-center justify-between">
+                          <span className="text-[9px] font-bold uppercase text-gray-500">{t('heroSodium')}</span>
+                          <span className="text-xs font-extrabold text-[#1E1E1E]">{meal.sodium || 1290} mg</span>
+                        </div>
+                        <div className="rounded-lg border border-gray-200/90 bg-white px-2.5 py-1.5 shadow-2xs flex items-center justify-between">
+                          <span className="text-[9px] font-bold uppercase text-gray-500">{t('heroPotassium')}</span>
+                          <span className="text-xs font-extrabold text-[#1E1E1E]">{meal.potassium || 365} mg</span>
+                        </div>
                       </div>
                     </div>
 

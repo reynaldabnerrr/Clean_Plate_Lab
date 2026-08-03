@@ -71,7 +71,7 @@ export function OrderModal({ isOpen, onClose }) {
 
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
-  const [proteinTier, setProteinTier] = useState(25);
+  const [proteinTier, setProteinTier] = useState(60);
   const [startDate, setStartDate] = useState(today);
   const [endDate, setEndDate] = useState(toDateInputValue(new Date(Date.now() + 4 * DAY_IN_MS)));
   const [address, setAddress] = useState('');

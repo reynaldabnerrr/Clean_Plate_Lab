@@ -207,21 +207,29 @@ export function Hero({ onOpenOrder, onScrollToLabel }) {
 
                 {/* Macro Table Grid */}
                 <div className="border border-[#1E1E1E] mb-4 text-xs font-bold bg-white/80">
-                  <div className="grid grid-cols-2 border-b border-[#1E1E1E] p-2">
+                  <div className="grid grid-cols-2 border-b border-[#1E1E1E] p-1.5 sm:p-2">
                     <span className="text-gray-700">{t('heroProtein')}</span>
-                    <span className="text-right text-[#8A9C7A] font-extrabold text-sm">43g</span>
+                    <span className="text-right text-[#8A9C7A] font-black text-sm">81.6g</span>
                   </div>
-                  <div className="grid grid-cols-2 border-b border-[#1E1E1E] p-2">
+                  <div className="grid grid-cols-2 border-b border-[#1E1E1E] p-1.5 sm:p-2 bg-white/60">
                     <span className="text-gray-700">{t('heroCarbs')}</span>
-                    <span className="text-right font-extrabold">46g</span>
+                    <span className="text-right font-extrabold">127.7g</span>
                   </div>
-                  <div className="grid grid-cols-2 border-b border-[#1E1E1E] p-2">
+                  <div className="grid grid-cols-2 border-b border-[#1E1E1E] p-1.5 sm:p-2">
                     <span className="text-gray-700">{t('heroFat')}</span>
-                    <span className="text-right font-extrabold">18g</span>
+                    <span className="text-right font-extrabold">28.2g</span>
                   </div>
-                  <div className="grid grid-cols-2 p-2 bg-[#8A9C7A]/20">
+                  <div className="grid grid-cols-2 border-b border-[#1E1E1E] p-1.5 sm:p-2 bg-white/60">
+                    <span className="text-gray-700">{t('heroSodium')}</span>
+                    <span className="text-right font-extrabold">1344.1 mg</span>
+                  </div>
+                  <div className="grid grid-cols-2 border-b border-[#1E1E1E] p-1.5 sm:p-2">
+                    <span className="text-gray-700">{t('heroPotassium')}</span>
+                    <span className="text-right font-extrabold">340 mg</span>
+                  </div>
+                  <div className="grid grid-cols-2 p-1.5 sm:p-2 bg-[#8A9C7A]/20">
                     <span className="text-[#1E1E1E] font-black">{t('heroCalories')}</span>
-                    <span className="text-right font-black text-sm text-[#1E1E1E]">582 KCAL</span>
+                    <span className="text-right font-black text-sm text-[#1E1E1E]">1111.3 KCAL</span>
                   </div>
                 </div>
 
