@@ -26,6 +26,18 @@ export function Navbar({ onOpenOrder, onOpenGuideline }) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [mobileMenuOpen]);
+
   const navItems = [
     { label: t('pillars'), href: "#pillars" },
     { label: t('labelInspector'), href: "#label-generator" },
@@ -46,12 +58,14 @@ export function Navbar({ onOpenOrder, onOpenGuideline }) {
 
       <header
         className={`sticky top-0 z-50 transition-all duration-300 ${
-          scrolled
+          mobileMenuOpen
+            ? 'bg-[#F5F2EA] shadow-md border-b border-[#1E1E1E]/15 py-3'
+            : scrolled
             ? 'bg-[#F5F2EA]/95 shadow-md border-b border-[#1E1E1E]/12 backdrop-blur-md py-3'
             : 'bg-[#F5F2EA]/90 border-b border-[#1E1E1E]/10 backdrop-blur-sm py-4'
         }`}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-2 sm:gap-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-2 sm:gap-4 relative z-50">
           
           {/* Brand Logo */}
           <a 
@@ -141,17 +155,17 @@ export function Navbar({ onOpenOrder, onOpenGuideline }) {
         {mobileMenuOpen && (
           <>
             <div 
-              className="fixed inset-0 top-[65px] bg-black/50 backdrop-blur-sm z-40 lg:hidden"
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
               onClick={() => setMobileMenuOpen(false)}
               aria-hidden="true"
             />
             
             <div 
               id="mobile-menu-drawer"
-              className="relative z-50 lg:hidden bg-[#F5F2EA] border-b-2 border-[#1E1E1E] px-5 py-6 space-y-5 font-display text-xs font-bold uppercase tracking-wider text-[#1E1E1E] shadow-2xl animate-in slide-in-from-top-3 duration-200"
+              className="absolute top-full left-0 right-0 z-50 lg:hidden bg-[#F5F2EA] border-b-2 border-[#1E1E1E] px-5 py-6 space-y-5 font-display text-xs font-bold uppercase tracking-wider text-[#1E1E1E] shadow-2xl max-h-[calc(100vh-80px)] overflow-y-auto animate-in slide-in-from-top-2 duration-200"
             >
               {/* Language Switcher Row in Drawer */}
-              <div className="flex items-center justify-between py-2.5 px-3.5 rounded-xl bg-white border border-[#1E1E1E]/15 shadow-sm">
+              <div className="flex items-center justify-between py-3 px-4 rounded-xl bg-white border border-[#1E1E1E]/15 shadow-sm">
                 <span className="flex items-center gap-2 text-xs text-[#1E1E1E] font-extrabold">
                   <Globe size={16} className="text-[#8A9C7A]" />
                   <span>{t('switchLanguage')}</span>
@@ -164,7 +178,7 @@ export function Navbar({ onOpenOrder, onOpenGuideline }) {
                     className={`px-3 py-1 text-xs font-black rounded-full transition-all ${
                       language === 'ID'
                         ? 'bg-[#8A9C7A] text-white shadow-sm'
-                        : 'text-[#1E1E1E]/70'
+                        : 'text-[#1E1E1E]/70 hover:text-[#1E1E1E]'
                     }`}
                   >
                     ID
@@ -175,7 +189,7 @@ export function Navbar({ onOpenOrder, onOpenGuideline }) {
                     className={`px-3 py-1 text-xs font-black rounded-full transition-all ${
                       language === 'EN'
                         ? 'bg-[#8A9C7A] text-white shadow-sm'
-                        : 'text-[#1E1E1E]/70'
+                        : 'text-[#1E1E1E]/70 hover:text-[#1E1E1E]'
                     }`}
                   >
                     EN
@@ -184,15 +198,16 @@ export function Navbar({ onOpenOrder, onOpenGuideline }) {
               </div>
 
               {/* Mobile Navigation Links */}
-              <nav aria-label="Mobile Navigation" className="space-y-1">
+              <nav aria-label="Mobile Navigation" className="space-y-2">
                 {navItems.map((item) => (
                   <a
                     key={item.href}
                     href={item.href}
                     onClick={() => setMobileMenuOpen(false)}
-                    className="block py-3 px-3 rounded-xl text-[#1E1E1E] hover:text-[#8A9C7A] hover:bg-[#8A9C7A]/10 font-extrabold text-sm transition-colors"
+                    className="flex items-center justify-between py-3 px-4 rounded-xl bg-white/80 hover:bg-white border border-[#1E1E1E]/10 hover:border-[#8A9C7A]/40 text-[#1E1E1E] hover:text-[#647554] font-extrabold text-sm transition-all shadow-sm active:scale-[0.99]"
                   >
-                    {item.label}
+                    <span>{item.label}</span>
+                    <ArrowRight size={16} className="text-[#8A9C7A]" />
                   </a>
                 ))}
               </nav>
@@ -213,7 +228,7 @@ export function Navbar({ onOpenOrder, onOpenGuideline }) {
                 <Button 
                   variant="default" 
                   onClick={() => { setMobileMenuOpen(false); onOpenOrder(); }} 
-                  className="w-full flex items-center justify-center gap-2 rounded-full bg-[#8A9C7A] hover:bg-[#647554] text-white font-extrabold text-xs py-3.5 shadow-md"
+                  className="w-full flex items-center justify-center gap-2 rounded-full bg-[#8A9C7A] hover:bg-[#647554] text-white font-extrabold text-xs py-3.5 shadow-md active:scale-[0.98] transition-transform"
                 >
                   <span>{t('orderMealPlan')}</span>
                   <ArrowRight size={16} />
