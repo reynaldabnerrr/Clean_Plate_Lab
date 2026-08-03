@@ -431,7 +431,8 @@ Mohon konfirmasi ketersediaan jadwal, total akhir, dan petunjuk pembayaran. Teri
                     <label htmlFor={`${fieldId}-start`} className="block font-display text-[10px] font-bold uppercase text-[#4D4D4D]">
                       {t('orderStartDate')}
                     </label>
-                    <div className="relative w-full min-w-0">
+                    <div className="relative w-full min-w-0 overflow-hidden">
+                      <CalendarDays size={15} className={`pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 transition-colors ${errors.startDate ? 'text-[#C93B2B]' : 'text-[#647554]'}`} />
                       <Input
                         id={`${fieldId}-start`}
                         type="date"
@@ -443,7 +444,7 @@ Mohon konfirmasi ketersediaan jadwal, total akhir, dan petunjuk pembayaran. Teri
                             setErrors((prev) => ({ ...prev, startDate: undefined, endDate: undefined }));
                           }
                         }}
-                        className={`h-11 w-full max-w-full min-w-0 rounded-lg px-3 font-sans text-xs font-semibold text-[#1E1E1E] transition-all duration-200 ${
+                        className={`h-11 w-full max-w-full min-w-0 rounded-lg pl-9 pr-2 font-sans text-xs font-semibold text-[#1E1E1E] transition-all duration-200 ${
                           errors.startDate
                             ? 'border-2 border-[#C93B2B] bg-[#FDF5F5] focus-visible:ring-2 focus-visible:ring-[#C93B2B]/20'
                             : 'border-[#1E1E1E]/25 bg-white'
@@ -465,7 +466,8 @@ Mohon konfirmasi ketersediaan jadwal, total akhir, dan petunjuk pembayaran. Teri
                     <label htmlFor={`${fieldId}-end`} className="block font-display text-[10px] font-bold uppercase text-[#4D4D4D]">
                       {t('orderEndDate')}
                     </label>
-                    <div className="relative w-full min-w-0">
+                    <div className="relative w-full min-w-0 overflow-hidden">
+                      <CalendarDays size={15} className={`pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 transition-colors ${errors.endDate ? 'text-[#C93B2B]' : 'text-[#647554]'}`} />
                       <Input
                         id={`${fieldId}-end`}
                         type="date"
@@ -477,7 +479,7 @@ Mohon konfirmasi ketersediaan jadwal, total akhir, dan petunjuk pembayaran. Teri
                             setErrors((prev) => ({ ...prev, endDate: undefined }));
                           }
                         }}
-                        className={`h-11 w-full max-w-full min-w-0 rounded-lg px-3 font-sans text-xs font-semibold text-[#1E1E1E] transition-all duration-200 ${
+                        className={`h-11 w-full max-w-full min-w-0 rounded-lg pl-9 pr-2 font-sans text-xs font-semibold text-[#1E1E1E] transition-all duration-200 ${
                           errors.endDate
                             ? 'border-2 border-[#C93B2B] bg-[#FDF5F5] focus-visible:ring-2 focus-visible:ring-[#C93B2B]/20'
                             : 'border-[#1E1E1E]/25 bg-white'
