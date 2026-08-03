@@ -18,7 +18,7 @@ const INITIAL_MENU_ITEMS = [
     tags_ID: ["Monday / Senin", "82.4g Protein", "1100.8 Kkal"],
     tags_EN: ["Monday", "82.4g Protein", "1100.8 Kcal"],
     desc_ID: "Dada ayam empuk berbalut saus teriyaki manis gurih, disajikan dengan spesifikasi nutrisi lengkap 82.4g protein, 132.5g karbo, 26.8g lemak, 1380.5mg sodium, dan 355mg kalium.",
-    desc_EN: "Tender chicken glazed in a sweet & savory teriyaki sauce, served with full lab specs: 82.4g protein, 132.5g carbs, 26.8g fat, 1380.5mg sodium, and 355mg potassium.",
+    desc_EN: "Tender chicken glazed in a sweet & savory teriyaki sauce, served with full lab specs: 82.4g protein, 132.5g carbs, 26.8g fat, 1380.5mg sodium, and 355mg kalium.",
     available: true,
     batch: "MON-01"
   },
@@ -38,7 +38,7 @@ const INITIAL_MENU_ITEMS = [
     tags_ID: ["Tuesday / Selasa", "79.8g Protein", "1080.7 Kkal"],
     tags_EN: ["Tuesday", "79.8g Protein", "1080.7 Kcal"],
     desc_ID: "Ayam empuk beraroma sambal cabai hijau segar, disajikan dengan spesifikasi nutrisi lengkap 79.8g protein, 124g karbo, 29.5g lemak, 1290mg sodium, dan 365mg kalium.",
-    desc_EN: "Tender chicken tossed in aromatic green chili sauce, served with full lab specs: 79.8g protein, 124g carbs, 29.5g fat, 1290mg sodium, and 365mg potassium.",
+    desc_EN: "Tender chicken tossed in aromatic green chili sauce, served with full lab specs: 79.8g protein, 124g carbs, 29.5g fat, 1290mg sodium, and 365mg kalium.",
     available: true,
     batch: "TUE-02"
   },
@@ -58,7 +58,7 @@ const INITIAL_MENU_ITEMS = [
     tags_ID: ["Wednesday / Rabu", "83.2g Protein", "1127.6 Kkal"],
     tags_EN: ["Wednesday", "83.2g Protein", "1127.6 Kcal"],
     desc_ID: "Dada ayam juicy dengan lapisan saus mentai gurih creamy, disajikan dengan spesifikasi nutrisi lengkap 83.2g protein, 128.5g karbo, 31.2g lemak, 1420mg sodium, dan 330mg kalium.",
-    desc_EN: "Juicy chicken topped with creamy, savory mentai sauce, served with full lab specs: 83.2g protein, 128.5g carbs, 31.2g fat, 1420mg sodium, and 330mg potassium.",
+    desc_EN: "Juicy chicken topped with creamy, savory mentai sauce, served with full lab specs: 83.2g protein, 128.5g carbs, 31.2g fat, 1420mg sodium, and 330mg kalium.",
     available: true,
     batch: "WED-03"
   },
@@ -78,7 +78,7 @@ const INITIAL_MENU_ITEMS = [
     tags_ID: ["Thursday / Kamis", "81.0g Protein", "1059.5 Kkal"],
     tags_EN: ["Thursday", "81.0g Protein", "1059.5 Kcal"],
     desc_ID: "Dada ayam empuk dengan kuah sate Padang kaya rempah khas, disajikan dengan spesifikasi nutrisi lengkap 81.0g protein, 122g karbo, 27.5g lemak, 1360mg sodium, dan 370mg kalium.",
-    desc_EN: "Tender chicken coated in rich and aromatic Padang-style sauce, served with full lab specs: 81.0g protein, 122g carbs, 27.5g fat, 1360mg sodium, and 370mg potassium.",
+    desc_EN: "Tender chicken coated in rich and aromatic Padang-style sauce, served with full lab specs: 81.0g protein, 122g carbs, 27.5g fat, 1360mg sodium, and 370mg kalium.",
     available: true,
     batch: "THU-04"
   },
@@ -98,7 +98,7 @@ const INITIAL_MENU_ITEMS = [
     tags_ID: ["Friday / Jumat", "78.5g Protein", "1039 Kkal"],
     tags_EN: ["Friday", "78.5g Protein", "1039 Kcal"],
     desc_ID: "Oseng ayam gurih bertabur irisan kecombrang harum, disajikan dengan spesifikasi nutrisi lengkap 78.5g protein, 125g karbo, 25g lemak, 1240mg sodium, dan 385mg kalium.",
-    desc_EN: "Savory stir-fried chicken infused with fragrant kecombrang, served with full lab specs: 78.5g protein, 125g carbs, 25g fat, 1240mg sodium, and 385mg potassium.",
+    desc_EN: "Savory stir-fried chicken infused with fragrant kecombrang, served with full lab specs: 78.5g protein, 125g carbs, 25g fat, 1240mg sodium, and 385mg kalium.",
     available: true,
     batch: "FRI-05"
   },
@@ -118,7 +118,7 @@ const INITIAL_MENU_ITEMS = [
     tags_ID: ["Saturday / Sabtu", "80.5g Protein", "1114 Kkal"],
     tags_EN: ["Saturday", "80.5g Protein", "1114 Kcal"],
     desc_ID: "Ayam renyah berbalut saus asam manis buatan sendiri yang segar, disajikan dengan spesifikasi nutrisi lengkap 80.5g protein, 135g karbo, 28g lemak, 1310mg sodium, dan 345mg kalium.",
-    desc_EN: "Crispy chicken tossed in a sweet and tangy homemade sauce, served with full lab specs: 80.5g protein, 135g carbs, 28g fat, 1310mg sodium, and 345mg potassium.",
+    desc_EN: "Crispy chicken tossed in a sweet and tangy homemade sauce, served with full lab specs: 80.5g protein, 135g carbs, 28g fat, 1310mg sodium, and 345mg kalium.",
     available: true,
     batch: "SAT-06"
   }
@@ -264,7 +264,7 @@ export function CplProvider({ children }) {
       labelMainTierBadge: "Porsi Utama: 60g Protein",
 
       // Menu Section
-      menuEyebrow: "🍱 MENU MINGGUAN",
+      menuEyebrow: "MENU MINGGUAN",
       menuTitle: "KATALOG MENU MINGGUAN",
       menuSubtitle: "Tinggi Protein • Dimasak Segar • Ramah Makro",
       menuFilterAll: "Semua Variasi",
@@ -477,7 +477,7 @@ export function CplProvider({ children }) {
       heroCarbs: "CARBS",
       heroFat: "FAT",
       heroSodium: "SODIUM",
-      heroPotassium: "POTASSIUM",
+      heroPotassium: "KALIUM",
       heroCalories: "CALORIES",
 
       // Brand Pillars
@@ -522,7 +522,7 @@ export function CplProvider({ children }) {
       labelMainTierBadge: "Main Tier: 60g Protein",
 
       // Menu Section
-      menuEyebrow: "🍱 WEEKLY MENU",
+      menuEyebrow: "WEEKLY MENU",
       menuTitle: "WEEKLY MENU CATALOG",
       menuSubtitle: "High Protein • Freshly Cooked • Macro Friendly",
       menuFilterAll: "All Variations",
