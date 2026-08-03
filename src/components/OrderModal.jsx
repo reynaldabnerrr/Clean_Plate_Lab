@@ -426,7 +426,7 @@ Mohon konfirmasi ketersediaan jadwal, total akhir, dan petunjuk pembayaran. Teri
                   <span className="h-px flex-1 min-w-[8px] bg-[#1E1E1E]/15" />
                 </div>
 
-                <div className="grid grid-cols-1 min-[420px]:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="min-w-0 space-y-1.5">
                     <label htmlFor={`${fieldId}-start`} className="block font-display text-[10px] font-bold uppercase text-[#4D4D4D]">
                       {t('orderStartDate')}
