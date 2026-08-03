@@ -1,7 +1,9 @@
 import { addons, proteinTiers } from '../data/site.js';
 import { getMealById } from '../data/meals.js';
 
-export const WHATSAPP_NUMBER = '628996727181';
+export const WHATSAPP_NUMBER = '6285111215704';
+export const WHATSAPP_DISPLAY = '+62 851-1121-5704';
+export const CONTACT_EMAIL = 'cleanplatelab.id@gmail.com';
 
 export function formatCurrency(value) {
   return new Intl.NumberFormat('id-ID', {

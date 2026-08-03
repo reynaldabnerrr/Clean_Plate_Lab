@@ -7,6 +7,7 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { addons, proteinTiers } from '../data/site';
 import { analytics } from '../lib/analytics';
+import { WHATSAPP_NUMBER } from '../lib/order';
 import {
   AlertCircle,
   ArrowRight,
@@ -14,6 +15,7 @@ import {
   Check,
   CheckCircle,
   Clock3,
+  Link2,
   MapPin,
   MessageCircle,
   PackageCheck,
@@ -84,6 +86,7 @@ export function OrderModal({ isOpen, onClose, initialProteinTier = 40, initialMe
   const [addonIds, setAddonIds] = useState([]);
   const [fulfillment, setFulfillment] = useState('Pickup');
   const [address, setAddress] = useState('');
+  const [mapsUrl, setMapsUrl] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState({});
 
@@ -249,6 +252,7 @@ export function OrderModal({ isOpen, onClose, initialProteinTier = 40, initialMe
       addons: selectedAddonNames,
       fulfillment,
       address,
+      mapsUrl,
       amount: totalCost,
     });
 
@@ -257,7 +261,7 @@ export function OrderModal({ isOpen, onClose, initialProteinTier = 40, initialMe
 
     const message = buildWhatsAppMessage();
 
-    const whatsappUrl = `https://api.whatsapp.com/send?phone=628996727181&text=${encodeURIComponent(message)}`;
+    const whatsappUrl = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
 
     try {
@@ -279,88 +283,55 @@ export function OrderModal({ isOpen, onClose, initialProteinTier = 40, initialMe
   };
 
   const buildWhatsAppMessage = () => {
-    const addonCostDetails = selectedAddons.length
-      ? selectedAddons.map((addon) => `• ${isIndonesian ? addon.nameID : addon.name}: *Rp ${addon.price.toLocaleString('id-ID')} × ${totalBoxes} box = Rp ${(addon.price * totalBoxes).toLocaleString('id-ID')}*`).join('\n')
-      : `• ${orderCopy.addons}: *${orderCopy.none}*`;
-
-    if (!isIndonesian) {
-      return `*CLEAN PLATE LAB MAKASSAR*
-_GOOD FOOD. CLEAR DATA. BETTER YOU._
-----------------------------------
-
-Hello Clean Plate Lab Team,
-I would like to submit a catering meal plan order:
-
-*CUSTOMER DETAILS*
-• Name: *${name}*
-• WhatsApp number: *${phone}*
-
-*MEAL PLAN*
-• Menu: *${orderCopy.weeklyRotation}*
-• Protein target: *${selectedTier.tier}g per serving*
-• Pricing period: *${periodLabel}*
-• Price per serving: *Rp ${selectedPrice.toLocaleString('id-ID')}*
-• Catering period: *${formatOrderDate(startDate, locale)} - ${formatOrderDate(endDate, locale)}*
-• Servings per day: *${mealsPerDay} (${mealsPerDay === 2 ? 'same daily menu' : 'one serving'})*
-• Total order: *${totalBoxes} boxes (${totalDays} service days)*
-• Service days: *Monday-Saturday (Sundays excluded)*
-
-*FULFILLMENT*
-• Method: *${fulfillment === 'Customer-arranged' ? orderCopy.customerArranged : fulfillment}*
-• Meal ready times: *${readyTimeMeal1}${mealsPerDay === 2 ? ` and ${readyTimeMeal2}` : ''}*
-• Clean Plate Lab: *${centralKitchenAddress}*
-${requiresDeliveryAddress ? `• Delivery destination: *${address || '-'}*` : '• Courier collection point: *Clean Plate Lab*'}
-
-*COST SUMMARY*
-• Base price: *Rp ${selectedPrice.toLocaleString('id-ID')} × ${totalBoxes} boxes = Rp ${(selectedPrice * totalBoxes).toLocaleString('id-ID')}*
-${addonCostDetails}
-• Total add-ons: *Rp ${(addonsPerBox * totalBoxes).toLocaleString('id-ID')}*
-• Estimated total: *Rp ${totalCost.toLocaleString('id-ID')}*
-
-----------------------------------
-Please confirm schedule availability, final total, and payment instructions. Thank you.`;
-    }
+    const whatsappPeriodLabel = { daily: 'Harian', weekly: 'Mingguan', monthly: 'Bulanan' }[cateringPeriod];
+    const addonSummary = selectedAddons.length
+      ? selectedAddons.map((addon) => addon.nameID).join(', ')
+      : 'Tanpa add-on';
+    const addonCostBreakdown = selectedAddons.length
+      ? `${selectedAddons.map((addon) => `• ${addon.nameID}: *Rp ${addon.price.toLocaleString('id-ID')} × ${totalBoxes} box = Rp ${(addon.price * totalBoxes).toLocaleString('id-ID')}*`).join('\n')}
+• Total add-on: *Rp ${(addonsPerBox * totalBoxes).toLocaleString('id-ID')}*`
+      : '• Add-on: *Tidak ada*';
+    const fulfillmentSummary = requiresDeliveryAddress
+      ? fulfillment
+      : fulfillment === 'Customer-arranged'
+        ? 'Kurir diatur pelanggan · pengambilan di Clean Plate Lab'
+        : 'Pickup di Clean Plate Lab';
+    const deliveryLocationDetails = requiresDeliveryAddress
+      ? `
+• Alamat lengkap: *${address || '-'}*${mapsUrl.trim() ? `
+• Titik Google Maps: ${mapsUrl.trim()}` : ''}`
+      : '';
 
     return `*CLEAN PLATE LAB MAKASSAR*
 _GOOD FOOD. CLEAR DATA. BETTER YOU._
-----------------------------------
 
-Halo Tim Clean Plate Lab,
-Saya ingin mengajukan pemesanan katering meal plan dengan rincian berikut:
+Halo Tim Clean Plate Lab, saya ingin memesan meal plan dengan rincian berikut:
 
-*DATA PEMESAN*
+*PEMESAN*
 • Nama: *${name}*
-• Nomor WhatsApp: *${phone}*
+• WhatsApp: *${phone}*
 
-*PILIHAN MEAL PLAN*
-• Menu: *${orderCopy.weeklyRotation}*
+*DETAIL MEAL PLAN*
 • Target protein: *${selectedTier.tier}g per porsi*
-• Periode harga: *${periodLabel}*
-• Harga per porsi: *Rp ${selectedPrice.toLocaleString('id-ID')}*
-• Periode katering: *${formatOrderDate(startDate, locale)} - ${formatOrderDate(endDate, locale)}*
-• Porsi per hari: *${mealsPerDay} (${mealsPerDay === 2 ? 'menu harian yang sama' : 'satu porsi'})*
-• Total pesanan: *${totalBoxes} box (${totalDays} hari layanan)*
-• Hari layanan: *Senin-Sabtu (Minggu tidak dihitung)*
+• Periode harga: *${whatsappPeriodLabel} · Rp ${selectedPrice.toLocaleString('id-ID')}/porsi*
+• Tanggal katering: *${formatOrderDate(startDate, 'id-ID')} – ${formatOrderDate(endDate, 'id-ID')}*
+• Jumlah: *${mealsPerDay} porsi/hari · ${totalBoxes} box (${totalDays} hari layanan)*
+• Jadwal layanan: *Senin–Sabtu, Minggu tidak dihitung*
+• Add-on: ${addonSummary}
+• Fulfillment: ${fulfillmentSummary}${deliveryLocationDetails}
 
-*FULFILLMENT*
-• Metode: *${fulfillment === 'Customer-arranged' ? orderCopy.customerArranged : fulfillment}*
-• Waktu makanan siap: *${readyTimeMeal1}${mealsPerDay === 2 ? ` dan ${readyTimeMeal2}` : ''}*
-• Clean Plate Lab: *${centralKitchenAddress}*
-${requiresDeliveryAddress ? `• Alamat tujuan: *${address || '-'}*` : '• Titik pengambilan kurir: *Clean Plate Lab*'}
+*ESTIMASI BIAYA*
+• Harga paket: *Rp ${selectedPrice.toLocaleString('id-ID')} × ${totalBoxes} box = Rp ${(selectedPrice * totalBoxes).toLocaleString('id-ID')}*
+${addonCostBreakdown}
 
-*RINGKASAN BIAYA*
-• Harga dasar: *Rp ${selectedPrice.toLocaleString('id-ID')} × ${totalBoxes} box = Rp ${(selectedPrice * totalBoxes).toLocaleString('id-ID')}*
-${addonCostDetails}
-• Total add-on: *Rp ${(addonsPerBox * totalBoxes).toLocaleString('id-ID')}*
-• Estimasi total: *Rp ${totalCost.toLocaleString('id-ID')}*
+*ESTIMASI TOTAL: Rp ${totalCost.toLocaleString('id-ID')}*
 
-----------------------------------
-Mohon konfirmasi ketersediaan jadwal, total akhir, dan petunjuk pembayaran. Terima kasih.`;
+Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasih.`;
   };
 
   const handleReopenWhatsApp = () => {
     const message = buildWhatsAppMessage();
-    const whatsappUrl = `https://api.whatsapp.com/send?phone=628996727181&text=${encodeURIComponent(message)}`;
+    const whatsappUrl = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
   };
 
@@ -684,40 +655,62 @@ Mohon konfirmasi ketersediaan jadwal, total akhir, dan petunjuk pembayaran. Teri
                   </div>
                 </div>
 
-                {requiresDeliveryAddress ? <div className="mt-4 space-y-1.5">
-                  <label htmlFor={`${fieldId}-address`} className="block font-display text-[10px] font-bold uppercase text-[#4D4D4D]">
-                    {t('orderAddress')}
-                  </label>
-                  <div className="relative">
-                    <MapPin size={15} className={`pointer-events-none absolute left-3 top-3 transition-colors ${errors.address ? 'text-[#C93B2B]' : 'text-[#647554]'}`} />
-                    <textarea
-                      id={`${fieldId}-address`}
-                      rows={2}
-                      autoComplete="street-address"
-                      value={address}
-                      onChange={(event) => {
-                        const val = event.target.value;
-                        setAddress(val);
-                        if (errors.address && val.trim()) {
-                          setErrors((prev) => ({ ...prev, address: undefined }));
-                        }
-                      }}
-                      placeholder={t('orderAddressPlaceholder')}
-                      className={`block h-20 w-full resize-none rounded-lg py-3 pl-9 pr-3 font-sans text-xs font-semibold outline-none transition-all duration-200 placeholder:font-normal placeholder:text-gray-400 ${
-                        errors.address
-                          ? 'border-2 border-[#C93B2B] bg-[#FDF5F5] text-[#1E1E1E] focus:ring-2 focus:ring-[#C93B2B]/20'
-                          : 'border border-[#1E1E1E]/25 bg-white text-[#1E1E1E] focus:ring-2 focus:ring-[#8A9C7A]'
-                      }`}
-                    />
-                    {errors.address && (
-                      <div
-                        role="alert"
-                        className="absolute left-0 top-full z-20 mt-1.5 flex max-w-full items-center gap-1.5 rounded-lg border border-[#F4C4BF] bg-[#FFF5F4] px-3 py-1.5 font-sans text-[11px] font-bold text-[#8A1F17] shadow-[0_4px_16px_rgba(201,59,43,0.18)] animate-in fade-in slide-in-from-top-1"
-                      >
-                        <AlertCircle size={13} className="shrink-0 text-[#C93B2B]" />
-                        <span className="leading-tight">{errors.address}</span>
-                      </div>
-                    )}
+                {requiresDeliveryAddress ? <div className="mt-4 space-y-3">
+                  <div className="space-y-1.5">
+                    <label htmlFor={`${fieldId}-address`} className="block font-display text-[10px] font-bold uppercase text-[#4D4D4D]">
+                      {t('orderAddress')}
+                    </label>
+                    <div className="relative">
+                      <MapPin size={15} className={`pointer-events-none absolute left-3 top-3 transition-colors ${errors.address ? 'text-[#C93B2B]' : 'text-[#647554]'}`} />
+                      <textarea
+                        id={`${fieldId}-address`}
+                        rows={2}
+                        autoComplete="street-address"
+                        value={address}
+                        onChange={(event) => {
+                          const val = event.target.value;
+                          setAddress(val);
+                          if (errors.address && val.trim()) {
+                            setErrors((prev) => ({ ...prev, address: undefined }));
+                          }
+                        }}
+                        placeholder={t('orderAddressPlaceholder')}
+                        className={`block h-20 w-full resize-none rounded-lg py-3 pl-9 pr-3 font-sans text-xs font-semibold outline-none transition-all duration-200 placeholder:font-normal placeholder:text-gray-400 ${
+                          errors.address
+                            ? 'border-2 border-[#C93B2B] bg-[#FDF5F5] text-[#1E1E1E] focus:ring-2 focus:ring-[#C93B2B]/20'
+                            : 'border border-[#1E1E1E]/25 bg-white text-[#1E1E1E] focus:ring-2 focus:ring-[#8A9C7A]'
+                        }`}
+                      />
+                      {errors.address && (
+                        <div
+                          role="alert"
+                          className="absolute left-0 top-full z-20 mt-1.5 flex max-w-full items-center gap-1.5 rounded-lg border border-[#F4C4BF] bg-[#FFF5F4] px-3 py-1.5 font-sans text-[11px] font-bold text-[#8A1F17] shadow-[0_4px_16px_rgba(201,59,43,0.18)] animate-in fade-in slide-in-from-top-1"
+                        >
+                          <AlertCircle size={13} className="shrink-0 text-[#C93B2B]" />
+                          <span className="leading-tight">{errors.address}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label htmlFor={`${fieldId}-maps-url`} className="block font-display text-[10px] font-bold uppercase text-[#4D4D4D]">
+                      {t('orderMapsLink')}
+                    </label>
+                    <div className="relative">
+                      <Link2 size={15} className="pointer-events-none absolute left-3 top-3 text-[#647554]" />
+                      <Input
+                        id={`${fieldId}-maps-url`}
+                        type="url"
+                        inputMode="url"
+                        autoComplete="url"
+                        value={mapsUrl}
+                        onChange={(event) => setMapsUrl(event.target.value)}
+                        placeholder={t('orderMapsPlaceholder')}
+                        className="rounded-lg border-[#1E1E1E]/25 bg-white pl-9 font-sans font-semibold normal-case"
+                      />
+                    </div>
+                    <p className="text-[9px] leading-4 text-[#647554]">{t('orderMapsHelp')}</p>
                   </div>
                 </div> : <div className="mt-3 rounded-lg border border-[#8A9C7A]/40 bg-[#E7EEE1] px-3 py-2 text-[9px] font-semibold leading-4 text-[#526049]">
                   <p>{fulfillment === 'Pickup' ? orderCopy.pickupNote : orderCopy.arrangedNote}</p>
@@ -735,6 +728,7 @@ Mohon konfirmasi ketersediaan jadwal, total akhir, dan petunjuk pembayaran. Teri
                     <p className="mt-1 text-[9px] text-[#647554]">{totalDays} {t('orderDaysUnit')} · {mealsPerDay}x/{isIndonesian ? 'hari' : 'day'} · {totalBoxes} box · {t('orderSundayExcluded')}</p>
                     <p className="mt-1 text-[9px] text-[#647554]">{orderCopy.fulfillment}: {fulfillment === 'Customer-arranged' ? orderCopy.customerArranged : fulfillment}</p>
                     <p className="mt-1 flex items-start gap-1 text-[9px] text-[#647554]"><MapPin size={10} className="mt-0.5 shrink-0" /><span><strong>{requiresDeliveryAddress ? orderCopy.deliveryDestination : orderCopy.centralKitchen}:</strong> {requiresDeliveryAddress ? (address || '-') : centralKitchenAddress}</span></p>
+                    {requiresDeliveryAddress && mapsUrl.trim() ? <p className="mt-1 flex items-start gap-1 text-[9px] text-[#647554]"><Link2 size={10} className="mt-0.5 shrink-0" /><span className="min-w-0 break-all"><strong>{t('orderMapsSummary')}:</strong> {mapsUrl.trim()}</span></p> : null}
                     <p className="mt-1 text-[9px] font-semibold text-[#526049]">{orderCopy.mealOne} {orderCopy.ready} {readyTimeMeal1}{mealsPerDay === 2 ? ` · ${orderCopy.mealTwo} ${orderCopy.ready} ${readyTimeMeal2} · ${orderCopy.sameMenu}` : ''}</p>
                     <div className="mt-2 border-t border-[#8A9C7A]/30 pt-2 font-mono text-[8px] text-[#647554]">
                       <div className="flex items-start justify-between gap-3"><span>{orderCopy.basePrice}: Rp {selectedPrice.toLocaleString('id-ID')} × {totalBoxes} box</span><strong className="whitespace-nowrap text-[#33402B]">Rp {(selectedPrice * totalBoxes).toLocaleString('id-ID')}</strong></div>

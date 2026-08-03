@@ -17,8 +17,8 @@ const INITIAL_MENU_ITEMS = [
     image: "/images/chicken_teriyaki.webp",
     tags_ID: ["Monday / Senin", "82.4g Protein", "1100.8 Kkal"],
     tags_EN: ["Monday", "82.4g Protein", "1100.8 Kcal"],
-    desc_ID: "Dada ayam empuk berbalut saus teriyaki manis gurih, disajikan dengan spesifikasi nutrisi lengkap 82.4g protein, 132.5g karbo, 26.8g lemak, 1380.5mg sodium, dan 355mg kalium.",
-    desc_EN: "Tender chicken glazed in a sweet & savory teriyaki sauce, served with full lab specs: 82.4g protein, 132.5g carbs, 26.8g fat, 1380.5mg sodium, and 355mg kalium.",
+    desc_ID: "Dada ayam empuk berbalut saus teriyaki manis gurih, disajikan dengan spesifikasi nutrisi lengkap 82.4g protein, 132.5g karbo, 26.8g lemak, 1380.5mg natrium, dan 355mg kalium.",
+    desc_EN: "Tender chicken glazed in a sweet & savory teriyaki sauce, served with full lab specs: 82.4g protein, 132.5g carbs, 26.8g fat, 1380.5mg sodium, and 355mg potassium.",
     available: true,
     batch: "MON-01"
   },
@@ -37,8 +37,8 @@ const INITIAL_MENU_ITEMS = [
     image: "/images/ayam_cabe_ijo.webp",
     tags_ID: ["Tuesday / Selasa", "79.8g Protein", "1080.7 Kkal"],
     tags_EN: ["Tuesday", "79.8g Protein", "1080.7 Kcal"],
-    desc_ID: "Ayam empuk beraroma sambal cabai hijau segar, disajikan dengan spesifikasi nutrisi lengkap 79.8g protein, 124g karbo, 29.5g lemak, 1290mg sodium, dan 365mg kalium.",
-    desc_EN: "Tender chicken tossed in aromatic green chili sauce, served with full lab specs: 79.8g protein, 124g carbs, 29.5g fat, 1290mg sodium, and 365mg kalium.",
+    desc_ID: "Ayam empuk beraroma sambal cabai hijau segar, disajikan dengan spesifikasi nutrisi lengkap 79.8g protein, 124g karbo, 29.5g lemak, 1290mg natrium, dan 365mg kalium.",
+    desc_EN: "Tender chicken tossed in aromatic green chili sauce, served with full lab specs: 79.8g protein, 124g carbs, 29.5g fat, 1290mg sodium, and 365mg potassium.",
     available: true,
     batch: "TUE-02"
   },
@@ -57,8 +57,8 @@ const INITIAL_MENU_ITEMS = [
     image: "/images/chicken_mentai.webp",
     tags_ID: ["Wednesday / Rabu", "83.2g Protein", "1127.6 Kkal"],
     tags_EN: ["Wednesday", "83.2g Protein", "1127.6 Kcal"],
-    desc_ID: "Dada ayam juicy dengan lapisan saus mentai gurih creamy, disajikan dengan spesifikasi nutrisi lengkap 83.2g protein, 128.5g karbo, 31.2g lemak, 1420mg sodium, dan 330mg kalium.",
-    desc_EN: "Juicy chicken topped with creamy, savory mentai sauce, served with full lab specs: 83.2g protein, 128.5g carbs, 31.2g fat, 1420mg sodium, and 330mg kalium.",
+    desc_ID: "Dada ayam juicy dengan lapisan saus mentai gurih creamy, disajikan dengan spesifikasi nutrisi lengkap 83.2g protein, 128.5g karbo, 31.2g lemak, 1420mg natrium, dan 330mg kalium.",
+    desc_EN: "Juicy chicken topped with creamy, savory mentai sauce, served with full lab specs: 83.2g protein, 128.5g carbs, 31.2g fat, 1420mg sodium, and 330mg potassium.",
     available: true,
     batch: "WED-03"
   },
@@ -77,8 +77,8 @@ const INITIAL_MENU_ITEMS = [
     image: "/images/sate_padang.webp",
     tags_ID: ["Thursday / Kamis", "81.0g Protein", "1059.5 Kkal"],
     tags_EN: ["Thursday", "81.0g Protein", "1059.5 Kcal"],
-    desc_ID: "Dada ayam empuk dengan kuah sate Padang kaya rempah khas, disajikan dengan spesifikasi nutrisi lengkap 81.0g protein, 122g karbo, 27.5g lemak, 1360mg sodium, dan 370mg kalium.",
-    desc_EN: "Tender chicken coated in rich and aromatic Padang-style sauce, served with full lab specs: 81.0g protein, 122g carbs, 27.5g fat, 1360mg sodium, and 370mg kalium.",
+    desc_ID: "Dada ayam empuk dengan kuah sate Padang kaya rempah khas, disajikan dengan spesifikasi nutrisi lengkap 81.0g protein, 122g karbo, 27.5g lemak, 1360mg natrium, dan 370mg kalium.",
+    desc_EN: "Tender chicken coated in rich and aromatic Padang-style sauce, served with full lab specs: 81.0g protein, 122g carbs, 27.5g fat, 1360mg sodium, and 370mg potassium.",
     available: true,
     batch: "THU-04"
   },
@@ -97,8 +97,8 @@ const INITIAL_MENU_ITEMS = [
     image: "/images/oseng_ayam_kecombrang.webp",
     tags_ID: ["Friday / Jumat", "78.5g Protein", "1039 Kkal"],
     tags_EN: ["Friday", "78.5g Protein", "1039 Kcal"],
-    desc_ID: "Oseng ayam gurih bertabur irisan kecombrang harum, disajikan dengan spesifikasi nutrisi lengkap 78.5g protein, 125g karbo, 25g lemak, 1240mg sodium, dan 385mg kalium.",
-    desc_EN: "Savory stir-fried chicken infused with fragrant kecombrang, served with full lab specs: 78.5g protein, 125g carbs, 25g fat, 1240mg sodium, and 385mg kalium.",
+    desc_ID: "Oseng ayam gurih bertabur irisan kecombrang harum, disajikan dengan spesifikasi nutrisi lengkap 78.5g protein, 125g karbo, 25g lemak, 1240mg natrium, dan 385mg kalium.",
+    desc_EN: "Savory stir-fried chicken infused with fragrant kecombrang, served with full lab specs: 78.5g protein, 125g carbs, 25g fat, 1240mg sodium, and 385mg potassium.",
     available: true,
     batch: "FRI-05"
   },
@@ -117,8 +117,8 @@ const INITIAL_MENU_ITEMS = [
     image: "/images/sweet_sour_crispy_chicken.webp",
     tags_ID: ["Saturday / Sabtu", "80.5g Protein", "1114 Kkal"],
     tags_EN: ["Saturday", "80.5g Protein", "1114 Kcal"],
-    desc_ID: "Ayam renyah berbalut saus asam manis buatan sendiri yang segar, disajikan dengan spesifikasi nutrisi lengkap 80.5g protein, 135g karbo, 28g lemak, 1310mg sodium, dan 345mg kalium.",
-    desc_EN: "Crispy chicken tossed in a sweet and tangy homemade sauce, served with full lab specs: 80.5g protein, 135g carbs, 28g fat, 1310mg sodium, and 345mg kalium.",
+    desc_ID: "Ayam renyah berbalut saus asam manis buatan sendiri yang segar, disajikan dengan spesifikasi nutrisi lengkap 80.5g protein, 135g karbo, 28g lemak, 1310mg natrium, dan 345mg kalium.",
+    desc_EN: "Crispy chicken tossed in a sweet and tangy homemade sauce, served with full lab specs: 80.5g protein, 135g carbs, 28g fat, 1310mg sodium, and 345mg potassium.",
     available: true,
     batch: "SAT-06"
   }
@@ -200,7 +200,7 @@ export function CplProvider({ children }) {
       english: "English",
 
       // Announcement
-      announcement: "🔥 HIGH PROTEIN & CUSTOMIZABLE PROTEIN CATERING • 100% Homemade Fresh Makassar • WA +62 899-6727-181",
+      announcement: "🔥 KATERING TINGGI PROTEIN & PILIHAN PROTEIN FLEKSIBEL • 100% Homemade Fresh Makassar • WA +62 851-1121-5704",
 
       // Hero Section
       heroEyebrow: "Katering Harian Tinggi Protein Makassar",
@@ -210,10 +210,10 @@ export function CplProvider({ children }) {
       heroTitle2: "CLEAR DATA.",
       heroTitle3: "BETTER YOU.",
       heroSubtitle: "Makanan tinggi protein yang dibuat dengan ilmu pangan, data nutrisi yang jelas, dan rasa yang benar-benar ingin kamu nikmati.",
-      heroAvgProtein: "Customizable Protein",
+      heroAvgProtein: "Pilihan Protein Fleksibel",
       heroAvgProteinDesc: "Bebas Pilih 25g, 40g, 60g, 80g & 100g",
-      heroWholeFood: "Formulasi Tinggi Protein",
-      heroWholeFoodDesc: "Nutrisi Makro Terhitung Presisi",
+      heroWholeFood: "Harga Mulai Dari",
+      heroWholeFoodDesc: "Tarif bulanan per porsi protein 25g",
       heroDeliveryBadge: "TERJADWAL",
       heroDeliveryValue: "1–2x/Hari",
       heroMacroAcc: "Jadwal Makanan Harian",
@@ -237,7 +237,7 @@ export function CplProvider({ children }) {
       heroProtein: "PROTEIN",
       heroCarbs: "KARBOHIDRAT",
       heroFat: "LEMAK",
-      heroSodium: "SODIUM",
+      heroSodium: "NATRIUM",
       heroPotassium: "KALIUM",
       heroCalories: "KALORI",
 
@@ -247,7 +247,7 @@ export function CplProvider({ children }) {
       pillarsSubtitle: "Bagaimana kami merevolusi katering sehat harian di Makassar dengan formulasi tinggi protein, custom porsi 25g - 100g, olahan rumahan (homemade), dan kemasan food-grade.",
       pillar1Title: "Formulasi Tinggi Protein",
       pillar1Desc: "Setiap porsi katering didesain khusus tinggi protein (hingga 100g per porsi) untuk mendukung pembentukan otot kering dan metabolisme harian.",
-      pillar2Title: "Customizable Protein Tiers",
+      pillar2Title: "Pilihan Protein Fleksibel",
       pillar2Desc: "Pilih tingkat protein harianmu secara bebas: 25g, 40g, 60g, 80g, atau 100g protein sesuai target energi dan fitness unik Anda.",
       pillar3Title: "100% Olahan Rumahan (Homemade)",
       pillar3Desc: "Setiap hidangan dikemas dalam wadah food-grade khusus yang terjamin kebersihan, higiene, dan aman dipanaskan.",
@@ -425,6 +425,10 @@ export function CplProvider({ children }) {
       orderPlanOpt6: "Inquiry Katering Perusahaan / B2B Makassar",
       orderAddress: "Alamat Pengiriman Lengkap (Makassar)",
       orderAddressPlaceholder: "Jl. G. Bulusaraung, nama gedung, atau alamat lengkap Anda...",
+      orderMapsLink: "Titik Google Maps (Opsional)",
+      orderMapsPlaceholder: "Tempel link lokasi dari Google Maps...",
+      orderMapsHelp: "Buka Google Maps, pilih Bagikan, lalu tempel tautan lokasi di sini.",
+      orderMapsSummary: "Titik Google Maps",
       orderStartDate: "Tanggal Mulai Katering",
       orderEndDate: "Tanggal Selesai Katering",
       orderTotalDays: "Total Hari Katering",
@@ -461,7 +465,7 @@ export function CplProvider({ children }) {
       switchLanguage: "Select Language",
       indonesian: "Indonesia",
       english: "English",
-      announcement: "🔥 HIGH PROTEIN & CUSTOMIZABLE PROTEIN CATERING • 100% Homemade Fresh Makassar • WA +62 899-6727-181",
+      announcement: "🔥 HIGH PROTEIN & CUSTOMIZABLE PROTEIN CATERING • 100% Homemade Fresh Makassar • WA +62 851-1121-5704",
 
       // Hero Section
       heroEyebrow: "Daily High Protein Catering Makassar",
@@ -473,8 +477,8 @@ export function CplProvider({ children }) {
       heroSubtitle: "High-protein meals made with food science, clear nutrition data, and food you actually want to eat.",
       heroAvgProtein: "Customizable Protein",
       heroAvgProteinDesc: "Select 25g, 40g, 60g, 80g & 100g",
-      heroWholeFood: "High Protein Density",
-      heroWholeFoodDesc: "Calculated Macro Precision",
+      heroWholeFood: "Starting Price",
+      heroWholeFoodDesc: "Monthly rate per 25g protein serving",
       heroDeliveryBadge: "SCHEDULED",
       heroDeliveryValue: "1–2x/Day",
       heroMacroAcc: "Scheduled Daily Meals",
@@ -499,7 +503,7 @@ export function CplProvider({ children }) {
       heroCarbs: "CARBS",
       heroFat: "FAT",
       heroSodium: "SODIUM",
-      heroPotassium: "KALIUM",
+      heroPotassium: "POTASSIUM",
       heroCalories: "CALORIES",
 
       // Brand Pillars
@@ -686,6 +690,10 @@ export function CplProvider({ children }) {
       orderPlanOpt6: "Corporate / B2B Catering Inquiry Makassar",
       orderAddress: "Full Delivery Address (Makassar)",
       orderAddressPlaceholder: "Street address, building name, unit number in Makassar...",
+      orderMapsLink: "Google Maps Pin (Optional)",
+      orderMapsPlaceholder: "Paste the Google Maps location link...",
+      orderMapsHelp: "Open Google Maps, choose Share, then paste the location link here.",
+      orderMapsSummary: "Google Maps pin",
       orderStartDate: "Catering Start Date",
       orderEndDate: "Catering End Date",
       orderTotalDays: "Total Catering Days",

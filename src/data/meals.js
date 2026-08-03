@@ -2,6 +2,8 @@
  * @typedef {Object} Meal
  * @property {string} id
  * @property {number} week
+ * @property {string} day
+ * @property {string} dayID
  * @property {string} name
  * @property {string} description
  * @property {string} photo
@@ -23,6 +25,8 @@ const mealCatalog = [
   {
     id: 'chicken-teriyaki',
     week: 1,
+    day: 'Monday',
+    dayID: 'Senin',
     name: 'Chicken Teriyaki',
     description: 'Tender chicken with a glossy house teriyaki, steamed rice, and crisp seasonal vegetables.',
     descriptionID: 'Ayam empuk dengan saus teriyaki racikan kami, nasi hangat, dan sayuran musiman yang renyah.',
@@ -42,6 +46,8 @@ const mealCatalog = [
   {
     id: 'ayam-cabe-ijo',
     week: 1,
+    day: 'Tuesday',
+    dayID: 'Selasa',
     name: 'Ayam Cabe Ijo',
     description: 'Lean chicken with bright green chilli sambal, rice, and vegetables for a fresh, savoury finish.',
     descriptionID: 'Ayam rendah lemak dengan sambal cabai hijau segar, nasi, dan sayuran dengan cita rasa gurih yang ringan.',
@@ -61,6 +67,8 @@ const mealCatalog = [
   {
     id: 'chicken-mentai',
     week: 2,
+    day: 'Monday',
+    dayID: 'Senin',
     name: 'Chicken Mentai',
     description: 'Juicy chicken with a balanced creamy mentai sauce, rice, and a clean vegetable side.',
     descriptionID: 'Ayam juicy dengan saus mentai creamy yang seimbang, nasi, dan pendamping sayuran segar.',
@@ -80,6 +88,8 @@ const mealCatalog = [
   {
     id: 'sate-padang',
     week: 2,
+    day: 'Tuesday',
+    dayID: 'Selasa',
     name: 'Sate Padang',
     description: 'Aromatic Padang-spiced chicken with a lighter house sauce, rice, and seasonal vegetables.',
     descriptionID: 'Ayam berbumbu Padang aromatik dengan saus racikan yang lebih ringan, nasi, dan sayuran musiman.',
@@ -99,6 +109,8 @@ const mealCatalog = [
   {
     id: 'oseng-ayam-kecombrang',
     week: 3,
+    day: 'Monday',
+    dayID: 'Senin',
     name: 'Oseng Ayam Kecombrang',
     description: 'Fragrant torch-ginger chicken stir-fry with rice and vegetables, prepared fresh for each service.',
     descriptionID: 'Tumis ayam kecombrang yang harum dengan nasi dan sayuran, dimasak segar untuk setiap layanan.',
@@ -118,6 +130,8 @@ const mealCatalog = [
   {
     id: 'sweet-sour-crispy-chicken',
     week: 4,
+    day: 'Monday',
+    dayID: 'Senin',
     name: 'Sweet & Sour Crispy Chicken',
     description: 'Crisp chicken finished in a house sweet-and-sour glaze with rice and a fresh vegetable side.',
     descriptionID: 'Ayam renyah dengan saus asam manis racikan kami, nasi, dan sayuran segar sebagai pendamping.',

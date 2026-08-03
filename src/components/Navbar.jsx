@@ -1,13 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { CplPrimaryLogo } from './CplLogo';
 import { Button } from './ui/button';
-import { Menu, X, ArrowRight, Globe } from 'lucide-react';
+import { Menu, X, ArrowRight } from 'lucide-react';
 import { useCpl } from '../hooks/useCpl';
 import { useSiteCopy } from '../hooks/useSiteCopy';
+
+const NAV_SECTION_HREFS = [
+  '#how-it-works',
+  '#protein-tiers',
+  '#menu',
+  '#calculator',
+  '#why-cpl',
+  '#faq',
+];
 
 export function Navbar({ onOpenOrder }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [activeHref, setActiveHref] = useState('');
   const { language, setLanguage, t } = useCpl();
   const copy = useSiteCopy();
 
@@ -17,6 +27,38 @@ export function Navbar({ onOpenOrder }) {
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    let animationFrame;
+
+    const updateActiveSection = () => {
+      animationFrame = undefined;
+      const marker = window.scrollY + Math.min(180, window.innerHeight * 0.3);
+      let nextActiveHref = '';
+
+      NAV_SECTION_HREFS.forEach((href) => {
+        const section = document.querySelector(href);
+        if (section && section.offsetTop <= marker) nextActiveHref = href;
+      });
+
+      setActiveHref(nextActiveHref);
+    };
+
+    const scheduleUpdate = () => {
+      if (animationFrame) return;
+      animationFrame = window.requestAnimationFrame(updateActiveSection);
+    };
+
+    updateActiveSection();
+    window.addEventListener('scroll', scheduleUpdate, { passive: true });
+    window.addEventListener('resize', scheduleUpdate);
+
+    return () => {
+      window.removeEventListener('scroll', scheduleUpdate);
+      window.removeEventListener('resize', scheduleUpdate);
+      if (animationFrame) window.cancelAnimationFrame(animationFrame);
+    };
   }, []);
 
   // Close mobile menu on ESC
@@ -41,13 +83,27 @@ export function Navbar({ onOpenOrder }) {
   }, [mobileMenuOpen]);
 
   const navItems = [
-    { label: copy.nav.protein, href: "#protein-tiers" },
     { label: copy.nav.how, href: "#how-it-works" },
+    { label: copy.nav.protein, href: "#protein-tiers" },
     { label: copy.nav.menu, href: "#menu" },
-    { label: copy.nav.standard, href: "#our-standard" },
     { label: copy.nav.calculator, href: "#calculator" },
+    { label: copy.nav.standard, href: "#why-cpl" },
     { label: copy.nav.faq, href: "#faq" },
   ];
+
+  const handleMobileNavigation = (event, href) => {
+    event.preventDefault();
+    document.body.style.overflow = '';
+    setActiveHref(href);
+    setMobileMenuOpen(false);
+
+    window.requestAnimationFrame(() => {
+      const target = document.querySelector(href);
+      if (!target) return;
+      window.history.pushState(null, '', href);
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  };
 
   return (
     <>
@@ -78,7 +134,7 @@ export function Navbar({ onOpenOrder }) {
             : 'bg-[#F5F2EA]/90 border-b border-[#1E1E1E]/10 backdrop-blur-sm py-4'
         }`}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-2 sm:gap-4 relative z-50">
+        <div className="mx-auto flex max-w-[90rem] items-center justify-between gap-2 px-4 sm:gap-4 sm:px-6 xl:gap-3 xl:px-5 2xl:gap-5 2xl:px-8 relative z-50">
           
           {/* Brand Logo */}
           <a 
@@ -86,7 +142,7 @@ export function Navbar({ onOpenOrder }) {
             className="flex items-center shrink-0 hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8A9C7A] rounded-lg"
             aria-label="Clean Plate Lab Home"
           >
-            <div className="transform scale-95 sm:scale-100 origin-left">
+            <div className="origin-left scale-95 transform sm:scale-100 xl:scale-[0.88] 2xl:scale-100">
               <CplPrimaryLogo />
             </div>
           </a>
@@ -94,29 +150,42 @@ export function Navbar({ onOpenOrder }) {
           {/* Desktop Navigation Links */}
           <nav 
             aria-label="Main Navigation"
-            className="hidden xl:flex items-center justify-center gap-6 xl:gap-8 text-xs font-display font-bold uppercase tracking-wider text-[#1E1E1E]"
+            className="hidden items-center justify-center gap-3 font-display text-[11px] font-extrabold uppercase tracking-[0.04em] text-[#1E1E1E] xl:flex 2xl:gap-6 2xl:text-xs 2xl:tracking-wider"
           >
-            {navItems.map((item) => (
-              <a 
-                key={item.href} 
-                href={item.href}
-                className="group relative py-1.5 hover:text-[#8A9C7A] transition-colors whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8A9C7A] rounded"
-              >
-                <span>{item.label}</span>
-                <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-[#8A9C7A] group-hover:w-full transition-all duration-200" />
-              </a>
-            ))}
+            {navItems.map((item) => {
+              const isActive = activeHref === item.href;
+
+              return (
+                <a
+                  key={item.href}
+                  href={item.href}
+                  aria-current={isActive ? 'location' : undefined}
+                  onClick={() => setActiveHref(item.href)}
+                  className={`group relative whitespace-nowrap rounded py-1.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8A9C7A] ${
+                    isActive ? 'text-[#526049]' : 'hover:text-[#647554]'
+                  }`}
+                >
+                  <span>{item.label}</span>
+                  <span
+                    aria-hidden="true"
+                    className={`absolute bottom-0 left-0 h-[2px] bg-[#647554] transition-all duration-200 ${
+                      isActive ? 'w-full' : 'w-0 group-hover:w-full'
+                    }`}
+                  />
+                </a>
+              );
+            })}
           </nav>
 
           {/* Right Action Bar */}
           <div className="flex items-center justify-end gap-2 sm:gap-3 shrink-0">
             
             {/* Desktop Language Switcher */}
-            <div className="hidden sm:flex items-center bg-[#1E1E1E]/8 p-1 rounded-full border border-[#1E1E1E]/15 shadow-inner">
+            <div className="hidden items-center rounded-full border border-[#1E1E1E]/15 bg-[#1E1E1E]/8 p-1 shadow-inner sm:flex">
               <button
                 type="button"
                 onClick={() => setLanguage('ID')}
-                className={`px-2.5 py-1 text-[11px] font-black rounded-full transition-all duration-200 ${
+                className={`rounded-full px-2.5 py-1 text-[11px] font-black transition-all duration-200 ${
                   language === 'ID'
                     ? 'bg-[#8A9C7A] text-white shadow-sm scale-[1.02]'
                     : 'text-[#1E1E1E]/70 hover:text-[#1E1E1E]'
@@ -128,7 +197,7 @@ export function Navbar({ onOpenOrder }) {
               <button
                 type="button"
                 onClick={() => setLanguage('EN')}
-                className={`px-2.5 py-1 text-[11px] font-black rounded-full transition-all duration-200 ${
+                className={`rounded-full px-2.5 py-1 text-[11px] font-black transition-all duration-200 ${
                   language === 'EN'
                     ? 'bg-[#8A9C7A] text-white shadow-sm scale-[1.02]'
                     : 'text-[#1E1E1E]/70 hover:text-[#1E1E1E]'
@@ -152,11 +221,12 @@ export function Navbar({ onOpenOrder }) {
 
             {/* Mobile / Tablet Menu Toggle Button (Touch Area 44x44px) */}
             <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              type="button"
+              onClick={() => setMobileMenuOpen((current) => !current)}
               aria-expanded={mobileMenuOpen}
               aria-controls="mobile-menu-drawer"
               aria-label={mobileMenuOpen ? "Close Menu" : "Open Navigation Menu"}
-              className="xl:hidden w-11 h-11 flex items-center justify-center rounded-xl bg-[#1E1E1E]/5 hover:bg-[#1E1E1E]/10 border border-[#1E1E1E]/15 text-[#1E1E1E] transition-colors shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8A9C7A]"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[#1E1E1E]/15 bg-[#1E1E1E]/5 text-[#1E1E1E] transition-colors hover:bg-[#1E1E1E]/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8A9C7A] xl:hidden"
             >
               {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
             </button>
@@ -168,35 +238,26 @@ export function Navbar({ onOpenOrder }) {
         {mobileMenuOpen && (
           <div 
             id="mobile-menu-drawer"
-            className="absolute top-full left-0 right-0 z-50 xl:hidden bg-[#F5F2EA] border-b-2 border-[#1E1E1E] px-5 py-6 space-y-5 font-display text-xs font-bold uppercase tracking-wider text-[#1E1E1E] shadow-2xl max-h-[calc(100vh-80px)] overflow-y-auto animate-cpl-slide-down origin-top"
+            className="absolute left-0 right-0 top-full z-50 max-h-[calc(100vh-80px)] origin-top space-y-4 overflow-y-auto border-b-2 border-[#1E1E1E] bg-[#F5F2EA] px-4 py-4 font-display text-xs font-bold uppercase tracking-wider text-[#1E1E1E] shadow-[0_18px_35px_rgba(30,30,30,0.16)] animate-cpl-slide-down sm:px-6 sm:py-5 xl:hidden"
           >
-            {/* Language Switcher Row in Drawer */}
-            <div className="flex items-center justify-between py-3 px-4 rounded-xl bg-white border border-[#1E1E1E]/15 shadow-sm">
-              <span className="flex items-center gap-2 text-xs text-[#1E1E1E] font-extrabold">
-                <Globe size={16} className="text-[#8A9C7A]" />
-                <span>{t('switchLanguage')}</span>
+            <div className="flex items-center justify-between gap-4 border-b border-[#1E1E1E]/20 pb-4 sm:hidden">
+              <span className="font-display text-[10px] font-extrabold uppercase tracking-wider text-[#1E1E1E]/65">
+                {t('switchLanguage')}
               </span>
-
-              <div className="flex items-center bg-[#1E1E1E]/8 p-1 rounded-full border border-[#1E1E1E]/15">
+              <div className="flex items-center rounded-full border border-[#1E1E1E]/15 bg-[#1E1E1E]/8 p-1 shadow-inner">
                 <button
                   type="button"
                   onClick={() => setLanguage('ID')}
-                  className={`px-3 py-1 text-xs font-black rounded-full transition-all ${
-                    language === 'ID'
-                      ? 'bg-[#8A9C7A] text-white shadow-sm'
-                      : 'text-[#1E1E1E]/70 hover:text-[#1E1E1E]'
-                  }`}
+                  className={`rounded-full px-3 py-1 text-[10px] font-black transition-all ${language === 'ID' ? 'bg-[#8A9C7A] text-white shadow-sm' : 'text-[#1E1E1E]/70 hover:text-[#1E1E1E]'}`}
+                  aria-label="Bahasa Indonesia"
                 >
                   ID
                 </button>
                 <button
                   type="button"
                   onClick={() => setLanguage('EN')}
-                  className={`px-3 py-1 text-xs font-black rounded-full transition-all ${
-                    language === 'EN'
-                      ? 'bg-[#8A9C7A] text-white shadow-sm'
-                      : 'text-[#1E1E1E]/70 hover:text-[#1E1E1E]'
-                  }`}
+                  className={`rounded-full px-3 py-1 text-[10px] font-black transition-all ${language === 'EN' ? 'bg-[#8A9C7A] text-white shadow-sm' : 'text-[#1E1E1E]/70 hover:text-[#1E1E1E]'}`}
+                  aria-label="English Language"
                 >
                   EN
                 </button>
@@ -204,26 +265,38 @@ export function Navbar({ onOpenOrder }) {
             </div>
 
             {/* Mobile Navigation Links */}
-            <nav aria-label="Mobile Navigation" className="space-y-2">
-              {navItems.map((item) => (
-                <a
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-between py-3 px-4 rounded-xl bg-white/80 hover:bg-white border border-[#1E1E1E]/10 hover:border-[#8A9C7A]/40 text-[#1E1E1E] hover:text-[#647554] font-extrabold text-sm transition-all shadow-sm active:scale-[0.99]"
-                >
-                  <span>{item.label}</span>
-                  <ArrowRight size={16} className="text-[#8A9C7A]" />
-                </a>
-              ))}
+            <nav aria-label="Mobile Navigation" className="grid border-t-2 border-[#1E1E1E]">
+              {navItems.map((item) => {
+                const isActive = activeHref === item.href;
+
+                return (
+                  <a
+                    key={item.href}
+                    href={item.href}
+                    aria-current={isActive ? 'location' : undefined}
+                    onClick={(event) => handleMobileNavigation(event, item.href)}
+                    className={`group flex min-h-12 items-center justify-between gap-3 border-b border-[#1E1E1E]/20 py-3 text-xs font-extrabold transition-all focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#8A9C7A] sm:min-h-14 sm:text-sm ${
+                      isActive
+                        ? 'border-l-4 border-l-[#647554] bg-[#DDE6D5] px-3 text-[#46533D]'
+                        : 'border-l-4 border-l-transparent px-2 text-[#1E1E1E] hover:bg-white/50 hover:px-3 hover:text-[#647554]'
+                    }`}
+                  >
+                    <span>{item.label}</span>
+                    <ArrowRight
+                      size={14}
+                      className={`shrink-0 transition-transform group-hover:translate-x-0.5 ${isActive ? 'text-[#526049]' : 'text-[#8A9C7A]'}`}
+                    />
+                  </a>
+                );
+              })}
             </nav>
             
             {/* Drawer Action Buttons */}
-            <div className="pt-3 border-t border-[#1E1E1E]/15 space-y-2.5">
+            <div className="border-t border-[#1E1E1E]/15 pt-4">
               <Button 
                 variant="default" 
                 onClick={() => { setMobileMenuOpen(false); onOpenOrder(); }} 
-                className="w-full flex items-center justify-center gap-2 rounded-full bg-[#8A9C7A] hover:bg-[#647554] text-white font-extrabold text-xs py-3.5 shadow-md active:scale-[0.98] transition-transform"
+                className="flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[#8A9C7A] px-5 text-xs font-extrabold text-white shadow-md transition-transform hover:bg-[#647554] active:scale-[0.98]"
               >
                 <span>{copy.nav.build}</span>
                 <ArrowRight size={16} />

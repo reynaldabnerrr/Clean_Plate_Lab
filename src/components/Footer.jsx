@@ -3,6 +3,7 @@ import { CplPrimaryLogo } from './CplLogo';
 import { Mail, MapPin, Phone, ArrowUp } from 'lucide-react';
 import { useCpl } from '../hooks/useCpl';
 import { useSiteCopy } from '../hooks/useSiteCopy';
+import { CONTACT_EMAIL, WHATSAPP_DISPLAY, WHATSAPP_NUMBER } from '../lib/order';
 
 const InstagramIcon = ({ size = 18, className = "" }) => (
   <svg 
@@ -82,12 +83,12 @@ export function Footer() {
               <div className="flex items-center gap-2.5">
                 <Phone size={18} className="text-[#8A9C7A] flex-shrink-0" />
                 <a 
-                  href="https://wa.me/628996727181" 
+                  href={`https://wa.me/${WHATSAPP_NUMBER}`}
                   target="_blank" 
                   rel="noopener noreferrer" 
                   className="hover:text-[#8A9C7A] transition-colors font-medium"
                 >
-                  WhatsApp: +62 899-6727-181
+                  WhatsApp: {WHATSAPP_DISPLAY}
                 </a>
               </div>
 
@@ -105,7 +106,12 @@ export function Footer() {
 
               <div className="flex items-center gap-2.5">
                 <Mail size={18} className="text-[#8A9C7A] flex-shrink-0" />
-                <span className="font-medium">hello@cleanplatelab.id</span>
+                <a
+                  href={`mailto:${CONTACT_EMAIL}`}
+                  className="break-all font-medium transition-colors hover:text-[#8A9C7A]"
+                >
+                  {CONTACT_EMAIL}
+                </a>
               </div>
             </div>
           </div>

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { CplBadgeLogo, CplFlaskIcon } from './CplLogo';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
-import { ShieldCheck, Award, ArrowRight, CheckCircle2, Zap, Leaf, Truck } from 'lucide-react';
+import { ArrowRight, BadgeDollarSign, Zap, Truck } from 'lucide-react';
 import { useCpl } from '../hooks/useCpl';
 
 export function Hero({ onOpenOrder, onScrollToLabel }) {
@@ -32,21 +32,18 @@ export function Hero({ onOpenOrder, onScrollToLabel }) {
 
   const metrics = [
     {
-      badge: 'CUSTOM',
       value: '25g-100g',
       title: t('heroAvgProtein'),
       description: t('heroAvgProteinDesc'),
       icon: Zap,
     },
     {
-      badge: 'CLEAN',
-      value: '100%',
+      value: 'Rp25.000',
       title: t('heroWholeFood'),
       description: t('heroWholeFoodDesc'),
-      icon: Leaf,
+      icon: BadgeDollarSign,
     },
     {
-      badge: t('heroDeliveryBadge'),
       value: t('heroDeliveryValue'),
       title: t('heroMacroAcc'),
       description: t('heroMacroAccDesc'),
@@ -60,25 +57,6 @@ export function Hero({ onOpenOrder, onScrollToLabel }) {
       <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(#1E1E1E_1px,transparent_1px)] [background-size:16px_16px]" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-
-        {/* Top Status Eyebrow */}
-        <div className="mb-6 flex flex-col items-start justify-between gap-2 sm:mb-8 sm:flex-row sm:items-center sm:gap-4">
-          <Badge variant="default" className="flex min-h-8 items-center gap-2 px-3 py-1.5 text-[10px] sm:text-xs">
-            <span className="w-2 h-2 rounded-full bg-[var(--cpl-sage)] animate-pulse shrink-0" />
-            <span>{t('heroEyebrow')}</span>
-          </Badge>
-
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 font-display text-[10px] font-semibold uppercase text-[var(--cpl-dark-muted)] sm:justify-end sm:text-xs">
-            <span className="flex min-h-8 items-center gap-1.5">
-              <ShieldCheck size={14} className="shrink-0 text-[var(--cpl-sage)]" />
-              <span>{t('heroBadge1')}</span>
-            </span>
-            <span className="hidden min-h-8 items-center gap-1.5 md:flex">
-              <Award size={14} className="shrink-0 text-[var(--cpl-sage)]" />
-              <span>{t('heroBadge2')}</span>
-            </span>
-          </div>
-        </div>
 
         {/* Hero Grid */}
         <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 items-center">
@@ -102,7 +80,7 @@ export function Hero({ onOpenOrder, onScrollToLabel }) {
 
                 return (
                   <div
-                    key={metric.badge}
+                    key={metric.title}
                     className="group flex min-h-[118px] min-w-0 flex-col items-start border-2 border-[#1E1E1E] bg-white p-2.5 shadow-[2px_2px_0px_0px_#1E1E1E] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[4px_4px_0px_0px_#8A9C7A] sm:min-h-[168px] sm:p-4"
                   >
                     <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-[#8A9C7A]/40 bg-[#EBF0E6] text-[#647554] transition-colors group-hover:bg-[#8A9C7A] group-hover:text-white sm:h-8 sm:w-8">
@@ -114,14 +92,9 @@ export function Hero({ onOpenOrder, onScrollToLabel }) {
                     </div>
 
                     <div className="mt-2 min-w-0 w-full">
-                      <div className="flex items-start justify-between gap-2">
-                        <p className="line-clamp-2 font-display text-[8px] font-extrabold uppercase leading-tight text-[#1E1E1E] sm:text-[11px]">
-                          {metric.title}
-                        </p>
-                        <span className="hidden rounded bg-[#8A9C7A]/15 px-1.5 py-0.5 font-mono text-[8px] font-extrabold text-[#647554] sm:inline-flex">
-                          {metric.badge}
-                        </span>
-                      </div>
+                      <p className="line-clamp-2 font-display text-[8px] font-extrabold uppercase leading-tight text-[#1E1E1E] sm:text-[11px]">
+                        {metric.title}
+                      </p>
                       <p className="mt-2 hidden line-clamp-3 text-[10px] leading-snug text-gray-500 sm:block">
                         {metric.description}
                       </p>
@@ -153,13 +126,6 @@ export function Hero({ onOpenOrder, onScrollToLabel }) {
               </Button>
             </div>
 
-            <div className="flex flex-wrap items-center gap-3 sm:gap-4 pt-2 text-[11px] sm:text-xs text-[var(--cpl-dark-muted)] font-display uppercase tracking-wider">
-              <span className="flex items-center gap-1.5"><CheckCircle2 size={14} className="text-[var(--cpl-sage)] shrink-0" /> {t('heroFeature1')}</span>
-              <span className="hidden sm:inline">•</span>
-              <span className="flex items-center gap-1.5"><CheckCircle2 size={14} className="text-[var(--cpl-sage)] shrink-0" /> {t('heroFeature2')}</span>
-              <span className="hidden sm:inline">•</span>
-              <span className="flex items-center gap-1.5"><CheckCircle2 size={14} className="text-[var(--cpl-sage)] shrink-0" /> {t('heroFeature3')}</span>
-            </div>
           </div>
 
           {/* Hero Visual CPL Label Box with 3D Motion & Zero Overlap */}

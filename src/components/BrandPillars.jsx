@@ -51,59 +51,59 @@ export function BrandPillars() {
   ];
 
   return (
-    <section id="pillars" className="py-20 bg-[var(--cpl-white)] border-b border-[var(--cpl-border-muted)]">
+    <section id="pillars" className="border-b border-[var(--cpl-border-muted)] bg-[var(--cpl-white)] py-12 sm:py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16 space-y-3">
+        <div className="mx-auto mb-8 max-w-3xl space-y-3 text-center sm:mb-16">
           <Badge variant="default">
             <span>{t('pillarsEyebrow')}</span>
           </Badge>
-          <h2 className="font-display text-4xl sm:text-5xl font-extrabold uppercase tracking-tight text-[var(--cpl-dark)]">
+          <h2 className="font-display text-3xl font-extrabold uppercase tracking-tight text-[var(--cpl-dark)] sm:text-5xl">
             {t('pillarsTitle')}
           </h2>
-          <p className="text-base text-[var(--cpl-dark-muted)] font-normal">
+          <p className="text-xs leading-5 text-[var(--cpl-dark-muted)] sm:text-base sm:leading-normal">
             {t('pillarsSubtitle')}
           </p>
         </div>
 
         {/* 3 Grid Cards */}
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid gap-2.5 sm:gap-4 md:grid-cols-3 md:gap-8">
           {pillars.map((pillar) => {
             const Icon = pillar.icon;
             return (
               <Card 
                 key={pillar.id}
-                className="p-8 flex flex-col justify-between relative border border-[var(--cpl-border-muted)] hover:border-[var(--cpl-sage)] transition-all rounded-none bg-[var(--cpl-white)]"
+                className="relative grid min-h-0 w-full grid-cols-[2.75rem_1fr] gap-x-3 rounded-none border border-[var(--cpl-border-muted)] bg-[var(--cpl-white)] p-4 transition-all hover:border-[var(--cpl-sage)] sm:grid-cols-[3rem_1fr] sm:p-5 md:flex md:min-h-[320px] md:flex-col md:justify-between md:p-8"
               >
-                <div className="space-y-4">
+                <div className="contents md:block md:space-y-4">
                   <div className="flex items-center justify-between">
-                    <div className="w-12 h-12 rounded-full bg-[var(--cpl-sage-light)] flex items-center justify-center text-[var(--cpl-sage-dark)]">
-                      <Icon size={24} />
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--cpl-sage-light)] text-[var(--cpl-sage-dark)] sm:h-11 sm:w-11 md:h-12 md:w-12">
+                      <Icon size={22} />
                     </div>
-                    <span className="font-display text-2xl font-black text-[var(--cpl-sand)]">
+                    <span className="hidden font-display text-2xl font-black text-[var(--cpl-sand)] md:block">
                       {pillar.number}
                     </span>
                   </div>
 
                   <div>
-                    <h3 className="font-display text-2xl font-extrabold text-[var(--cpl-dark)] uppercase tracking-tight">
+                    <h3 className="font-display text-lg font-extrabold uppercase tracking-tight text-[var(--cpl-dark)] sm:text-xl md:text-2xl">
                       {pillar.title}
                     </h3>
-                    <div className="text-xs font-display font-bold text-[var(--cpl-sage-dark)] uppercase tracking-wider mt-0.5">
+                    <div className="mt-0.5 font-display text-[10px] font-bold uppercase tracking-wider text-[var(--cpl-sage-dark)] sm:text-xs">
                       {pillar.subhead}
                     </div>
                   </div>
 
-                  <p className="text-xs text-[var(--cpl-dark-muted)] leading-relaxed font-normal">
+                  <p className="col-start-2 mt-2 text-[10px] font-normal leading-4 text-[var(--cpl-dark-muted)] sm:text-[11px] sm:leading-5 md:mt-0 md:text-xs md:leading-relaxed">
                     {pillar.description}
                   </p>
                 </div>
 
-                <div className="pt-6 border-t border-[var(--cpl-border-muted)] space-y-2 mt-6">
+                <div className="col-span-2 mt-3 grid grid-cols-1 gap-1 border-t border-[var(--cpl-border-muted)] pt-3 sm:grid-cols-3 sm:gap-2 md:mt-6 md:block md:space-y-2 md:pt-6">
                   {pillar.highlights.map((item, idx) => (
-                    <div key={idx} className="flex items-center gap-2 text-xs font-semibold text-[var(--cpl-dark)]">
-                      <Check size={14} className="text-[var(--cpl-sage)] flex-shrink-0" />
+                    <div key={idx} className="flex items-center gap-1.5 text-[10px] font-semibold text-[var(--cpl-dark)] sm:text-[11px] md:gap-2 md:text-xs">
+                      <Check size={12} className="text-[var(--cpl-sage)] flex-shrink-0 md:size-[14px]" />
                       <span>{item}</span>
                     </div>
                   ))}

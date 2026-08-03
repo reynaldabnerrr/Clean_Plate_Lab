@@ -60,7 +60,7 @@ export function LabelGenerator({ onOpenOrder }) {
   };
 
   const handleCopySpec = () => {
-    const text = `${t('labelSpecTitle')}\nItem: ${currentTitle} (${currentCode})\nProtein: ${protein}g | Carbs: ${carbs}g | Fat: ${fat}g | Sodium: ${sodium}mg | Kalium: ${potassium}mg | Calories: ${calculatedKcal} Kcal\n${t('labelStandardStr')}`;
+    const text = `${t('labelSpecTitle')}\nItem: ${currentTitle} (${currentCode})\nProtein: ${protein}g | Carbs: ${carbs}g | Fat: ${fat}g | ${t('heroSodium')}: ${sodium}mg | ${t('heroPotassium')}: ${potassium}mg | Calories: ${calculatedKcal} Kcal\n${t('labelStandardStr')}`;
     navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);

@@ -47,28 +47,28 @@ export function MacroCalculator({ onOpenOrder }) {
   const activeActivity = activityOptions.find((option) => option.value === activity) || activityOptions[2];
 
   return (
-    <section id="calculator" className="overflow-x-clip border-b border-[var(--cpl-border)] bg-[var(--cpl-cream)] py-16 sm:py-24">
+    <section id="calculator" className="overflow-x-clip border-b border-[var(--cpl-border)] bg-[var(--cpl-white)] py-12 sm:py-24">
       <div className="mx-auto min-w-0 max-w-7xl px-4 sm:px-6 lg:px-8">
         
         {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-16 space-y-4">
+        <div className="mx-auto mb-8 max-w-3xl space-y-3 text-center sm:mb-16 sm:space-y-4">
           <Badge variant="default">
             <span>{t('calcEyebrow')}</span>
           </Badge>
-          <h2 className="font-display text-3xl sm:text-6xl font-extrabold uppercase tracking-tight text-[var(--cpl-dark)]">
+          <h2 className="font-display text-2xl font-extrabold uppercase tracking-tight text-[var(--cpl-dark)] sm:text-6xl">
             {t('calcTitle')}
           </h2>
-          <p className="text-base sm:text-lg text-[var(--cpl-dark-muted)] font-light">
+          <p className="text-xs leading-5 text-[var(--cpl-dark-muted)] sm:text-lg sm:leading-normal">
             {t('calcSubtitle')}
           </p>
         </div>
 
-        <div className="grid min-w-0 items-stretch gap-8 lg:grid-cols-12 lg:gap-10">
+        <div className="grid min-w-0 items-stretch gap-5 sm:gap-8 lg:grid-cols-12 lg:gap-10">
           
           {/* Inputs Column (Equal Height) */}
-          <Card className="flex h-full min-w-0 w-full flex-col justify-between space-y-6 rounded-3xl border-2 border-[var(--cpl-dark)] bg-[var(--cpl-white)] p-5 shadow-sm sm:p-8 lg:col-span-6">
+          <Card className="flex h-full min-w-0 w-full flex-col justify-between space-y-4 rounded-2xl border-2 border-[var(--cpl-dark)] bg-[var(--cpl-cream)] p-4 shadow-sm sm:space-y-6 sm:rounded-3xl sm:p-8 lg:col-span-6">
             
-            <div className="flex items-center gap-2 border-b border-[var(--cpl-border)] pb-4">
+            <div className="flex items-center gap-2 border-b border-[var(--cpl-border)] pb-3 sm:pb-4">
               <Calculator size={20} className="text-[var(--cpl-sage)] shrink-0" />
               <h3 className="font-display font-extrabold text-base sm:text-lg uppercase tracking-wider text-[var(--cpl-dark)]">
                 {t('calcInputSection')}
@@ -101,7 +101,7 @@ export function MacroCalculator({ onOpenOrder }) {
             </div>
 
             {/* Body Metric Sliders */}
-            <div className="space-y-5">
+            <div className="space-y-4 sm:space-y-5">
               <div className="space-y-2">
                 <div className="flex justify-between text-xs font-display font-bold text-[var(--cpl-dark)]">
                   <span>{t('calcWeightLabel')}</span>
@@ -151,7 +151,7 @@ export function MacroCalculator({ onOpenOrder }) {
                 {t('calcActivity')}
               </label>
               <Select value={String(activity)} onValueChange={(value) => setActivity(Number(value))}>
-                <SelectTrigger aria-labelledby="activity-level-label" className="group min-h-16 rounded-2xl border-2 border-[#1E1E1E] bg-[var(--cpl-cream)] px-3 py-2.5 text-left hover:bg-[#E7EEE1]">
+                <SelectTrigger aria-labelledby="activity-level-label" className="group min-h-14 rounded-xl border-2 border-[#1E1E1E] bg-[var(--cpl-cream)] px-3 py-2 text-left hover:bg-[#E7EEE1] sm:min-h-16 sm:rounded-2xl sm:py-2.5">
                   <span className="min-w-0 flex-1">
                     <strong className="block truncate font-display text-[11px] font-extrabold uppercase text-[#1E1E1E]">{activeActivity.label}</strong>
                     <span className="mt-0.5 block font-mono text-[9px] font-bold uppercase tracking-wider text-[#647554]">Activity factor · {activity}×</span>
@@ -175,13 +175,13 @@ export function MacroCalculator({ onOpenOrder }) {
               <label className="block text-xs font-display font-bold uppercase tracking-widest text-[var(--cpl-dark-muted)] mb-2">
                 {t('calcGoal')}
               </label>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
                 <Button
                   type="button"
                   size="sm"
                   variant={goal === "cut" ? "dark" : "outline"}
                   onClick={() => setGoal("cut")}
-                  className={`min-h-[52px] flex-col gap-0.5 rounded-xl ${goal === "cut" ? "bg-[#1E1E1E] text-white font-extrabold" : ""}`}
+                  className={`min-h-12 min-w-0 flex-col gap-0.5 rounded-lg px-1 text-[9px] sm:min-h-[52px] sm:rounded-xl sm:px-3 sm:text-[11px] ${goal === "cut" ? "bg-[#1E1E1E] text-white font-extrabold" : ""}`}
                 >
                   <span>{t('calcGoalCut')}</span><span className="text-[8px] font-medium opacity-65">{upToLabel} 2.2g/kg</span>
                 </Button>
@@ -190,7 +190,7 @@ export function MacroCalculator({ onOpenOrder }) {
                   size="sm"
                   variant={goal === "maintain" ? "dark" : "outline"}
                   onClick={() => setGoal("maintain")}
-                  className={`min-h-[52px] flex-col gap-0.5 rounded-xl ${goal === "maintain" ? "bg-[#1E1E1E] text-white font-extrabold" : ""}`}
+                  className={`min-h-12 min-w-0 flex-col gap-0.5 rounded-lg px-1 text-[9px] sm:min-h-[52px] sm:rounded-xl sm:px-3 sm:text-[11px] ${goal === "maintain" ? "bg-[#1E1E1E] text-white font-extrabold" : ""}`}
                 >
                   <span>{t('calcGoalMaintain')}</span><span className="text-[8px] font-medium opacity-65">{upToLabel} 1.4g/kg</span>
                 </Button>
@@ -199,7 +199,7 @@ export function MacroCalculator({ onOpenOrder }) {
                   size="sm"
                   variant={goal === "muscle" ? "dark" : "outline"}
                   onClick={() => setGoal("muscle")}
-                  className={`min-h-[52px] flex-col gap-0.5 rounded-xl ${goal === "muscle" ? "bg-[#1E1E1E] text-white font-extrabold" : ""}`}
+                  className={`min-h-12 min-w-0 flex-col gap-0.5 rounded-lg px-1 text-[9px] sm:min-h-[52px] sm:rounded-xl sm:px-3 sm:text-[11px] ${goal === "muscle" ? "bg-[#1E1E1E] text-white font-extrabold" : ""}`}
                 >
                   <span>{t('calcGoalMuscle')}</span><span className="text-[8px] font-medium opacity-65">{upToLabel} 2.4g/kg</span>
                 </Button>
@@ -209,62 +209,62 @@ export function MacroCalculator({ onOpenOrder }) {
           </Card>
 
           {/* Results Output Column (Equal Height) */}
-          <div className="flex h-full min-w-0 w-full flex-col justify-between gap-6 lg:col-span-6">
+          <div className="flex h-full min-w-0 w-full flex-col justify-between gap-4 sm:gap-6 lg:col-span-6">
             
             {/* Target Card (Rounded) */}
-            <Card className="relative flex min-w-0 w-full flex-1 flex-col justify-between overflow-hidden rounded-3xl border-2 border-[var(--cpl-dark)] bg-[var(--cpl-dark)] p-5 text-white shadow-xl sm:p-8">
-              <div className="mb-6 flex flex-col items-start justify-between gap-3 sm:flex-row">
+            <Card className="relative flex min-w-0 w-full flex-1 flex-col justify-between overflow-hidden rounded-2xl border-2 border-[var(--cpl-dark)] bg-[var(--cpl-dark)] p-4 text-white shadow-xl sm:rounded-3xl sm:p-8">
+              <div className="mb-4 flex items-start justify-between gap-3 sm:mb-6">
                 <div className="min-w-0">
                   <div className="text-[10px] sm:text-xs font-display font-bold uppercase tracking-widest text-[var(--cpl-sage)]">
                     {t('calcEnergyNeeds')}
                   </div>
-                  <h4 className="font-display text-2xl sm:text-3xl font-extrabold uppercase tracking-tight mt-1">
+                  <h4 className="mt-1 font-display text-xl font-extrabold uppercase tracking-tight sm:text-3xl">
                     {t('calcResultTitle')}
                   </h4>
                 </div>
 
-                <div className="shrink-0 text-left sm:text-right">
+                <div className="shrink-0 text-right">
                   <div className="text-[10px] sm:text-xs font-mono text-gray-400 uppercase">TDEE</div>
                   <div className="text-xl sm:text-2xl font-display font-extrabold text-[var(--cpl-sage)]">{targetCalories} KCAL</div>
                 </div>
               </div>
 
               {/* Macro Bar Metrics (Rounded) */}
-              <div className="mb-6 grid grid-cols-3 gap-2 border-t border-gray-700 pt-6 text-center sm:gap-4">
-                <div className="rounded-2xl bg-white/10 p-2 sm:p-3">
+              <div className="mb-4 grid grid-cols-3 gap-1.5 border-t border-gray-700 pt-4 text-center sm:mb-6 sm:gap-4 sm:pt-6">
+                <div className="rounded-xl bg-white/10 p-1.5 sm:rounded-2xl sm:p-3">
                   <div className="text-[10px] font-display font-bold uppercase tracking-wider text-[var(--cpl-sage)]">{t('calcDailyProtein')}</div>
                   <div className="mt-1 font-display text-xl font-black text-white sm:text-3xl">{targetProteinGrams}g</div>
                   <div className="text-[9px] text-gray-400 font-mono">{(targetProteinGrams*4/targetCalories*100).toFixed(0)}% energy</div>
                 </div>
 
-                <div className="rounded-2xl bg-white/10 p-2 sm:p-3">
+                <div className="rounded-xl bg-white/10 p-1.5 sm:rounded-2xl sm:p-3">
                   <div className="text-[10px] font-display font-bold uppercase tracking-wider text-gray-300">{t('calcDailyCarbs')}</div>
                   <div className="mt-1 font-display text-xl font-black text-white sm:text-3xl">{targetCarbGrams}g</div>
                   <div className="text-[9px] text-gray-400 font-mono">{(targetCarbGrams*4/targetCalories*100).toFixed(0)}% energy</div>
                 </div>
 
-                <div className="rounded-2xl bg-white/10 p-2 sm:p-3">
+                <div className="rounded-xl bg-white/10 p-1.5 sm:rounded-2xl sm:p-3">
                   <div className="text-[10px] font-display font-bold uppercase tracking-wider text-gray-300">{t('calcDailyFat')}</div>
                   <div className="mt-1 font-display text-xl font-black text-white sm:text-3xl">{targetFatGrams}g</div>
                   <div className="text-[9px] text-gray-400 font-mono">{(targetFatGrams*9/targetCalories*100).toFixed(0)}% energy</div>
                 </div>
               </div>
 
-              <div className="text-xs text-gray-300 font-mono space-y-1">
+              <div className="space-y-1 font-mono text-[10px] leading-4 text-gray-300 sm:text-xs sm:leading-normal">
                 <p>{t('calcProteinTargetDesc').replace('{ratio}', proteinRatio)}</p>
                 <p>{t('calcBmrEstimate')} <strong>{Math.round(bmr)} Kcal</strong> | {t('calcFactor')} <strong>{activity}x</strong></p>
               </div>
             </Card>
 
             {/* Tailored CPL Recommendation (Rounded) */}
-            <Card className="min-w-0 w-full space-y-4 rounded-3xl border-2 border-[var(--cpl-sage)] bg-[var(--cpl-sage-light)] p-5 shadow-sm sm:p-6">
+            <Card className="min-w-0 w-full space-y-3 rounded-2xl border-2 border-[var(--cpl-sage)] bg-[var(--cpl-sage-light)] p-4 shadow-sm sm:space-y-4 sm:rounded-3xl sm:p-6">
               <div className="flex items-center gap-2 text-xs font-display font-bold uppercase tracking-widest text-[var(--cpl-sage-dark)]">
                 <Target size={16} className="shrink-0" />
                 <span>{t('calcRecommendationTitle')}</span>
               </div>
 
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <h4 className="min-w-0 wrap-break-word font-display text-xl font-extrabold uppercase text-[var(--cpl-dark)] sm:text-2xl">
+                <h4 className="min-w-0 wrap-break-word font-display text-lg font-extrabold uppercase text-[var(--cpl-dark)] sm:text-2xl">
                   {recommendedPlanName}
                 </h4>
                 <Badge variant="solid" className="bg-[#8A9C7A] text-white w-fit">
@@ -276,7 +276,7 @@ export function MacroCalculator({ onOpenOrder }) {
                 {t('calcRecSummary').replace('{protein}', targetProteinGrams).replace('{plan}', recommendedPlanName).replace('{meals}', recommendedMealsPerDay)}
               </p>
 
-              <p className="rounded-xl border border-[var(--cpl-sage)]/35 bg-white/70 p-3 text-[11px] leading-relaxed text-[var(--cpl-dark-muted)]">
+              <p className="rounded-lg border border-[var(--cpl-sage)]/35 bg-white/70 p-2.5 text-[10px] leading-4 text-[var(--cpl-dark-muted)] sm:rounded-xl sm:p-3 sm:text-[11px] sm:leading-relaxed">
                 {copy.calculatorDisclaimer}
               </p>
 

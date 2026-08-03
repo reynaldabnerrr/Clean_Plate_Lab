@@ -4,7 +4,7 @@
 @layer base {
   :root {
     --cpl-sage: #8A9C7A;
-    --cpl-sage-dark: #647554;
+    --cpl-sage-dark: #526049;
     --cpl-sage-light: #EBF0E6;
     --cpl-cream: #F5F2EA;
     --cpl-sand: #D6C7B0;
@@ -126,6 +126,11 @@ img {
   background: var(--cpl-cream);
   padding: 1.5rem;
   box-shadow: 4px 4px 0 var(--cpl-dark);
+}
+
+.nutrition-panel-compact {
+  padding: 0.75rem;
+  box-shadow: 3px 3px 0 var(--cpl-dark);
 }
 
 .builder-section {
@@ -258,6 +263,10 @@ img {
 
   .nutrition-panel {
     padding: 2rem;
+  }
+
+  .nutrition-panel-compact {
+    padding: 1.25rem;
   }
 }
 

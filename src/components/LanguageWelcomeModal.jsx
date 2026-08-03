@@ -37,7 +37,7 @@ export function LanguageWelcomeModal() {
         aria-describedby="language-welcome-description"
         onEscapeKeyDown={(event) => event.preventDefault()}
         onPointerDownOutside={(event) => event.preventDefault()}
-        className="w-[calc(100%-2rem)] max-w-[25rem] gap-0 rounded-3xl border border-[#1E1E1E]/15 bg-[#F5F2EA] p-6 text-center shadow-[0_24px_70px_rgba(30,30,30,0.22)] sm:w-[calc(100%-3rem)] sm:p-8"
+        className="w-[calc(100%_-_2rem)] max-w-[25rem] gap-0 rounded-3xl border border-[#1E1E1E]/15 bg-[#F5F2EA] p-6 text-center shadow-[0_24px_70px_rgba(30,30,30,0.22)] sm:w-[calc(100%_-_3rem)] sm:p-8"
       >
         <CplLogoImage size={62} className="mx-auto" />
         <DialogTitle className="mt-4 text-2xl leading-none sm:text-[1.7rem]">
