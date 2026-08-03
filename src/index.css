@@ -144,3 +144,29 @@ body {
   z-index: 25;
   animation: cpl-gloss-sweep 4.5s ease-in-out infinite;
 }
+
+/* Fix native date input inner shadow dom overflow & styling */
+input[type="date"] {
+  box-sizing: border-box;
+  max-width: 100%;
+  color-scheme: light;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 4px;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
+
+input[type="date"]::-webkit-datetime-edit {
+  display: inline-flex;
+  min-width: 0;
+  max-width: 100%;
+}
+

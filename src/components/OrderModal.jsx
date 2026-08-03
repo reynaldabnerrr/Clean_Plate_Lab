@@ -301,7 +301,7 @@ Mohon konfirmasi ketersediaan jadwal, total akhir, dan petunjuk pembayaran. Teri
                             }
                           }}
                           placeholder="Alex Pratama"
-                          className={`h-11 min-w-0 rounded-lg pl-9 pr-3 font-sans text-xs font-semibold transition-all duration-200 ${
+                          className={`h-11 w-full max-w-full min-w-0 rounded-lg pl-9 pr-3 font-sans text-xs font-semibold transition-all duration-200 ${
                             errors.name
                               ? 'border-2 border-[#C93B2B] bg-[#FDF5F5] text-[#1E1E1E] focus-visible:ring-2 focus-visible:ring-[#C93B2B]/20'
                               : 'border-[#1E1E1E]/25 bg-white'
@@ -339,7 +339,7 @@ Mohon konfirmasi ketersediaan jadwal, total akhir, dan petunjuk pembayaran. Teri
                             }
                           }}
                           placeholder={t('orderPhonePlaceholder') || '0812 3456 7890'}
-                          className={`h-11 min-w-0 rounded-lg pl-9 pr-3 font-sans text-xs font-semibold transition-all duration-200 ${
+                          className={`h-11 w-full max-w-full min-w-0 rounded-lg pl-9 pr-3 font-sans text-xs font-semibold transition-all duration-200 ${
                             errors.phone
                               ? 'border-2 border-[#C93B2B] bg-[#FDF5F5] text-[#1E1E1E] focus-visible:ring-2 focus-visible:ring-[#C93B2B]/20'
                               : 'border-[#1E1E1E]/25 bg-white'
@@ -431,7 +431,7 @@ Mohon konfirmasi ketersediaan jadwal, total akhir, dan petunjuk pembayaran. Teri
                     <label htmlFor={`${fieldId}-start`} className="block font-display text-[10px] font-bold uppercase text-[#4D4D4D]">
                       {t('orderStartDate')}
                     </label>
-                    <div className="relative">
+                    <div className="relative w-full min-w-0">
                       <Input
                         id={`${fieldId}-start`}
                         type="date"
@@ -443,7 +443,7 @@ Mohon konfirmasi ketersediaan jadwal, total akhir, dan petunjuk pembayaran. Teri
                             setErrors((prev) => ({ ...prev, startDate: undefined, endDate: undefined }));
                           }
                         }}
-                        className={`h-11 w-full min-w-0 rounded-lg px-3 font-sans text-xs font-semibold text-[#1E1E1E] transition-all duration-200 ${
+                        className={`h-11 w-full max-w-full min-w-0 rounded-lg px-3 font-sans text-xs font-semibold text-[#1E1E1E] transition-all duration-200 ${
                           errors.startDate
                             ? 'border-2 border-[#C93B2B] bg-[#FDF5F5] focus-visible:ring-2 focus-visible:ring-[#C93B2B]/20'
                             : 'border-[#1E1E1E]/25 bg-white'
@@ -465,7 +465,7 @@ Mohon konfirmasi ketersediaan jadwal, total akhir, dan petunjuk pembayaran. Teri
                     <label htmlFor={`${fieldId}-end`} className="block font-display text-[10px] font-bold uppercase text-[#4D4D4D]">
                       {t('orderEndDate')}
                     </label>
-                    <div className="relative">
+                    <div className="relative w-full min-w-0">
                       <Input
                         id={`${fieldId}-end`}
                         type="date"
@@ -477,7 +477,7 @@ Mohon konfirmasi ketersediaan jadwal, total akhir, dan petunjuk pembayaran. Teri
                             setErrors((prev) => ({ ...prev, endDate: undefined }));
                           }
                         }}
-                        className={`h-11 w-full min-w-0 rounded-lg px-3 font-sans text-xs font-semibold text-[#1E1E1E] transition-all duration-200 ${
+                        className={`h-11 w-full max-w-full min-w-0 rounded-lg px-3 font-sans text-xs font-semibold text-[#1E1E1E] transition-all duration-200 ${
                           errors.endDate
                             ? 'border-2 border-[#C93B2B] bg-[#FDF5F5] focus-visible:ring-2 focus-visible:ring-[#C93B2B]/20'
                             : 'border-[#1E1E1E]/25 bg-white'
