@@ -498,7 +498,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   cursor: pointer;
   transition: border-color 180ms, box-shadow 180ms;
 }
-.cpl-drp-trigger:hover { border-color: var(--cpl-sage); }
+.cpl-drp-trigger:hover { border-color: var(--cpl-sage); box-shadow: 0 0 0 1px rgba(138, 156, 122, 0.18); }
 .cpl-drp-trigger.open  { border-color: #1E1E1E; box-shadow: 0 0 0 2px rgba(30,30,30,0.12); }
 .cpl-drp-trigger.error { border: 2px solid #C93B2B; background: #FDF5F5; }
 
@@ -558,10 +558,8 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   border: none;
   cursor: pointer;
   text-align: left;
-  transition: background 150ms;
   min-width: 0;
 }
-.cpl-drp-slot:hover  { background: #F7F5EF; }
 .cpl-drp-slot.active { background: #EBF0E6; }
 .cpl-drp-slot:focus-visible { outline: 2px solid var(--cpl-sage); outline-offset: -2px; border-radius: 8px; }
 

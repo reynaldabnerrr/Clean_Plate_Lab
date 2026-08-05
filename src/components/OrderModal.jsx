@@ -134,9 +134,10 @@ export function OrderModal({ isOpen, onClose, initialProteinTier = 40, initialMe
   const [mapsUrl, setMapsUrl] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState({});
+  const [selectedPeriod, setSelectedPeriod] = useState(null);
 
   const totalDays = calculateDeliveryDays(startDate, endDate);
-  const cateringPeriod = getCateringPeriod(totalDays);
+  const cateringPeriod = selectedPeriod ?? getCateringPeriod(totalDays);
   const selectedTier = TIER_OPTIONS.find((option) => option.tier === proteinTier) || TIER_OPTIONS[0];
   const selectedPrice = selectedTier.prices[cateringPeriod];
   const selectedAddons = addons.filter((addon) => addonIds.includes(addon.id));
@@ -151,6 +152,11 @@ export function OrderModal({ isOpen, onClose, initialProteinTier = 40, initialMe
     ? { daily: 'Harian', weekly: 'Mingguan', monthly: 'Bulanan' }
     : { daily: 'Daily', weekly: 'Weekly', monthly: 'Monthly' };
   const periodLabel = periodLabels[cateringPeriod];
+  const periodOptions = [
+    { key: 'daily', label: periodLabels.daily, subtitle: `1–5 ${isIndonesian ? 'hari' : 'days'}` },
+    { key: 'weekly', label: periodLabels.weekly, subtitle: `6–23 ${isIndonesian ? 'hari' : 'days'}` },
+    { key: 'monthly', label: periodLabels.monthly, subtitle: `24+ ${isIndonesian ? 'hari' : 'days'}` },
+  ];
   const orderCopy = isIndonesian ? {
     servingsPerDay: 'Porsi per hari',
     oneServing: '1 porsi / hari',
@@ -236,6 +242,14 @@ export function OrderModal({ isOpen, onClose, initialProteinTier = 40, initialMe
       fulfillment,
     });
   }, [addonIds, endDate, fulfillment, mealsPerDay, proteinTier, singleMealReadyTime, startDate]);
+
+  useEffect(() => {
+    if (!isOpen) return undefined;
+
+    setSelectedPeriod(getCateringPeriod(totalDays));
+
+    return undefined;
+  }, [isOpen, totalDays]);
 
   useEffect(() => {
     if (!isOpen) return undefined;
@@ -613,10 +627,23 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
                     })}
                   </div>
 
-                  <div className="mt-3 grid grid-cols-3 border border-[#1E1E1E]/20 bg-white text-center font-mono text-[9px] font-bold uppercase">
-                    <div className={`p-2 ${cateringPeriod === 'daily' ? 'bg-[#1E1E1E] text-white' : ''}`}>{periodLabels.daily}<span className="mt-0.5 block font-sans text-[8px] font-normal normal-case opacity-65">1–5 {isIndonesian ? 'hari' : 'days'}</span></div>
-                    <div className={`border-x border-[#1E1E1E]/20 p-2 ${cateringPeriod === 'weekly' ? 'bg-[#1E1E1E] text-white' : ''}`}>{periodLabels.weekly}<span className="mt-0.5 block font-sans text-[8px] font-normal normal-case opacity-65">6–23 {isIndonesian ? 'hari' : 'days'}</span></div>
-                    <div className={`p-2 ${cateringPeriod === 'monthly' ? 'bg-[#1E1E1E] text-white' : ''}`}>{periodLabels.monthly}<span className="mt-0.5 block font-sans text-[8px] font-normal normal-case opacity-65">24+ {isIndonesian ? 'hari' : 'days'}</span></div>
+                  <div className="mt-3 grid grid-cols-3 overflow-hidden rounded-lg border border-[#1E1E1E]/20 bg-white text-center font-mono text-[9px] font-bold uppercase">
+                    {periodOptions.map((option) => {
+                      const isSelectedPlan = cateringPeriod === option.key;
+                      const borderClass = option.key === 'weekly' ? 'border-x border-[#1E1E1E]/20' : '';
+
+                      return (
+                        <button
+                          key={option.key}
+                          type="button"
+                          onClick={() => setSelectedPeriod(option.key)}
+                          className={`p-2 transition-colors ${isSelectedPlan ? 'bg-[#1E1E1E] text-white' : ''} ${borderClass}`}
+                        >
+                          <span className="block">{option.label}</span>
+                          <span className={`mt-0.5 block font-sans text-[8px] font-normal normal-case ${isSelectedPlan ? 'text-white/70' : 'text-[#647554]'}`}>{option.subtitle}</span>
+                        </button>
+                      );
+                    })}
                   </div>
 
                   <div className="mt-3 flex min-w-0 items-start gap-3 rounded-lg border border-[#8A9C7A]/50 bg-[#E7EEE1] p-3.5">
@@ -701,8 +728,8 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
                     <span className="h-px min-w-[8px] flex-1 bg-[#1E1E1E]/15" />
                   </div>
                   <div className="mt-2 grid grid-cols-2 gap-2" role="radiogroup" aria-label={orderCopy.servingsPerDay}>
-                    <button type="button" role="radio" aria-checked={mealsPerDay === 1} onClick={() => setMealsPerDay(1)} className={`min-h-11 rounded-lg border-2 px-3 font-display text-[10px] font-extrabold uppercase ${mealsPerDay === 1 ? 'border-[#1E1E1E] bg-[#1E1E1E] text-white' : 'border-[#1E1E1E]/20 bg-white'}`}>{orderCopy.oneServing}</button>
-                    <button type="button" role="radio" aria-checked={mealsPerDay === 2} onClick={() => setMealsPerDay(2)} className={`min-h-11 rounded-lg border-2 px-3 font-display text-[10px] font-extrabold uppercase ${mealsPerDay === 2 ? 'border-[#1E1E1E] bg-[#1E1E1E] text-white' : 'border-[#1E1E1E]/20 bg-white'}`}>{orderCopy.twoServings}</button>
+                    <button type="button" role="radio" aria-checked={mealsPerDay === 1} onClick={() => setMealsPerDay(1)} className={`min-h-11 rounded-lg border-2 px-3 font-display text-[10px] font-extrabold uppercase transition-all duration-200 hover:-translate-y-0.5 hover:border-[#8A9C7A] hover:shadow-sm ${mealsPerDay === 1 ? 'border-[#1E1E1E] bg-[#1E1E1E] text-white' : 'border-[#1E1E1E]/20 bg-white'}`}>{orderCopy.oneServing}</button>
+                    <button type="button" role="radio" aria-checked={mealsPerDay === 2} onClick={() => setMealsPerDay(2)} className={`min-h-11 rounded-lg border-2 px-3 font-display text-[10px] font-extrabold uppercase transition-all duration-200 hover:-translate-y-0.5 hover:border-[#8A9C7A] hover:shadow-sm ${mealsPerDay === 2 ? 'border-[#1E1E1E] bg-[#1E1E1E] text-white' : 'border-[#1E1E1E]/20 bg-white'}`}>{orderCopy.twoServings}</button>
                   </div>
                   {mealsPerDay === 2 ? <p className="mt-2 rounded-lg border border-[#8A9C7A]/40 bg-[#E7EEE1] px-3 py-2 text-[10px] font-semibold leading-4 text-[#526049]">{orderCopy.sameMenu}</p> : null}
                 </div>
@@ -724,7 +751,7 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
                             role="radio"
                             aria-checked={isSelected}
                             onClick={() => setSingleMealReadyTime(time)}
-                            className={`flex min-h-11 items-center justify-between rounded-lg border-2 px-3 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8A9C7A] ${isSelected ? 'border-[#1E1E1E] bg-[#1E1E1E] text-white' : 'border-[#1E1E1E]/15 bg-[var(--cpl-cream)] text-[#1E1E1E]'}`}
+                            className={`flex min-h-11 items-center justify-between rounded-lg border-2 px-3 transition-all duration-200 hover:-translate-y-0.5 hover:border-[#8A9C7A] hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8A9C7A] ${isSelected ? 'border-[#1E1E1E] bg-[#1E1E1E] text-white' : 'border-[#1E1E1E]/15 bg-[var(--cpl-cream)] text-[#1E1E1E]'}`}
                           >
                             <span className={`font-display text-[9px] font-bold uppercase ${isSelected ? 'text-[#B8C8AA]' : 'text-[#647554]'}`}>{label}</span>
                             <strong className="font-mono text-xs">{time.replace(':', '.')}</strong>
@@ -748,7 +775,7 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
                     <span className="h-px min-w-[8px] flex-1 bg-[#1E1E1E]/15" />
                   </div>
                   <div className="grid grid-cols-2 gap-2">
-                    {fulfillmentOptions.map((option) => <button key={option.id} type="button" aria-pressed={fulfillment === option.id} onClick={() => { setFulfillment(option.id); setErrors((current) => ({ ...current, address: undefined, mapsUrl: undefined })); }} className={`min-h-11 rounded-lg border-2 px-2 font-display text-[9px] font-extrabold uppercase leading-tight ${fulfillment === option.id ? 'border-[#1E1E1E] bg-[#1E1E1E] text-white' : 'border-[#1E1E1E]/20 bg-white'}`}>{option.label}</button>)}
+                    {fulfillmentOptions.map((option) => <button key={option.id} type="button" aria-pressed={fulfillment === option.id} onClick={() => { setFulfillment(option.id); setErrors((current) => ({ ...current, address: undefined, mapsUrl: undefined })); }} className={`min-h-11 rounded-lg border-2 px-2 font-display text-[9px] font-extrabold uppercase leading-tight transition-all duration-200 hover:-translate-y-0.5 hover:border-[#8A9C7A] hover:shadow-sm ${fulfillment === option.id ? 'border-[#1E1E1E] bg-[#1E1E1E] text-white' : 'border-[#1E1E1E]/20 bg-white'}`}>{option.label}</button>)}
                   </div>
                 </div>
 

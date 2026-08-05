@@ -218,7 +218,7 @@ export function DateRangePicker({
     return () => document.removeEventListener('pointerdown', handler);
   }, [open, notifyOpen]);
 
-  const openPicker = useCallback((mode) => {
+  const openPicker = useCallback((mode = 'start') => {
     setSelecting(mode);
     selectingRef.current = mode;
 
@@ -413,7 +413,13 @@ export function DateRangePicker({
 
   return (
     <div className="cpl-drp-root" ref={rootRef}>
-      <div className={`cpl-drp-trigger${hasError ? ' error' : ''}${open ? ' open' : ''}`} role="group" aria-label={periodLabel}>
+      <button
+        type="button"
+        className={`cpl-drp-trigger${hasError ? ' error' : ''}${open ? ' open' : ''}`}
+        role="group"
+        aria-label={periodLabel}
+        onClick={() => openPicker('start')}
+      >
         <div className="cpl-drp-top-row">
           <span className="cpl-drp-stay-label">
             <CalendarDays size={13} className="cpl-drp-cal-icon" />
@@ -427,7 +433,7 @@ export function DateRangePicker({
           )}
         </div>
         <div className="cpl-drp-cols">
-          <button type="button" className={`cpl-drp-slot${open && selecting === 'start' ? ' active' : ''}`} onClick={() => openPicker('start')} aria-label={isIndonesian ? 'Pilih tanggal mulai katering' : 'Select catering start date'}>
+          <div className={`cpl-drp-slot${open && selecting === 'start' ? ' active' : ''}`}>
             <span className="cpl-drp-slot-label">{startLabel}</span>
             {sp ? (
               <span className="cpl-drp-slot-date">
@@ -435,11 +441,11 @@ export function DateRangePicker({
                 <span className="cpl-drp-slot-rest">{sp.dayName}, {sp.monthName} {sp.year}</span>
               </span>
             ) : <span className="cpl-drp-slot-placeholder">{isIndonesian ? 'Pilih tanggal mulai' : 'Select start date'}</span>}
-          </button>
+          </div>
           <div className="cpl-drp-divider" aria-hidden="true">
             <div className="cpl-drp-divider-line" />
           </div>
-          <button type="button" className={`cpl-drp-slot${open && selecting === 'end' ? ' active' : ''}`} onClick={() => openPicker('end')} aria-label={isIndonesian ? 'Pilih tanggal selesai katering' : 'Select catering end date'}>
+          <div className={`cpl-drp-slot${open && selecting === 'end' ? ' active' : ''}`}>
             <span className="cpl-drp-slot-label">{endLabel}</span>
             {ep ? (
               <span className="cpl-drp-slot-date">
@@ -447,9 +453,9 @@ export function DateRangePicker({
                 <span className="cpl-drp-slot-rest">{ep.dayName}, {ep.monthName} {ep.year}</span>
               </span>
             ) : <span className="cpl-drp-slot-placeholder">{isIndonesian ? 'Pilih tanggal selesai' : 'Select end date'}</span>}
-          </button>
+          </div>
         </div>
-      </div>
+      </button>
       {hasError && errorMsg && (
         <div role="alert" className="cpl-drp-error animate-in fade-in slide-in-from-top-1">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
