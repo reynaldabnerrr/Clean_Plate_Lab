@@ -7,7 +7,7 @@ import { useCpl } from '../hooks/useCpl';
 import { useSiteCopy } from '../hooks/useSiteCopy';
 import { readStoredState, writeStoredState } from '../lib/storage';
 
-const weeks = [1, 2, 3, 4];
+const weeks = [1, 2, 3];
 const isMenuSelections = (value) => value
   && weeks.includes(value.activeWeek)
   && typeof value.selectedMobileMealId === 'string'
@@ -17,11 +17,17 @@ const isMenuSelections = (value) => value
     return meal?.availableProteinTiers.includes(tier);
   });
 
+/** Build the default tier map: every meal defaults to 40g */
+const buildDefaultTiers = () =>
+  Object.fromEntries(meals.map((meal) => [meal.id, 40]));
+
 export function MenuArchiveSection() {
   const [storedSelections] = useState(() => readStoredState('menu-archive', isMenuSelections));
   const [activeWeek, setActiveWeek] = useState(storedSelections?.activeWeek ?? 1);
   const [selectedMobileMealId, setSelectedMobileMealId] = useState(storedSelections?.selectedMobileMealId ?? '');
-  const [selectedTiers, setSelectedTiers] = useState(storedSelections?.selectedTiers ?? {});
+  const [selectedTiers, setSelectedTiers] = useState(
+    storedSelections?.selectedTiers ?? buildDefaultTiers()
+  );
 
   useEffect(() => {
     writeStoredState('menu-archive', { activeWeek, selectedMobileMealId, selectedTiers });
@@ -41,7 +47,7 @@ export function MenuArchiveSection() {
           <SectionHeader eyebrow={copy.menu.eyebrow} title={copy.menu.title} description={copy.menu.description} />
         </div>
 
-        <div className="mt-6 grid grid-cols-4 border-2 border-[#1E1E1E] sm:mt-10" role="tablist" aria-label={copy.menu.weekFilter}>
+        <div className="mt-6 grid grid-cols-3 border-2 border-[#1E1E1E] sm:mt-10" role="tablist" aria-label={copy.menu.weekFilter}>
           {weeks.map((week) => (
             <button key={week} type="button" role="tab" aria-selected={activeWeek === week} aria-controls="weekly-menu-panel" onClick={() => setActiveWeek(week)} className={`min-h-11 border-r border-[#1E1E1E] px-1 font-display text-[9px] font-extrabold uppercase tracking-wide transition-colors last:border-r-0 sm:min-h-14 sm:px-4 sm:text-xs sm:tracking-wider ${activeWeek === week ? 'bg-[#1E1E1E] text-white' : 'bg-[var(--cpl-cream)] hover:bg-[var(--cpl-sage-light)]'}`}>
               {copy.menu.week} {week}
