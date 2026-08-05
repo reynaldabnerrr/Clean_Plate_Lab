@@ -13,6 +13,7 @@ import { formatCurrency } from '../lib/order';
 import { analytics } from '../lib/analytics';
 import { useCpl } from '../hooks/useCpl';
 import { useSiteCopy } from '../hooks/useSiteCopy';
+import { readStoredState, writeStoredState } from '../lib/storage';
 
 const PRICING_PERIODS = ['monthly', 'weekly', 'daily'];
 
@@ -30,7 +31,11 @@ export default function HomePage({ onBuild }) {
   const { language } = useCpl();
   const copy = useSiteCopy();
   const isIndonesian = language === 'ID';
-  const [pricingPeriod, setPricingPeriod] = React.useState('monthly');
+  const [pricingPeriod, setPricingPeriod] = React.useState(() => readStoredState('pricing-period', (value) => PRICING_PERIODS.includes(value)) || 'monthly');
+
+  React.useEffect(() => {
+    writeStoredState('pricing-period', pricingPeriod);
+  }, [pricingPeriod]);
 
   return (
     <>

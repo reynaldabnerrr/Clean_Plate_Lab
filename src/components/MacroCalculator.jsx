@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Card } from './ui/card';
@@ -11,16 +11,30 @@ import { analytics } from '../lib/analytics';
 import { useSiteCopy } from '../hooks/useSiteCopy';
 import { proteinTiers } from '../data/site';
 import { formatCurrency } from '../lib/order';
+import { readStoredState, writeStoredState } from '../lib/storage';
+
+const isMacroInputs = (value) => value
+  && Number.isInteger(value.weight) && value.weight >= 40 && value.weight <= 130
+  && Number.isInteger(value.height) && value.height >= 140 && value.height <= 210
+  && Number.isInteger(value.age) && value.age >= 16 && value.age <= 70
+  && ['male', 'female'].includes(value.gender)
+  && [1.2, 1.375, 1.55, 1.725, 1.9].includes(value.activity)
+  && ['cut', 'maintain', 'muscle'].includes(value.goal);
 
 export function MacroCalculator({ onOpenOrder }) {
   const { t, language } = useCpl();
   const copy = useSiteCopy();
-  const [weight, setWeight] = useState(70);
-  const [height, setHeight] = useState(175);
-  const [age, setAge] = useState(28);
-  const [gender, setGender] = useState("male");
-  const [activity, setActivity] = useState(1.55);
-  const [goal, setGoal] = useState("muscle");
+  const [storedInputs] = useState(() => readStoredState('macro-calculator', isMacroInputs));
+  const [weight, setWeight] = useState(storedInputs?.weight ?? 70);
+  const [height, setHeight] = useState(storedInputs?.height ?? 175);
+  const [age, setAge] = useState(storedInputs?.age ?? 28);
+  const [gender, setGender] = useState(storedInputs?.gender ?? 'male');
+  const [activity, setActivity] = useState(storedInputs?.activity ?? 1.55);
+  const [goal, setGoal] = useState(storedInputs?.goal ?? 'muscle');
+
+  useEffect(() => {
+    writeStoredState('macro-calculator', { weight, height, age, gender, activity, goal });
+  }, [activity, age, gender, goal, height, weight]);
 
   const result = calculateMacroTargets({ weight, height, age, gender, activity, goal });
   const {

@@ -41,6 +41,7 @@ export default function App() {
   const [orderModalOpen, setOrderModalOpen] = React.useState(false);
   const [initialProteinTier, setInitialProteinTier] = React.useState(40);
   const [initialMealsPerDay, setInitialMealsPerDay] = React.useState(1);
+  const [hasExplicitOrderDefaults, setHasExplicitOrderDefaults] = React.useState(false);
 
   React.useEffect(() => {
     trackEvent('page_view', { page_path: '/' });
@@ -50,6 +51,7 @@ export default function App() {
     analytics.builderOpened(source);
     if (proteinTier) setInitialProteinTier(proteinTier);
     setInitialMealsPerDay(mealsPerDay);
+    setHasExplicitOrderDefaults(Boolean(proteinTier));
     setOrderModalOpen(true);
   };
 
@@ -63,7 +65,7 @@ export default function App() {
             <HomePage onBuild={handleBuild} />
           </main>
           <Footer />
-          <OrderModal isOpen={orderModalOpen} onClose={() => setOrderModalOpen(false)} initialProteinTier={initialProteinTier} initialMealsPerDay={initialMealsPerDay} />
+          <OrderModal isOpen={orderModalOpen} onClose={() => setOrderModalOpen(false)} initialProteinTier={initialProteinTier} initialMealsPerDay={initialMealsPerDay} hasExplicitInitialValues={hasExplicitOrderDefaults} />
         </div>
       </CplProvider>
     </ErrorBoundary>

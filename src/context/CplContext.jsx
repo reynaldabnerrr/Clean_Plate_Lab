@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { CplContext } from './cpl-context';
 import { getDateInputValueInTimeZone } from '../lib/order';
+import { migrateStoredLanguage, writeStoredState } from '../lib/storage';
 
 const INITIAL_MENU_ITEMS = [
   {
@@ -166,11 +167,7 @@ export function CplProvider({ children }) {
   const [orders, setOrders] = useState(INITIAL_ORDERS);
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
   const [announcementText, setAnnouncementText] = useState("100% Lab Verified High Protein Meal Prep • Free Delivery Jabodetabek");
-  const [storedLanguage] = useState(() => {
-    if (typeof window === 'undefined') return null;
-    const savedLanguage = window.localStorage.getItem('cpl-language');
-    return savedLanguage === 'ID' || savedLanguage === 'EN' ? savedLanguage : null;
-  });
+  const [storedLanguage] = useState(migrateStoredLanguage);
   const [language, setLanguageState] = useState(storedLanguage || 'EN');
   const [hasSelectedLanguage, setHasSelectedLanguage] = useState(Boolean(storedLanguage));
 
@@ -178,7 +175,7 @@ export function CplProvider({ children }) {
     if (nextLanguage !== 'ID' && nextLanguage !== 'EN') return;
     setLanguageState(nextLanguage);
     setHasSelectedLanguage(true);
-    window.localStorage.setItem('cpl-language', nextLanguage);
+    writeStoredState('language', nextLanguage);
   }, []);
 
   useEffect(() => {

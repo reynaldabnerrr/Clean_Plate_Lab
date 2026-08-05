@@ -1,17 +1,31 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { SectionHeader } from './SectionHeader';
 import { NutritionPanel } from './NutritionPanel';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { meals } from '../data/meals';
 import { useCpl } from '../hooks/useCpl';
 import { useSiteCopy } from '../hooks/useSiteCopy';
+import { readStoredState, writeStoredState } from '../lib/storage';
 
 const weeks = [1, 2, 3, 4];
+const isMenuSelections = (value) => value
+  && weeks.includes(value.activeWeek)
+  && typeof value.selectedMobileMealId === 'string'
+  && value.selectedTiers && typeof value.selectedTiers === 'object' && !Array.isArray(value.selectedTiers)
+  && Object.entries(value.selectedTiers).every(([mealId, tier]) => {
+    const meal = meals.find((item) => item.id === mealId);
+    return meal?.availableProteinTiers.includes(tier);
+  });
 
 export function MenuArchiveSection() {
-  const [activeWeek, setActiveWeek] = useState(1);
-  const [selectedMobileMealId, setSelectedMobileMealId] = useState('');
-  const [selectedTiers, setSelectedTiers] = useState({});
+  const [storedSelections] = useState(() => readStoredState('menu-archive', isMenuSelections));
+  const [activeWeek, setActiveWeek] = useState(storedSelections?.activeWeek ?? 1);
+  const [selectedMobileMealId, setSelectedMobileMealId] = useState(storedSelections?.selectedMobileMealId ?? '');
+  const [selectedTiers, setSelectedTiers] = useState(storedSelections?.selectedTiers ?? {});
+
+  useEffect(() => {
+    writeStoredState('menu-archive', { activeWeek, selectedMobileMealId, selectedTiers });
+  }, [activeWeek, selectedMobileMealId, selectedTiers]);
   const { language } = useCpl();
   const copy = useSiteCopy();
   const isIndonesian = language === 'ID';

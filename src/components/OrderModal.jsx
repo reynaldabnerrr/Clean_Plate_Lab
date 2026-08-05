@@ -7,6 +7,7 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { addons, proteinTiers } from '../data/site';
 import { analytics } from '../lib/analytics';
+import { readStoredState, writeStoredState } from '../lib/storage';
 import {
   addDaysToDateInputValue,
   getDateInputValueInTimeZone,
@@ -91,22 +92,32 @@ function getCateringPeriod(totalDays) {
   return 'daily';
 }
 
-export function OrderModal({ isOpen, onClose, initialProteinTier = 40, initialMealsPerDay = 1 }) {
+const isDateInput = (value) => typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value);
+const isOrderDraft = (value) => value
+  && TIER_OPTIONS.some((option) => option.tier === value.proteinTier)
+  && isDateInput(value.startDate) && isDateInput(value.endDate)
+  && [1, 2].includes(value.mealsPerDay)
+  && /^([01]\d|2[0-3]):[0-5]\d$/.test(value.singleMealReadyTime)
+  && Array.isArray(value.addonIds) && value.addonIds.every((id) => addons.some((addon) => addon.id === id))
+  && ['Self-arranged', 'Online-delivery'].includes(value.fulfillment);
+
+export function OrderModal({ isOpen, onClose, initialProteinTier = 40, initialMealsPerDay = 1, hasExplicitInitialValues = false }) {
   const { addOrder, t, language } = useCpl();
   const fieldId = useId();
   const [today, setToday] = useState(() => getDateInputValueInTimeZone());
 
+  const [storedDraft] = useState(() => readStoredState('order-draft', isOrderDraft));
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
-  const [proteinTier, setProteinTier] = useState(initialProteinTier);
-  const [startDate, setStartDate] = useState(today);
-  const [endDate, setEndDate] = useState(() => addDaysToDateInputValue(today, 4));
-  const [mealsPerDay, setMealsPerDay] = useState(initialMealsPerDay);
-  const [singleMealReadyTime, setSingleMealReadyTime] = useState('12:00');
+  const [proteinTier, setProteinTier] = useState(storedDraft?.proteinTier ?? initialProteinTier);
+  const [startDate, setStartDate] = useState(storedDraft?.startDate >= today ? storedDraft.startDate : today);
+  const [endDate, setEndDate] = useState(storedDraft?.endDate >= today ? storedDraft.endDate : addDaysToDateInputValue(today, 4));
+  const [mealsPerDay, setMealsPerDay] = useState(storedDraft?.mealsPerDay ?? initialMealsPerDay);
+  const [singleMealReadyTime, setSingleMealReadyTime] = useState(storedDraft?.singleMealReadyTime ?? '12:00');
   const readyTimeMeal1 = mealsPerDay === 1 ? singleMealReadyTime : '12:00';
   const readyTimeMeal2 = '18:00';
-  const [addonIds, setAddonIds] = useState([]);
-  const [fulfillment, setFulfillment] = useState('Self-arranged');
+  const [addonIds, setAddonIds] = useState(storedDraft?.addonIds ?? []);
+  const [fulfillment, setFulfillment] = useState(storedDraft?.fulfillment ?? 'Self-arranged');
   const [address, setAddress] = useState('');
   const [mapsUrl, setMapsUrl] = useState('');
   const [submitted, setSubmitted] = useState(false);
@@ -196,11 +207,23 @@ export function OrderModal({ isOpen, onClose, initialProteinTier = 40, initialMe
   const planString = `${selectedTier.tier}g Protein · ${periodLabel} · ${mealsPerDay}x ${isIndonesian ? 'per hari' : 'per day'} · Rp ${selectedPrice.toLocaleString('id-ID')} / ${isIndonesian ? 'porsi' : 'serving'}`;
 
   useEffect(() => {
-    if (isOpen && TIER_OPTIONS.some((option) => option.tier === initialProteinTier)) {
+    if (isOpen && hasExplicitInitialValues && TIER_OPTIONS.some((option) => option.tier === initialProteinTier)) {
       setProteinTier(initialProteinTier);
       setMealsPerDay(initialMealsPerDay === 2 ? 2 : 1);
     }
-  }, [initialMealsPerDay, initialProteinTier, isOpen]);
+  }, [hasExplicitInitialValues, initialMealsPerDay, initialProteinTier, isOpen]);
+
+  useEffect(() => {
+    writeStoredState('order-draft', {
+      proteinTier,
+      startDate,
+      endDate,
+      mealsPerDay,
+      singleMealReadyTime,
+      addonIds,
+      fulfillment,
+    });
+  }, [addonIds, endDate, fulfillment, mealsPerDay, proteinTier, singleMealReadyTime, startDate]);
 
   useEffect(() => {
     if (!isOpen) return undefined;
