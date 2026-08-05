@@ -653,6 +653,10 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   border: 1.5px solid rgba(30,30,30,0.14);
   box-shadow: 0 20px 60px rgba(0,0,0,0.18), 0 4px 16px rgba(0,0,0,0.08);
   overflow: hidden;
+  touch-action: none;
+  pointer-events: auto;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 /* Popup header */
@@ -828,6 +832,8 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   cursor: pointer;
   transition: background 120ms, color 120ms, transform 80ms;
   flex-shrink: 0;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 .cpl-cal-day:hover:not(:disabled):not(.start):not(.end):not(.in-range) {
   background: #F5F2EA;
@@ -910,6 +916,25 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   z-index: 9998;
   backdrop-filter: blur(2px);
   animation: cpl-fade-in 0.2s ease-out;
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+  pointer-events: auto;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Desktop: still blocks clicks to the form; light dim only */
+.cpl-cal-backdrop-desktop {
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: none;
+}
+
+/* Brief post-close layer that eats the delayed mobile ghost click */
+.cpl-cal-backdrop-shield {
+  background: transparent;
+  backdrop-filter: none;
+  animation: none;
+  z-index: 10000;
 }
 
 /* Sheet */
@@ -926,6 +951,10 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   overscroll-behavior: contain;
   box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.22);
   animation: cpl-sheet-up 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  touch-action: none;
+  pointer-events: auto;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 @keyframes cpl-sheet-up {

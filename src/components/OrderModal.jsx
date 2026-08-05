@@ -244,7 +244,10 @@ export function OrderModal({ isOpen, onClose, initialProteinTier = 40, initialMe
   const handleStartDateChange = (value) => {
     const nextStartDate = value < today ? today : value;
     setStartDate(nextStartDate);
-    if (endDate < nextStartDate) setEndDate(nextStartDate);
+    setEndDate((current) => {
+      if (!current || current < nextStartDate) return nextStartDate;
+      return current;
+    });
   };
 
   const handleEndDateChange = (value) => {
@@ -412,18 +415,26 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
     window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
   };
 
-  // Track when date picker calendar is open so we can prevent
-  // Radix DismissableLayer from closing the dialog on outside clicks.
   const datePickerOpenRef = useRef(false);
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent
         style={{ width: 'min(calc(100vw - 1rem), 52rem)', maxWidth: 'none' }}
-        onPointerDownOutside={(e) => {
-          // If the date picker calendar is open, the click is inside the portal
-          // (rendered to document.body) — prevent Radix from dismissing the dialog.
-          if (datePickerOpenRef.current) e.preventDefault();
+        onPointerDownOutside={(event) => {
+          if (datePickerOpenRef.current || event.target?.closest?.('[data-cpl-datepicker]')) {
+            event.preventDefault();
+          }
+        }}
+        onFocusOutside={(event) => {
+          if (datePickerOpenRef.current || event.target?.closest?.('[data-cpl-datepicker]')) {
+            event.preventDefault();
+          }
+        }}
+        onInteractOutside={(event) => {
+          if (datePickerOpenRef.current || event.target?.closest?.('[data-cpl-datepicker]')) {
+            event.preventDefault();
+          }
         }}
         className="max-h-[calc(100dvh-1.5rem)] overflow-x-hidden overflow-y-auto rounded-[28px] border border-black/10 bg-[#F7F5EF] p-0 text-[#1E1E1E] shadow-2xl sm:rounded-[32px] [&>button]:right-3 [&>button]:top-3 [&>button]:z-30 [&>button]:grid [&>button]:size-11 [&>button]:place-items-center [&>button]:rounded-full [&>button]:border-2 [&>button]:border-white/70 [&>button]:bg-white [&>button]:p-0 [&>button]:text-[#1E1E1E] [&>button]:opacity-100 [&>button]:shadow-[0_8px_24px_rgba(0,0,0,0.28)] [&>button]:transition-[transform,background-color,box-shadow] [&>button:hover]:scale-105 [&>button:hover]:bg-[#EBF0E6] [&>button:active]:scale-95 [&>button:focus-visible]:ring-2 [&>button:focus-visible]:ring-[#B8C8AA] [&>button:focus-visible]:ring-offset-2 [&>button:focus-visible]:ring-offset-[#1E1E1E] sm:[&>button]:right-4 sm:[&>button]:top-4"
       >
@@ -650,19 +661,21 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
                     startDate={startDate}
                     endDate={endDate}
                     today={today}
-                    onStartDateChange={(val) => {
-                      handleStartDateChange(val);
+                    onStartDateChange={(value) => {
+                      handleStartDateChange(value);
                       if (errors.startDate || errors.endDate) {
                         setErrors((prev) => ({ ...prev, startDate: undefined, endDate: undefined }));
                       }
                     }}
-                    onEndDateChange={(val) => {
-                      handleEndDateChange(val);
+                    onEndDateChange={(value) => {
+                      handleEndDateChange(value);
                       if (errors.endDate) {
                         setErrors((prev) => ({ ...prev, endDate: undefined }));
                       }
                     }}
-                    onOpenChange={(isOpen) => { datePickerOpenRef.current = isOpen; }}
+                    onOpenChange={(isOpen) => {
+                      datePickerOpenRef.current = isOpen;
+                    }}
                     isIndonesian={isIndonesian}
                     hasError={!!(errors.startDate || errors.endDate)}
                     errorMsg={errors.startDate || errors.endDate}
@@ -816,6 +829,7 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
                         <p className="font-display text-[8px] font-bold uppercase tracking-wide text-[#647554]">{orderCopy.weeklyRotation}</p>
                         <p className="mt-1 font-display text-xs font-black leading-tight text-[#1E1E1E] sm:text-sm">{selectedTier.tier}g Protein · {periodLabel}</p>
                         <p className="mt-0.5 text-[9px] leading-4 text-[#647554]">{dayCountLabel} · {boxCountLabel}</p>
+                        <p className="mt-1 text-[9px] font-semibold leading-4 text-[#33402B]">{formatOrderDate(startDate, locale)} – {formatOrderDate(endDate, locale)}</p>
                       </div>
                       <div className="rounded-xl border border-[#8A9C7A]/25 bg-white p-3">
                         <p className="font-display text-[8px] font-bold uppercase tracking-wide text-[#647554]">{orderCopy.servingsPerDay}</p>
