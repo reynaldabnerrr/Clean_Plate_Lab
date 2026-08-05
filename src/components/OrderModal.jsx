@@ -224,6 +224,10 @@ export function OrderModal({ isOpen, onClose, initialProteinTier = 40, initialMe
     if (endDate < nextStartDate) setEndDate(nextStartDate);
   };
 
+  const handleEndDateChange = (value) => {
+    setEndDate(value < startDate ? startDate : value);
+  };
+
   const toggleAddon = (addonId) => {
     setAddonIds((current) => current.includes(addonId)
       ? current.filter((id) => id !== addonId)
@@ -609,75 +613,55 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
                   <span className="h-px flex-1 min-w-[8px] bg-[#1E1E1E]/15" />
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div className="min-w-0 space-y-1.5">
-                    <label htmlFor={`${fieldId}-start`} className="block font-display text-[10px] font-bold uppercase text-[#4D4D4D]">
-                      {t('orderStartDate')}
-                    </label>
-                    <div className="relative w-full min-w-0">
-                      <CalendarDays size={15} className={`pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 z-10 transition-colors ${errors.startDate ? 'text-[#C93B2B]' : 'text-[#647554]'}`} />
-                      <Input
-                        id={`${fieldId}-start`}
-                        type="date"
-                        value={startDate}
-                        min={today}
-                        onChange={(event) => {
-                          handleStartDateChange(event.target.value);
-                          if (errors.startDate || errors.endDate) {
-                            setErrors((prev) => ({ ...prev, startDate: undefined, endDate: undefined }));
-                          }
-                        }}
-                        className={`h-11 w-full max-w-full min-w-0 flex items-center rounded-lg pl-9 pr-2 font-sans text-xs font-semibold text-[#1E1E1E] transition-all duration-200 ${
-                          errors.startDate
-                            ? 'border-2 border-[#C93B2B] bg-[#FDF5F5] focus-visible:ring-2 focus-visible:ring-[#C93B2B]/20'
-                            : 'border-[#1E1E1E]/25 bg-white'
-                        }`}
-                      />
-                      {errors.startDate && (
-                        <div
-                          role="alert"
-                          className="absolute left-0 top-full z-20 mt-1.5 flex max-w-full items-center gap-1.5 rounded-lg border border-[#F4C4BF] bg-[#FFF5F4] px-3 py-1.5 font-sans text-[11px] font-bold text-[#8A1F17] shadow-[0_4px_16px_rgba(201,59,43,0.18)] animate-in fade-in slide-in-from-top-1"
-                        >
-                          <AlertCircle size={13} className="shrink-0 text-[#C93B2B]" />
-                          <span className="leading-tight">{errors.startDate}</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="min-w-0 space-y-1.5">
-                    <label htmlFor={`${fieldId}-end`} className="block font-display text-[10px] font-bold uppercase text-[#4D4D4D]">
-                      {t('orderEndDate')}
-                    </label>
-                    <div className="relative w-full min-w-0">
-                      <CalendarDays size={15} className={`pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 z-10 transition-colors ${errors.endDate ? 'text-[#C93B2B]' : 'text-[#647554]'}`} />
-                      <Input
-                        id={`${fieldId}-end`}
-                        type="date"
-                        value={endDate}
-                        min={startDate || today}
-                        onChange={(event) => {
-                          setEndDate(event.target.value);
-                          if (errors.endDate) {
-                            setErrors((prev) => ({ ...prev, endDate: undefined }));
-                          }
-                        }}
-                        className={`h-11 w-full max-w-full min-w-0 flex items-center rounded-lg pl-9 pr-2 font-sans text-xs font-semibold text-[#1E1E1E] transition-all duration-200 ${
-                          errors.endDate
-                            ? 'border-2 border-[#C93B2B] bg-[#FDF5F5] focus-visible:ring-2 focus-visible:ring-[#C93B2B]/20'
-                            : 'border-[#1E1E1E]/25 bg-white'
-                        }`}
-                      />
-                      {errors.endDate && (
-                        <div
-                          role="alert"
-                          className="absolute left-0 top-full z-20 mt-1.5 flex max-w-full items-center gap-1.5 rounded-lg border border-[#F4C4BF] bg-[#FFF5F4] px-3 py-1.5 font-sans text-[11px] font-bold text-[#8A1F17] shadow-[0_4px_16px_rgba(201,59,43,0.18)] animate-in fade-in slide-in-from-top-1"
-                        >
-                          <AlertCircle size={13} className="shrink-0 text-[#C93B2B]" />
-                          <span className="leading-tight">{errors.endDate}</span>
-                        </div>
-                      )}
-                    </div>
+                <div className="min-w-0 space-y-1.5">
+                  <span id={`${fieldId}-date-range-label`} className="block font-display text-[10px] font-bold uppercase text-[#4D4D4D]">
+                    {t('orderDateRangeLabel')}
+                  </span>
+                  <div
+                    role="group"
+                    aria-labelledby={`${fieldId}-date-range-label`}
+                    className={`relative flex min-h-11 w-full min-w-0 items-center rounded-lg border bg-white px-2 transition-all duration-200 focus-within:ring-2 ${
+                      errors.startDate || errors.endDate
+                        ? 'border-2 border-[#C93B2B] bg-[#FDF5F5] focus-within:ring-[#C93B2B]/20'
+                        : 'border-[#1E1E1E]/25 focus-within:ring-[#647554]/20'
+                    }`}
+                  >
+                    <CalendarDays size={15} className={`ml-1 shrink-0 ${errors.startDate || errors.endDate ? 'text-[#C93B2B]' : 'text-[#647554]'}`} />
+                    <Input
+                      id={`${fieldId}-start`}
+                      aria-label={t('orderStartDate')}
+                      type="date"
+                      value={startDate}
+                      min={today}
+                      onChange={(event) => {
+                        handleStartDateChange(event.target.value);
+                        if (errors.startDate || errors.endDate) {
+                          setErrors((prev) => ({ ...prev, startDate: undefined, endDate: undefined }));
+                        }
+                      }}
+                      className="h-10 min-w-0 flex-1 border-0 bg-transparent px-2 font-sans text-xs font-semibold text-[#1E1E1E] shadow-none focus-visible:ring-0"
+                    />
+                    <span aria-hidden="true" className="shrink-0 font-mono text-xs font-bold text-[#647554]">–</span>
+                    <Input
+                      id={`${fieldId}-end`}
+                      aria-label={t('orderEndDate')}
+                      type="date"
+                      value={endDate}
+                      min={startDate || today}
+                      onChange={(event) => {
+                        handleEndDateChange(event.target.value);
+                        if (errors.endDate) {
+                          setErrors((prev) => ({ ...prev, endDate: undefined }));
+                        }
+                      }}
+                      className="h-10 min-w-0 flex-1 border-0 bg-transparent px-2 font-sans text-xs font-semibold text-[#1E1E1E] shadow-none focus-visible:ring-0"
+                    />
+                    {(errors.startDate || errors.endDate) && (
+                      <div role="alert" className="absolute left-0 top-full z-20 mt-1.5 flex max-w-full items-center gap-1.5 rounded-lg border border-[#F4C4BF] bg-[#FFF5F4] px-3 py-1.5 font-sans text-[11px] font-bold text-[#8A1F17] shadow-[0_4px_16px_rgba(201,59,43,0.18)] animate-in fade-in slide-in-from-top-1">
+                        <AlertCircle size={13} className="shrink-0 text-[#C93B2B]" />
+                        <span className="leading-tight">{errors.startDate || errors.endDate}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
 
