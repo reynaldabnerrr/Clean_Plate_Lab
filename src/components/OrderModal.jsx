@@ -1,7 +1,8 @@
-import React, { useEffect, useId, useState } from 'react';
+import React, { useEffect, useId, useRef, useState } from 'react';
 import confetti from 'canvas-confetti';
 import { useCpl } from '../hooks/useCpl';
 import { CplLogoImage } from './CplLogo';
+import { DateRangePicker } from './DateRangePicker';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from './ui/dialog';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -16,7 +17,6 @@ import {
 import {
   AlertCircle,
   ArrowRight,
-  CalendarDays,
   Check,
   CheckCircle,
   Clock3,
@@ -412,10 +412,19 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
     window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
   };
 
+  // Track when date picker calendar is open so we can prevent
+  // Radix DismissableLayer from closing the dialog on outside clicks.
+  const datePickerOpenRef = useRef(false);
+
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent
         style={{ width: 'min(calc(100vw - 1rem), 52rem)', maxWidth: 'none' }}
+        onPointerDownOutside={(e) => {
+          // If the date picker calendar is open, the click is inside the portal
+          // (rendered to document.body) — prevent Radix from dismissing the dialog.
+          if (datePickerOpenRef.current) e.preventDefault();
+        }}
         className="max-h-[calc(100dvh-1.5rem)] overflow-x-hidden overflow-y-auto rounded-[28px] border border-black/10 bg-[#F7F5EF] p-0 text-[#1E1E1E] shadow-2xl sm:rounded-[32px] [&>button]:right-3 [&>button]:top-3 [&>button]:z-30 [&>button]:grid [&>button]:size-11 [&>button]:place-items-center [&>button]:rounded-full [&>button]:border-2 [&>button]:border-white/70 [&>button]:bg-white [&>button]:p-0 [&>button]:text-[#1E1E1E] [&>button]:opacity-100 [&>button]:shadow-[0_8px_24px_rgba(0,0,0,0.28)] [&>button]:transition-[transform,background-color,box-shadow] [&>button:hover]:scale-105 [&>button:hover]:bg-[#EBF0E6] [&>button:active]:scale-95 [&>button:focus-visible]:ring-2 [&>button:focus-visible]:ring-[#B8C8AA] [&>button:focus-visible]:ring-offset-2 [&>button:focus-visible]:ring-offset-[#1E1E1E] sm:[&>button]:right-4 sm:[&>button]:top-4"
       >
         {!submitted ? (
@@ -636,56 +645,28 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
                   <span className="h-px flex-1 min-w-[8px] bg-[#1E1E1E]/15" />
                 </div>
 
-                <div className="min-w-0 space-y-1.5">
-                  <span id={`${fieldId}-date-range-label`} className="block font-display text-[10px] font-bold uppercase text-[#4D4D4D]">
-                    {t('orderDateRangeLabel')}
-                  </span>
-                  <div
-                    role="group"
-                    aria-labelledby={`${fieldId}-date-range-label`}
-                    className={`relative flex min-h-11 w-full min-w-0 items-center rounded-lg border bg-white px-2 transition-all duration-200 focus-within:ring-2 ${
-                      errors.startDate || errors.endDate
-                        ? 'border-2 border-[#C93B2B] bg-[#FDF5F5] focus-within:ring-[#C93B2B]/20'
-                        : 'border-[#1E1E1E]/25 focus-within:ring-[#647554]/20'
-                    }`}
-                  >
-                    <CalendarDays size={15} className={`ml-1 shrink-0 ${errors.startDate || errors.endDate ? 'text-[#C93B2B]' : 'text-[#647554]'}`} />
-                    <Input
-                      id={`${fieldId}-start`}
-                      aria-label={t('orderStartDate')}
-                      type="date"
-                      value={startDate}
-                      min={today}
-                      onChange={(event) => {
-                        handleStartDateChange(event.target.value);
-                        if (errors.startDate || errors.endDate) {
-                          setErrors((prev) => ({ ...prev, startDate: undefined, endDate: undefined }));
-                        }
-                      }}
-                      className="h-10 min-w-0 flex-1 border-0 bg-transparent px-2 font-sans text-xs font-semibold text-[#1E1E1E] shadow-none focus-visible:ring-0"
-                    />
-                    <span aria-hidden="true" className="shrink-0 font-mono text-xs font-bold text-[#647554]">–</span>
-                    <Input
-                      id={`${fieldId}-end`}
-                      aria-label={t('orderEndDate')}
-                      type="date"
-                      value={endDate}
-                      min={startDate || today}
-                      onChange={(event) => {
-                        handleEndDateChange(event.target.value);
-                        if (errors.endDate) {
-                          setErrors((prev) => ({ ...prev, endDate: undefined }));
-                        }
-                      }}
-                      className="h-10 min-w-0 flex-1 border-0 bg-transparent px-2 font-sans text-xs font-semibold text-[#1E1E1E] shadow-none focus-visible:ring-0"
-                    />
-                    {(errors.startDate || errors.endDate) && (
-                      <div role="alert" className="absolute left-0 top-full z-20 mt-1.5 flex max-w-full items-center gap-1.5 rounded-lg border border-[#F4C4BF] bg-[#FFF5F4] px-3 py-1.5 font-sans text-[11px] font-bold text-[#8A1F17] shadow-[0_4px_16px_rgba(201,59,43,0.18)] animate-in fade-in slide-in-from-top-1">
-                        <AlertCircle size={13} className="shrink-0 text-[#C93B2B]" />
-                        <span className="leading-tight">{errors.startDate || errors.endDate}</span>
-                      </div>
-                    )}
-                  </div>
+                <div className="min-w-0">
+                  <DateRangePicker
+                    startDate={startDate}
+                    endDate={endDate}
+                    today={today}
+                    onStartDateChange={(val) => {
+                      handleStartDateChange(val);
+                      if (errors.startDate || errors.endDate) {
+                        setErrors((prev) => ({ ...prev, startDate: undefined, endDate: undefined }));
+                      }
+                    }}
+                    onEndDateChange={(val) => {
+                      handleEndDateChange(val);
+                      if (errors.endDate) {
+                        setErrors((prev) => ({ ...prev, endDate: undefined }));
+                      }
+                    }}
+                    onOpenChange={(isOpen) => { datePickerOpenRef.current = isOpen; }}
+                    isIndonesian={isIndonesian}
+                    hasError={!!(errors.startDate || errors.endDate)}
+                    errorMsg={errors.startDate || errors.endDate}
+                  />
                 </div>
 
                 <div className="mt-5">

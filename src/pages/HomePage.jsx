@@ -170,6 +170,18 @@ export default function HomePage({ onBuild }) {
               {standards.map((standard, index) => <Card key={standard.title} className="grid min-h-0 grid-cols-[2.25rem_1fr] gap-x-3 rounded-none border border-[#1E1E1E] bg-white p-4 sm:p-5 md:block md:min-h-[210px] md:p-6"><span className="row-span-2 font-mono text-[10px] font-bold text-[#647554] md:row-span-auto">0{index + 1}</span><h4 className="font-display text-base font-extrabold uppercase sm:text-lg md:mt-8 md:text-xl">{isIndonesian ? standard.titleID : standard.title}</h4><p className="mt-1 text-[10px] leading-4 text-[var(--cpl-dark-muted)] sm:text-[11px] sm:leading-5 md:mt-3 md:text-xs md:leading-6">{isIndonesian ? standard.descriptionID : standard.description}</p></Card>)}
             </div>
           </div>
+
+          {/* Full-width quote — anchored to bottom of section */}
+          <blockquote className="mt-10 sm:mt-16">
+            <div className="border-2 border-[#1E1E1E] bg-[#1E1E1E] px-6 py-8 shadow-[5px_5px_0_#8A9C7A] sm:px-12 sm:py-12 sm:shadow-[7px_7px_0_#8A9C7A]">
+              <p className="font-display text-2xl font-black uppercase leading-snug tracking-tight text-white sm:text-4xl sm:leading-tight lg:text-5xl">
+                {copy.why.quote}
+              </p>
+              <span className="mt-5 block font-mono text-[10px] font-bold uppercase tracking-widest text-[#8A9C7A] sm:mt-7 sm:text-xs">
+                — Clean Plate Lab
+              </span>
+            </div>
+          </blockquote>
         </div>
       </section>
 
