@@ -17,6 +17,7 @@ import {
 import {
   AlertCircle,
   ArrowRight,
+  CalendarDays,
   Check,
   CheckCircle,
   Clock3,
@@ -81,6 +82,17 @@ function formatOrderDate(value, locale = 'id-ID') {
   return new Intl.DateTimeFormat(locale, {
     day: '2-digit',
     month: 'long',
+    year: 'numeric',
+    timeZone: 'Asia/Makassar',
+  }).format(new Date(`${value}T00:00:00+08:00`));
+}
+
+function formatOrderDateCompact(value, locale = 'id-ID') {
+  if (!value) return '-';
+
+  return new Intl.DateTimeFormat(locale, {
+    day: '2-digit',
+    month: 'short',
     year: 'numeric',
     timeZone: 'Asia/Makassar',
   }).format(new Date(`${value}T00:00:00+08:00`));
@@ -829,7 +841,6 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
                         <p className="font-display text-[8px] font-bold uppercase tracking-wide text-[#647554]">{orderCopy.weeklyRotation}</p>
                         <p className="mt-1 font-display text-xs font-black leading-tight text-[#1E1E1E] sm:text-sm">{selectedTier.tier}g Protein · {periodLabel}</p>
                         <p className="mt-0.5 text-[9px] leading-4 text-[#647554]">{dayCountLabel} · {boxCountLabel}</p>
-                        <p className="mt-1 text-[9px] font-semibold leading-4 text-[#33402B]">{formatOrderDate(startDate, locale)} – {formatOrderDate(endDate, locale)}</p>
                       </div>
                       <div className="rounded-xl border border-[#8A9C7A]/25 bg-white p-3">
                         <p className="font-display text-[8px] font-bold uppercase tracking-wide text-[#647554]">{orderCopy.servingsPerDay}</p>
@@ -839,6 +850,13 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
                     </div>
 
                     <div className="divide-y divide-[#1E1E1E]/10 rounded-xl border border-[#8A9C7A]/25 bg-white px-3">
+                      <div className="flex items-start gap-2.5 py-2.5">
+                        <CalendarDays size={14} className="mt-0.5 shrink-0 text-[#647554]" />
+                        <div className="min-w-0">
+                          <p className="font-display text-[8px] font-bold uppercase tracking-wide text-[#647554]">{isIndonesian ? 'Tanggal katering' : 'Catering dates'}</p>
+                          <p className="mt-0.5 text-[10px] font-semibold text-[#1E1E1E]">{formatOrderDate(startDate, locale)} – {formatOrderDate(endDate, locale)}</p>
+                        </div>
+                      </div>
                       <div className="flex items-start gap-2.5 py-2.5">
                         <Truck size={14} className="mt-0.5 shrink-0 text-[#647554]" />
                         <div className="min-w-0">
