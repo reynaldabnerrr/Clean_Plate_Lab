@@ -134,6 +134,7 @@ export function OrderModal({ isOpen, onClose, initialProteinTier = 40, initialMe
   const [fulfillment, setFulfillment] = useState(storedDraft?.fulfillment ?? 'Self-arranged');
   const [address, setAddress] = useState('');
   const [mapsUrl, setMapsUrl] = useState(storedDraft?.mapsUrl ?? '');
+  const [copiedMapLink, setCopiedMapLink] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState({});
   const [selectedPeriod, setSelectedPeriod] = useState(null);
@@ -608,10 +609,10 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
                             setProteinTier(option.tier);
                             analytics.proteinTierSelected(option.tier);
                           }}
-                          className={`min-h-24 min-w-0 rounded-lg border-2 p-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8D9B7D] ${
+                          className={`min-h-24 min-w-0 rounded-lg border-2 p-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D1954E] ${
                             isSelected
                               ? 'border-[#1E1E1E] bg-[#1E1E1E] text-white'
-                              : 'border-[#1E1E1E]/15 bg-white text-[#1E1E1E] hover:border-[#8D9B7D]'
+                              : 'border-[#1E1E1E]/15 bg-white text-[#1E1E1E] hover:border-[#D1954E]'
                           }`}
                         >
                           <span className="flex items-center justify-between gap-1">
@@ -680,7 +681,7 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
                     {addons.map((addon) => {
                       const selected = addonIds.includes(addon.id);
                       return (
-                        <button key={addon.id} type="button" aria-pressed={selected} onClick={() => toggleAddon(addon.id)} className={`flex min-h-16 items-center justify-between gap-3 rounded-lg border-2 p-3 text-left transition-colors ${selected ? 'border-[#1E1E1E] bg-[#1E1E1E] text-white' : 'border-[#1E1E1E]/15 bg-white hover:border-[#8D9B7D]'}`}>
+                        <button key={addon.id} type="button" aria-pressed={selected} onClick={() => toggleAddon(addon.id)} className={`flex min-h-16 items-center justify-between gap-3 rounded-lg border-2 p-3 text-left transition-colors ${selected ? 'border-[#1E1E1E] bg-[#1E1E1E] text-white' : 'border-[#1E1E1E]/15 bg-white hover:border-[#D1954E]'}`}>
                           <span className="min-w-0"><strong className="block font-display text-[10px] font-extrabold uppercase leading-tight">{isIndonesian ? addon.nameID : addon.name}</strong><span className={`mt-1 block font-mono text-[9px] font-bold ${selected ? 'text-[#C8D8B8]' : 'text-[#6B7860]'}`}>+ Rp {addon.price.toLocaleString('id-ID')} / box</span></span>
                           {selected ? <Check size={16} className="shrink-0 text-[#C8D8B8]" /> : null}
                         </button>
@@ -733,8 +734,8 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
                     <span className="h-px min-w-[8px] flex-1 bg-[#1E1E1E]/15" />
                   </div>
                   <div className="mt-2 grid grid-cols-2 gap-2" role="radiogroup" aria-label={orderCopy.servingsPerDay}>
-                    <button type="button" role="radio" aria-checked={mealsPerDay === 1} onClick={() => setMealsPerDay(1)} className={`min-h-11 rounded-lg border-2 px-3 font-display text-[10px] font-extrabold uppercase transition-all duration-200 hover:-translate-y-0.5 hover:border-[#8D9B7D] hover:shadow-sm ${mealsPerDay === 1 ? 'border-[#1E1E1E] bg-[#1E1E1E] text-white' : 'border-[#1E1E1E]/20 bg-white'}`}>{orderCopy.oneServing}</button>
-                    <button type="button" role="radio" aria-checked={mealsPerDay === 2} onClick={() => setMealsPerDay(2)} className={`min-h-11 rounded-lg border-2 px-3 font-display text-[10px] font-extrabold uppercase transition-all duration-200 hover:-translate-y-0.5 hover:border-[#8D9B7D] hover:shadow-sm ${mealsPerDay === 2 ? 'border-[#1E1E1E] bg-[#1E1E1E] text-white' : 'border-[#1E1E1E]/20 bg-white'}`}>{orderCopy.twoServings}</button>
+                    <button type="button" role="radio" aria-checked={mealsPerDay === 1} onClick={() => setMealsPerDay(1)} className={`min-h-11 rounded-lg border-2 px-3 font-display text-[10px] font-extrabold uppercase transition-all duration-200 hover:-translate-y-0.5 hover:border-[#D1954E] hover:shadow-sm ${mealsPerDay === 1 ? 'border-[#1E1E1E] bg-[#1E1E1E] text-white' : 'border-[#1E1E1E]/20 bg-white'}`}>{orderCopy.oneServing}</button>
+                    <button type="button" role="radio" aria-checked={mealsPerDay === 2} onClick={() => setMealsPerDay(2)} className={`min-h-11 rounded-lg border-2 px-3 font-display text-[10px] font-extrabold uppercase transition-all duration-200 hover:-translate-y-0.5 hover:border-[#D1954E] hover:shadow-sm ${mealsPerDay === 2 ? 'border-[#1E1E1E] bg-[#1E1E1E] text-white' : 'border-[#1E1E1E]/20 bg-white'}`}>{orderCopy.twoServings}</button>
                   </div>
                   {mealsPerDay === 2 ? <p className="mt-2 rounded-lg border border-[#8D9B7D]/40 bg-[#E1ECD3] px-3 py-2 text-[10px] font-semibold leading-4 text-[#6B7860]">{orderCopy.sameMenu}</p> : null}
                 </div>
@@ -756,7 +757,7 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
                             role="radio"
                             aria-checked={isSelected}
                             onClick={() => setSingleMealReadyTime(time)}
-                            className={`flex min-h-11 items-center justify-between rounded-lg border-2 px-3 transition-all duration-200 hover:-translate-y-0.5 hover:border-[#8D9B7D] hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8D9B7D] ${isSelected ? 'border-[#1E1E1E] bg-[#1E1E1E] text-white' : 'border-[#1E1E1E]/15 bg-[var(--cpl-cream)] text-[#1E1E1E]'}`}
+                            className={`flex min-h-11 items-center justify-between rounded-lg border-2 px-3 transition-all duration-200 hover:-translate-y-0.5 hover:border-[#D1954E] hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D1954E] ${isSelected ? 'border-[#1E1E1E] bg-[#1E1E1E] text-white' : 'border-[#1E1E1E]/15 bg-[var(--cpl-cream)] text-[#1E1E1E]'}`}
                           >
                             <span className={`font-display text-[9px] font-bold uppercase ${isSelected ? 'text-[#C8D8B8]' : 'text-[#6B7860]'}`}>{label}</span>
                             <strong className="font-mono text-xs">{time.replace(':', '.')}</strong>
@@ -780,7 +781,7 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
                     <span className="h-px min-w-[8px] flex-1 bg-[#1E1E1E]/15" />
                   </div>
                   <div className="grid grid-cols-2 gap-2">
-                    {fulfillmentOptions.map((option) => <button key={option.id} type="button" aria-pressed={fulfillment === option.id} onClick={() => { setFulfillment(option.id); setErrors((current) => ({ ...current, address: undefined, mapsUrl: undefined })); }} className={`min-h-11 rounded-lg border-2 px-2 font-display text-[9px] font-extrabold uppercase leading-tight transition-all duration-200 hover:-translate-y-0.5 hover:border-[#8D9B7D] hover:shadow-sm ${fulfillment === option.id ? 'border-[#1E1E1E] bg-[#1E1E1E] text-white' : 'border-[#1E1E1E]/20 bg-white'}`}>{option.label}</button>)}
+                    {fulfillmentOptions.map((option) => <button key={option.id} type="button" aria-pressed={fulfillment === option.id} onClick={() => { setFulfillment(option.id); setErrors((current) => ({ ...current, address: undefined, mapsUrl: undefined })); }} className={`min-h-11 rounded-lg border-2 px-2 font-display text-[9px] font-extrabold uppercase leading-tight transition-all duration-200 hover:-translate-y-0.5 hover:border-[#D1954E] hover:shadow-sm ${fulfillment === option.id ? 'border-[#1E1E1E] bg-[#1E1E1E] text-white' : 'border-[#1E1E1E]/20 bg-white'}`}>{option.label}</button>)}
                   </div>
                 </div>
 
@@ -807,7 +808,7 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
                         className={`block h-20 w-full resize-none rounded-lg py-3 pl-9 pr-3 font-sans text-xs font-semibold outline-none transition-all duration-200 placeholder:font-normal placeholder:text-gray-400 ${
                           errors.address
                             ? 'border-2 border-[#C93B2B] bg-[#FDF5F5] text-[#1E1E1E] focus:ring-2 focus:ring-[#C93B2B]/20'
-                            : 'border border-[#1E1E1E]/25 bg-white text-[#1E1E1E] focus:ring-2 focus:ring-[#8D9B7D]'
+                            : 'border border-[#1E1E1E]/25 bg-white text-[#1E1E1E] focus:ring-2 focus:ring-[#D1954E]'
                         }`}
                       />
                       {errors.address && (
@@ -855,8 +856,15 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
                   </div>
                 </div> : <div className="mt-3 rounded-lg border border-[#8D9B7D]/40 bg-[#E1ECD3] px-3 py-2 text-[9px] font-semibold leading-4 text-[#6B7860]">
                   <p>{orderCopy.selfArrangedNote}</p>
-                  <p className="mt-1.5 flex items-start gap-1.5 font-bold text-[#3A4A30]"><MapPin size={12} className="mt-0.5 shrink-0" /><a href={CENTRAL_KITCHEN_MAPS_LINK} target="_blank" rel="noopener noreferrer" className="hover:text-[#8D9B7D] hover:underline">{centralKitchenAddress}</a></p>
-                  <button type="button" onClick={() => navigator.clipboard.writeText(CENTRAL_KITCHEN_MAPS_LINK)} className="mt-1.5 inline-flex items-center gap-1 rounded bg-[#1E1E1E]/10 px-2 py-1 font-mono text-[8px] font-bold text-[#3A4A30] hover:bg-[#1E1E1E]/20">Copy link <Copy size={10} /></button>
+                  <div className="mt-1.5 flex items-start gap-1.5 font-bold text-[#3A4A30]">
+                    <MapPin size={12} className="mt-0.5 shrink-0" />
+                    <a href={CENTRAL_KITCHEN_MAPS_LINK} target="_blank" rel="noopener noreferrer" className="hover:text-[#D1954E] hover:underline">{centralKitchenAddress}</a>
+                  </div>
+                  <div className="mt-1.5 flex items-center gap-2">
+                    <button type="button" onClick={() => { navigator.clipboard.writeText(CENTRAL_KITCHEN_MAPS_LINK); setCopiedMapLink(true); setTimeout(() => setCopiedMapLink(false), 2000); }} className="inline-flex items-center gap-1 rounded bg-[#1E1E1E]/10 px-2 py-1 font-mono text-[8px] font-bold text-[#3A4A30] hover:bg-[#1E1E1E]/20">
+                      {copiedMapLink ? <><Check size={10} /> Link copied! </> : <><Copy size={10} /> Copy link</>}
+                    </button>
+                  </div>
                 </div>}
 
                 <div className="mt-5 overflow-hidden rounded-2xl border-2 border-[#8D9B7D] bg-[#E1ECD3]" aria-live="polite">
@@ -1063,7 +1071,7 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
                 <Button
                   variant="dark"
                   onClick={handleReopenWhatsApp}
-                  className="h-11 w-full rounded-xl bg-[#1E1E1E] px-6 text-xs font-bold text-white shadow-md transition-all hover:bg-[#6B7860] sm:w-auto"
+                  className="h-11 w-full rounded-xl bg-[#1E1E1E] px-6 text-xs font-bold text-white shadow-md transition-all hover:bg-[#B8803C] sm:w-auto"
                 >
                   <MessageCircle size={17} />
                   <span>{t('orderOpenWaCta')}</span>
@@ -1072,7 +1080,7 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
                 <Button
                   variant="outline"
                   onClick={handleReset}
-                  className="h-11 w-full rounded-xl border-[#1E1E1E]/25 bg-white px-6 text-xs font-bold text-[#1E1E1E] hover:bg-[#E1ECD3] sm:w-auto"
+                  className="h-11 w-full rounded-xl border-[#1E1E1E]/25 bg-white px-6 text-xs font-bold text-[#1E1E1E] hover:bg-[#D1954E] hover:text-white sm:w-auto"
                 >
                   {t('orderBackBtn')}
                 </Button>
