@@ -24,10 +24,10 @@ export function CplPrimaryLogo({ className = "", size = "normal", inverted = fal
     <div className={`flex items-center gap-2 min-[360px]:gap-3 select-none ${className}`}>
       <CplLogoImage size={imgSize} />
       <div className="flex flex-col justify-center leading-none">
-        <div className={`font-display font-black tracking-tighter uppercase ${inverted ? 'text-white' : 'text-[#1E1E1E]'} ${isLarge ? 'text-2xl' : 'text-base min-[360px]:text-lg sm:text-xl'}`}>
+        <div className={`font-display font-bold tracking-tight uppercase ${inverted ? 'text-white' : 'text-[#1E1E1E]'} ${isLarge ? 'text-2xl' : 'text-base min-[360px]:text-lg sm:text-xl'}`}>
           CLEAN PLATE LAB
         </div>
-        <div className={`mt-1 font-display font-bold uppercase tracking-widest ${inverted ? 'text-[#C8D8B8]' : 'text-[#6B7860]'} ${isLarge ? 'text-xs' : 'hidden text-[8px] min-[360px]:block sm:text-[10px]'}`}>
+        <div className={`mt-1 font-sans font-medium uppercase tracking-widest ${inverted ? 'text-[#C8D8B8]' : 'text-[#6B7860]'} ${isLarge ? 'text-xs' : 'hidden text-[8px] min-[360px]:block sm:text-[10px]'}`}>
           GOOD FOOD. CLEAR DATA. BETTER YOU.
         </div>
       </div>

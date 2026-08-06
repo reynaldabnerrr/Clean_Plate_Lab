@@ -33,7 +33,7 @@
     --cpl-amber-dark: #B8803C;    /* Amber hover */
     --cpl-dark: #1E1E1E;          /* Charcoal — text / dark bg */
     --cpl-dark-muted: #555555;    /* Muted text */
-    --cpl-white: #FEFDF9;         /* Off White surfaces */
+    --cpl-white: #FFFFFF;         /* Card/surface — kontras dari page bg */
 
     --cpl-border: #1E1E1E;
     --cpl-border-muted: rgba(30, 30, 30, 0.15);
@@ -146,7 +146,7 @@ img {
 .nutrition-panel {
   border: 2px solid var(--cpl-dark);
   border-radius: 0;
-  background: var(--cpl-cream);
+  background: var(--cpl-white);
   padding: 1.5rem;
   box-shadow: 4px 4px 0 var(--cpl-dark);
 }
@@ -208,7 +208,7 @@ img {
   gap: 0.35rem;
   border: 2px solid rgba(30, 30, 30, 0.75);
   border-radius: 0.5rem;
-  background: var(--cpl-cream);
+  background: var(--cpl-white);
   padding: 0.9rem;
   color: var(--cpl-dark);
   font-family: var(--font-display);
@@ -259,7 +259,7 @@ img {
   min-height: 3rem;
   border: 1px solid rgba(30, 30, 30, 0.16);
   border-radius: 0.5rem;
-  background: var(--cpl-cream);
+  background: var(--cpl-white);
   padding: 0.75rem 0.9rem;
   color: var(--cpl-dark);
   font-family: var(--font-body);
@@ -316,7 +316,7 @@ img {
 
 /* Authentic CPL Label Styling from CPL_Guideline.JPG */
 .cpl-label-paper {
-  background: #FEFDF9;
+  background: #FFFFFF;
   color: #1E1E1E;
   font-family: var(--font-display);
   border: 2px solid #1E1E1E;
@@ -516,7 +516,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   width: 100%;
   border-radius: 12px;
   border: 1.5px solid rgba(30, 30, 30, 0.22);
-  background: #fff;
+  background: #FFFFFF;
   overflow: hidden;
   cursor: pointer;
   transition: border-color 180ms, box-shadow 180ms;

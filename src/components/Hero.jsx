@@ -152,7 +152,7 @@ export function Hero({ onOpenOrder, onScrollToLabel }) {
                   transition: isHeroHovered ? 'transform 0.1s ease-out, box-shadow 0.3s ease' : 'transform 0.5s ease-out, box-shadow 0.5s ease',
                   boxShadow: isHeroHovered ? '0 25px 50px -12px rgba(0, 0, 0, 0.3)' : '0 10px 25px -5px rgba(0, 0, 0, 0.12)'
                 }}
-                className={`cpl-label-paper p-5 sm:p-6 rounded-none relative z-10 border-2 border-[#1E1E1E] bg-[#FEFDF9] transition-all duration-300 ${!isHeroHovered ? 'cpl-3d-idle-float' : ''}`}
+                className={`cpl-label-paper p-5 sm:p-6 rounded-none relative z-10 border-2 border-[#1E1E1E] bg-white transition-all duration-300 ${!isHeroHovered ? 'cpl-3d-idle-float' : ''}`}
               >
                 {/* Glossy Sheen Reflection Pass */}
                 <div className="cpl-gloss-sheen" />

@@ -26,7 +26,7 @@ export default {
           dark: "#1E1E1E",
           "dark-muted": "#555555",
           /* Off White surfaces */
-          white: "#FEFDF9",
+          white: "#FFFFFF",
         }
       },
       fontFamily: {
