@@ -1,26 +1,28 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Space+Grotesk:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 
 @layer base {
   :root {
     /* New CPL Palette */
-    --cpl-sage: #8D9B7D;          /* Olive Green — secondary */
-    --cpl-sage-dark: #6B7860;     /* Darker Olive — hovers / accents */
-    --cpl-sage-light: #E1ECD3;    /* Soft Sage — bg alt / badge */
-    --cpl-cream: #FEFDF9;         /* Off White — main background */
-    --cpl-sand: #EABB85;          /* Soft Apricot — accent bg / card */
-    --cpl-sand-light: #EABB85;    /* Soft Apricot (light usage) */
-    --cpl-amber: #D1954E;         /* Amber — primary / CTA */
-    --cpl-amber-dark: #B8803C;    /* Amber hover */
-    --cpl-dark: #1E1E1E;          /* Charcoal — text / dark bg */
-    --cpl-dark-muted: #555555;    /* Muted text */
-    --cpl-white: #FFFFFF;         /* Card/surface — kontras dari page bg */
+    --cpl-sage: #8d9b7d; /* Olive Green — secondary */
+    --cpl-sage-dark: #6b7860; /* Darker Olive — hovers / accents */
+    --cpl-sage-light: #e1ecd3; /* Soft Sage — bg alt / badge */
+    --cpl-cream: #fefdf9; /* Off White — main background */
+    --cpl-sand: #eabb85; /* Soft Apricot — accent bg / card */
+    --cpl-sand-light: #eabb85; /* Soft Apricot (light usage) */
+    --cpl-amber: #d1954e; /* Amber — primary / CTA */
+    --cpl-amber-dark: #b8803c; /* Amber hover */
+    --cpl-dark: #1e1e1e; /* Charcoal — text / dark bg */
+    --cpl-dark-muted: #555555; /* Muted text */
+    --cpl-white: #ffffff; /* Card/surface — kontras dari page bg */
 
-    --cpl-border: #1E1E1E;
+    --cpl-border: #1e1e1e;
     --cpl-border-muted: rgba(30, 30, 30, 0.15);
 
-    --font-display: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
-    --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-display:
+      "Space Grotesk", -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-body:
+      "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
 
     --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.05);
     --shadow-label: 0 20px 50px rgba(0, 0, 0, 0.15);
@@ -28,12 +30,12 @@
 
   .dark-mode {
     --cpl-cream: #141412;
-    --cpl-white: #1C1B18;
-    --cpl-dark: #FEFDF9;
-    --cpl-dark-muted: #A8ABA4;
-    --cpl-sand: #3A2E1E;
-    --cpl-sand-light: #2A221A;
-    --cpl-border: #FEFDF9;
+    --cpl-white: #1c1b18;
+    --cpl-dark: #fefdf9;
+    --cpl-dark-muted: #a8aba4;
+    --cpl-sand: #3a2e1e;
+    --cpl-sand-light: #2a221a;
+    --cpl-border: #fefdf9;
     --cpl-border-muted: rgba(254, 253, 249, 0.2);
   }
 }
@@ -95,7 +97,7 @@ img {
 
 ::selection {
   background: var(--cpl-amber);
-  color: #FEFDF9;
+  color: #fefdf9;
 }
 
 .section-shell {
@@ -120,7 +122,7 @@ img {
 }
 
 .section-kicker.section-kicker-inverted {
-  color: #C8D8B8;
+  color: #c8d8b8;
 }
 
 .nutrition-panel {
@@ -193,7 +195,10 @@ img {
   color: var(--cpl-dark);
   font-family: var(--font-display);
   text-align: left;
-  transition: border-color 180ms ease, background-color 180ms ease, color 180ms ease;
+  transition:
+    border-color 180ms ease,
+    background-color 180ms ease,
+    color 180ms ease;
 }
 
 .choice-card:hover {
@@ -296,20 +301,23 @@ img {
 
 /* Authentic CPL Label Styling from CPL_Guideline.JPG */
 .cpl-label-paper {
-  background: #FFFFFF;
-  color: #1E1E1E;
+  background: #ffffff;
+  color: #1e1e1e;
   font-family: var(--font-display);
-  border: 2px solid #1E1E1E;
+  border: 2px solid #1e1e1e;
   box-shadow: var(--shadow-label);
   position: relative;
   overflow: hidden;
 }
 
 .cpl-label-paper::before {
-  content: '';
+  content: "";
   position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background-image: radial-gradient(rgba(0,0,0,0.03) 1px, transparent 0);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: radial-gradient(rgba(0, 0, 0, 0.03) 1px, transparent 0);
   background-size: 8px 8px;
   pointer-events: none;
 }
@@ -317,16 +325,16 @@ img {
 .barcode-strip {
   background: repeating-linear-gradient(
     90deg,
-    #1E1E1E 0,
-    #1E1E1E 2px,
+    #1e1e1e 0,
+    #1e1e1e 2px,
     transparent 2px,
     transparent 4px,
-    #1E1E1E 4px,
-    #1E1E1E 7px,
+    #1e1e1e 4px,
+    #1e1e1e 7px,
     transparent 7px,
     transparent 10px,
-    #1E1E1E 10px,
-    #1E1E1E 11px,
+    #1e1e1e 10px,
+    #1e1e1e 11px,
     transparent 11px,
     transparent 14px
   );
@@ -496,14 +504,25 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   width: 100%;
   border-radius: 12px;
   border: 1.5px solid rgba(30, 30, 30, 0.22);
-  background: #FFFFFF;
+  background: #ffffff;
   overflow: hidden;
   cursor: pointer;
-  transition: border-color 180ms, box-shadow 180ms;
+  transition:
+    border-color 180ms,
+    box-shadow 180ms;
 }
-.cpl-drp-trigger:hover { border-color: var(--cpl-amber); box-shadow: 0 0 0 1px rgba(209, 149, 78, 0.18); }
-.cpl-drp-trigger.open  { border-color: #1E1E1E; box-shadow: 0 0 0 2px rgba(30,30,30,0.12); }
-.cpl-drp-trigger.error { border: 2px solid #C93B2B; background: #FDF5F5; }
+.cpl-drp-trigger:hover {
+  border-color: var(--cpl-amber);
+  box-shadow: 0 0 0 1px rgba(209, 149, 78, 0.18);
+}
+.cpl-drp-trigger.open {
+  border-color: #1e1e1e;
+  box-shadow: 0 0 0 2px rgba(30, 30, 30, 0.12);
+}
+.cpl-drp-trigger.error {
+  border: 2px solid #c93b2b;
+  background: #fdf5f5;
+}
 
 /* Top row: label + nights badge */
 .cpl-drp-top-row {
@@ -512,7 +531,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   justify-content: space-between;
   gap: 0.5rem;
   padding: 0.55rem 0.875rem 0.3rem;
-  border-bottom: 1px solid rgba(30,30,30,0.08);
+  border-bottom: 1px solid rgba(30, 30, 30, 0.08);
 }
 
 .cpl-drp-stay-label {
@@ -527,14 +546,17 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   color: #555555;
 }
 
-.cpl-drp-cal-icon { color: var(--cpl-sage-dark); flex-shrink: 0; }
+.cpl-drp-cal-icon {
+  color: var(--cpl-sage-dark);
+  flex-shrink: 0;
+}
 
 .cpl-drp-nights-badge {
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
-  background: #1E1E1E;
-  color: #C8D8B8;
+  background: #1e1e1e;
+  color: #c8d8b8;
   border-radius: 999px;
   padding: 0.2rem 0.6rem;
   font-family: var(--font-body);
@@ -563,8 +585,14 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   text-align: left;
   min-width: 0;
 }
-.cpl-drp-slot.active { background: #E1ECD3; }
-.cpl-drp-slot:focus-visible { outline: 2px solid var(--cpl-amber); outline-offset: -2px; border-radius: 8px; }
+.cpl-drp-slot.active {
+  background: #e1ecd3;
+}
+.cpl-drp-slot:focus-visible {
+  outline: 2px solid var(--cpl-amber);
+  outline-offset: -2px;
+  border-radius: 8px;
+}
 
 .cpl-drp-slot-label {
   font-family: var(--font-body);
@@ -572,7 +600,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #6B7860;
+  color: #6b7860;
 }
 
 .cpl-drp-slot-date {
@@ -587,7 +615,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   font-family: var(--font-display);
   font-size: 1.35rem;
   font-weight: 900;
-  color: #1E1E1E;
+  color: #1e1e1e;
   line-height: 1;
 }
 
@@ -618,7 +646,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 .cpl-drp-divider-line {
   width: 1px;
   flex: 1;
-  background: rgba(30,30,30,0.12);
+  background: rgba(30, 30, 30, 0.12);
 }
 .cpl-drp-divider-badge {
   display: none; /* hidden on mobile, shown in popup footer */
@@ -632,13 +660,13 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   margin-top: 0.4rem;
   padding: 0.4rem 0.75rem;
   border-radius: 8px;
-  border: 1px solid #F4C4BF;
-  background: #FFF5F4;
-  color: #8A1F17;
+  border: 1px solid #f4c4bf;
+  background: #fff5f4;
+  color: #8a1f17;
   font-family: var(--font-body);
   font-size: 0.6875rem;
   font-weight: 700;
-  box-shadow: 0 4px 16px rgba(201,59,43,0.14);
+  box-shadow: 0 4px 16px rgba(201, 59, 43, 0.14);
 }
 
 /* ── Calendar Popup ─────────────────────────────────────────────── */
@@ -651,8 +679,10 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   width: max(100%, min(640px, 98vw));
   background: #fff;
   border-radius: 16px;
-  border: 1.5px solid rgba(30,30,30,0.14);
-  box-shadow: 0 20px 60px rgba(0,0,0,0.18), 0 4px 16px rgba(0,0,0,0.08);
+  border: 1.5px solid rgba(30, 30, 30, 0.14);
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.18),
+    0 4px 16px rgba(0, 0, 0, 0.08);
   overflow: hidden;
   touch-action: none;
   pointer-events: auto;
@@ -663,7 +693,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 /* Popup header */
 .cpl-cal-popup-header {
   padding: 0.75rem 1rem 0.6rem;
-  border-bottom: 1px solid rgba(30,30,30,0.08);
+  border-bottom: 1px solid rgba(30, 30, 30, 0.08);
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -685,12 +715,12 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   border-radius: 999px;
 }
 .cpl-cal-selecting-badge.badge-start {
-  background: #E1ECD3;
-  color: #3A4A30;
+  background: #e1ecd3;
+  color: #3a4a30;
 }
 .cpl-cal-selecting-badge.badge-end {
-  background: #F3E0C5;
-  color: #7A4E20;
+  background: #f3e0c5;
+  color: #7a4e20;
 }
 
 .cpl-cal-clear-btn {
@@ -698,7 +728,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   align-items: center;
   gap: 0.25rem;
   background: none;
-  border: 1px solid rgba(30,30,30,0.2);
+  border: 1px solid rgba(30, 30, 30, 0.2);
   border-radius: 999px;
   padding: 0.2rem 0.6rem;
   font-family: var(--font-body);
@@ -706,9 +736,14 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   font-weight: 700;
   color: #555555;
   cursor: pointer;
-  transition: background 150ms, color 150ms;
+  transition:
+    background 150ms,
+    color 150ms;
 }
-.cpl-cal-clear-btn:hover { background: #FEFDF9; color: #1E1E1E; }
+.cpl-cal-clear-btn:hover {
+  background: #fefdf9;
+  color: #1e1e1e;
+}
 
 /* Month nav */
 .cpl-cal-nav {
@@ -723,7 +758,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.04em;
-  color: #1E1E1E;
+  color: #1e1e1e;
   flex: 1;
   text-align: center;
 }
@@ -734,15 +769,23 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   width: 2rem;
   height: 2rem;
   border-radius: 8px;
-  border: 1px solid rgba(30,30,30,0.15);
-  background: #FEFDF9;
-  color: #1E1E1E;
+  border: 1px solid rgba(30, 30, 30, 0.15);
+  background: #fefdf9;
+  color: #1e1e1e;
   cursor: pointer;
   flex-shrink: 0;
-  transition: background 150ms, border-color 150ms;
+  transition:
+    background 150ms,
+    border-color 150ms;
 }
-.cpl-cal-nav-btn:hover:not(:disabled) { background: #F0EDD8; border-color: var(--cpl-amber); }
-.cpl-cal-nav-btn:disabled { opacity: 0.3; cursor: default; }
+.cpl-cal-nav-btn:hover:not(:disabled) {
+  background: #f0edd8;
+  border-color: var(--cpl-amber);
+}
+.cpl-cal-nav-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
 
 /* Two-month grid */
 .cpl-cal-months {
@@ -753,10 +796,15 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   overflow-x: auto;
 }
 
-.cpl-cal-month-sep { background: rgba(30,30,30,0.08); margin-block: 0.25rem; }
+.cpl-cal-month-sep {
+  background: rgba(30, 30, 30, 0.08);
+  margin-block: 0.25rem;
+}
 
 /* Month */
-.cpl-cal-month { min-width: 0; }
+.cpl-cal-month {
+  min-width: 0;
+}
 
 .cpl-cal-month-title {
   font-family: var(--font-body);
@@ -764,7 +812,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #1E1E1E;
+  color: #1e1e1e;
   margin: 0 0 0.5rem;
   padding-inline: 0.25rem;
 }
@@ -801,18 +849,27 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 .cpl-cal-day-wrapper.range-mid::before,
 .cpl-cal-day-wrapper.range-start-cap::before,
 .cpl-cal-day-wrapper.range-end-cap::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
   height: 2rem;
-  background: #E1ECD3;
+  background: #e1ecd3;
   z-index: 0;
 }
 
-.cpl-cal-day-wrapper.range-mid::before { left: 0; right: 0; }
-.cpl-cal-day-wrapper.range-start-cap::before { left: 50%; right: 0; }
-.cpl-cal-day-wrapper.range-end-cap::before { left: 0; right: 50%; }
+.cpl-cal-day-wrapper.range-mid::before {
+  left: 0;
+  right: 0;
+}
+.cpl-cal-day-wrapper.range-start-cap::before {
+  left: 50%;
+  right: 0;
+}
+.cpl-cal-day-wrapper.range-end-cap::before {
+  left: 0;
+  right: 50%;
+}
 
 /* Day button */
 .cpl-cal-day {
@@ -829,26 +886,51 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   font-family: var(--font-body);
   font-size: 0.7rem;
   font-weight: 600;
-  color: #1E1E1E;
+  color: #1e1e1e;
   cursor: pointer;
-  transition: background 120ms, color 120ms, transform 80ms;
+  transition:
+    background 120ms,
+    color 120ms,
+    transform 80ms;
   flex-shrink: 0;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
 .cpl-cal-day:hover:not(:disabled):not(.start):not(.end):not(.in-range) {
-  background: #F0EDD8;
+  background: #f0edd8;
   transform: scale(1.08);
 }
-.cpl-cal-day.past       { color: #cccccc; cursor: default; }
-.cpl-cal-day.sunday      { color: #cccccc; cursor: not-allowed; }
-.cpl-cal-day.today      { font-weight: 800; color: var(--cpl-amber); box-shadow: inset 0 0 0 1.5px var(--cpl-amber); }
-.cpl-cal-day.hovered    { background: #E1ECD3; }
-.cpl-cal-day.in-range   { background: transparent; color: #3A4A30; font-weight: 700; }
+.cpl-cal-day.past {
+  color: #cccccc;
+  cursor: default;
+}
+.cpl-cal-day.sunday {
+  color: #cccccc;
+  cursor: not-allowed;
+}
+.cpl-cal-day.today {
+  font-weight: 800;
+  color: var(--cpl-amber);
+  box-shadow: inset 0 0 0 1.5px var(--cpl-amber);
+}
+.cpl-cal-day.hovered {
+  background: #e1ecd3;
+}
+.cpl-cal-day.in-range {
+  background: transparent;
+  color: #3a4a30;
+  font-weight: 700;
+}
 .cpl-cal-day.start,
-.cpl-cal-day.end        { background: #1E1E1E; color: #FEFDF9; font-weight: 800; }
+.cpl-cal-day.end {
+  background: #1e1e1e;
+  color: #fefdf9;
+  font-weight: 800;
+}
 .cpl-cal-day.start:hover,
-.cpl-cal-day.end:hover  { background: #3a3a3a; }
+.cpl-cal-day.end:hover {
+  background: #3a3a3a;
+}
 
 /* Footer */
 .cpl-cal-footer {
@@ -858,8 +940,8 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   gap: 0.5rem;
   flex-wrap: wrap;
   padding: 0.6rem 1rem 0.75rem;
-  border-top: 1px solid rgba(30,30,30,0.08);
-  background: #F5F2E0;
+  border-top: 1px solid rgba(30, 30, 30, 0.08);
+  background: #f5f2e0;
 }
 
 .cpl-cal-footer-dates {
@@ -881,24 +963,27 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #6B7860;
+  color: #6b7860;
 }
 
 .cpl-cal-footer-item strong {
   font-family: var(--font-body);
   font-size: 0.7rem;
   font-weight: 700;
-  color: #1E1E1E;
+  color: #1e1e1e;
 }
 
-.cpl-cal-footer-arrow { color: #999999; font-size: 0.8rem; }
+.cpl-cal-footer-arrow {
+  color: #999999;
+  font-size: 0.8rem;
+}
 
 .cpl-cal-footer-nights {
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
-  background: #1E1E1E;
-  color: #C8D8B8;
+  background: #1e1e1e;
+  color: #c8d8b8;
   border-radius: 999px;
   padding: 0.3rem 0.75rem;
   font-family: var(--font-body);
@@ -946,7 +1031,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   left: 0;
   right: 0;
   z-index: 9999;
-  background: #FEFDF9;
+  background: #fefdf9;
   border-radius: 20px 20px 0 0;
   max-height: 92dvh;
   overflow-y: auto;
@@ -960,8 +1045,14 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 }
 
 @keyframes cpl-sheet-up {
-  from { transform: translateY(100%); opacity: 0.6; }
-  to   { transform: translateY(0);    opacity: 1; }
+  from {
+    transform: translateY(100%);
+    opacity: 0.6;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 /* Drag handle */
@@ -982,13 +1073,15 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   height: 2rem;
   border-radius: 50%;
   border: 1px solid rgba(30, 30, 30, 0.15);
-  background: #FEFDF9;
-  color: #1E1E1E;
+  background: #fefdf9;
+  color: #1e1e1e;
   cursor: pointer;
   flex-shrink: 0;
   transition: background 150ms;
 }
-.cpl-cal-close-btn:hover { background: #F0EDD8; }
+.cpl-cal-close-btn:hover {
+  background: #f0edd8;
+}
 
 /* Single-month layout inside sheet */
 .cpl-cal-months-mobile {

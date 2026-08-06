@@ -1,24 +1,24 @@
-import React from 'react';
-import { useCpl } from '../hooks/useCpl';
-import { trackEvent } from '../lib/analytics';
-import { CplLogoImage } from './CplLogo';
+import React from "react";
+import { useCpl } from "../hooks/useCpl";
+import { trackEvent } from "../lib/analytics";
+import { CplLogoImage } from "./CplLogo";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogTitle,
-} from './ui/dialog';
+} from "./ui/dialog";
 
 const languageOptions = [
   {
-    id: 'ID',
-    shortLabel: 'ID',
-    name: 'Bahasa Indonesia',
+    id: "ID",
+    shortLabel: "ID",
+    name: "Bahasa Indonesia",
   },
   {
-    id: 'EN',
-    shortLabel: 'EN',
-    name: 'English',
+    id: "EN",
+    shortLabel: "EN",
+    name: "English",
   },
 ];
 
@@ -27,7 +27,10 @@ export function LanguageWelcomeModal() {
 
   const selectLanguage = (nextLanguage) => {
     setLanguage(nextLanguage);
-    trackEvent('language_selected', { language: nextLanguage, source: 'welcome_modal' });
+    trackEvent("language_selected", {
+      language: nextLanguage,
+      source: "welcome_modal",
+    });
   };
 
   return (
@@ -44,7 +47,10 @@ export function LanguageWelcomeModal() {
           Pilih bahasa
           <span className="mt-1 block text-[#6B7860]">Choose language</span>
         </DialogTitle>
-        <DialogDescription id="language-welcome-description" className="mx-auto mt-3 max-w-xs font-sans text-[11px] leading-5 text-[#6B7860]">
+        <DialogDescription
+          id="language-welcome-description"
+          className="mx-auto mt-3 max-w-xs font-sans text-[11px] leading-5 text-[#6B7860]"
+        >
           Pilih bahasa untuk melanjutkan.
         </DialogDescription>
 
@@ -53,14 +59,16 @@ export function LanguageWelcomeModal() {
             <button
               key={option.id}
               type="button"
-              autoFocus={option.id === 'ID'}
+              autoFocus={option.id === "ID"}
               onClick={() => selectLanguage(option.id)}
               className="flex min-h-13 items-center gap-3 rounded-xl border border-[#1E1E1E]/20 bg-white px-4 py-3 text-left transition-colors hover:border-[#8D9B7D] hover:bg-[#E1ECD3] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8D9B7D] focus-visible:ring-offset-2"
             >
               <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#E1ECD3] font-mono text-[9px] font-black text-[#6B7860]">
                 {option.shortLabel}
               </span>
-              <strong className="font-display text-xs font-black uppercase">{option.name}</strong>
+              <strong className="font-display text-xs font-black uppercase">
+                {option.name}
+              </strong>
             </button>
           ))}
         </div>

@@ -1,7 +1,7 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { CplContext } from './cpl-context';
-import { getDateInputValueInTimeZone } from '../lib/order';
-import { migrateStoredLanguage, writeStoredState } from '../lib/storage';
+import React, { useCallback, useEffect, useState } from "react";
+import { CplContext } from "./cpl-context";
+import { getDateInputValueInTimeZone } from "../lib/order";
+import { migrateStoredLanguage, writeStoredState } from "../lib/storage";
 
 const INITIAL_MENU_ITEMS = [
   {
@@ -19,10 +19,12 @@ const INITIAL_MENU_ITEMS = [
     image: "/images/chicken_teriyaki.webp",
     tags_ID: ["Monday / Senin", "82.4g Protein", "1100.8 Kkal"],
     tags_EN: ["Monday", "82.4g Protein", "1100.8 Kcal"],
-    desc_ID: "Dada ayam empuk berbalut saus teriyaki manis gurih, disajikan dengan spesifikasi nutrisi lengkap 82.4g protein, 132.5g karbo, 26.8g lemak, 1380.5mg natrium, dan 355mg kalium.",
-    desc_EN: "Tender chicken glazed in a sweet & savory teriyaki sauce, served with full lab specs: 82.4g protein, 132.5g carbs, 26.8g fat, 1380.5mg sodium, and 355mg potassium.",
+    desc_ID:
+      "Dada ayam empuk berbalut saus teriyaki manis gurih, disajikan dengan spesifikasi nutrisi lengkap 82.4g protein, 132.5g karbo, 26.8g lemak, 1380.5mg natrium, dan 355mg kalium.",
+    desc_EN:
+      "Tender chicken glazed in a sweet & savory teriyaki sauce, served with full lab specs: 82.4g protein, 132.5g carbs, 26.8g fat, 1380.5mg sodium, and 355mg potassium.",
     available: true,
-    batch: "MON-01"
+    batch: "MON-01",
   },
   {
     id: "m2",
@@ -39,10 +41,12 @@ const INITIAL_MENU_ITEMS = [
     image: "/images/ayam_cabe_ijo.webp",
     tags_ID: ["Tuesday / Selasa", "79.8g Protein", "1080.7 Kkal"],
     tags_EN: ["Tuesday", "79.8g Protein", "1080.7 Kcal"],
-    desc_ID: "Ayam empuk beraroma sambal cabai hijau segar, disajikan dengan spesifikasi nutrisi lengkap 79.8g protein, 124g karbo, 29.5g lemak, 1290mg natrium, dan 365mg kalium.",
-    desc_EN: "Tender chicken tossed in aromatic green chili sauce, served with full lab specs: 79.8g protein, 124g carbs, 29.5g fat, 1290mg sodium, and 365mg potassium.",
+    desc_ID:
+      "Ayam empuk beraroma sambal cabai hijau segar, disajikan dengan spesifikasi nutrisi lengkap 79.8g protein, 124g karbo, 29.5g lemak, 1290mg natrium, dan 365mg kalium.",
+    desc_EN:
+      "Tender chicken tossed in aromatic green chili sauce, served with full lab specs: 79.8g protein, 124g carbs, 29.5g fat, 1290mg sodium, and 365mg potassium.",
     available: true,
-    batch: "TUE-02"
+    batch: "TUE-02",
   },
   {
     id: "m3",
@@ -59,10 +63,12 @@ const INITIAL_MENU_ITEMS = [
     image: "/images/chicken_mentai.webp",
     tags_ID: ["Wednesday / Rabu", "83.2g Protein", "1127.6 Kkal"],
     tags_EN: ["Wednesday", "83.2g Protein", "1127.6 Kcal"],
-    desc_ID: "Dada ayam juicy dengan lapisan saus mentai gurih creamy, disajikan dengan spesifikasi nutrisi lengkap 83.2g protein, 128.5g karbo, 31.2g lemak, 1420mg natrium, dan 330mg kalium.",
-    desc_EN: "Juicy chicken topped with creamy, savory mentai sauce, served with full lab specs: 83.2g protein, 128.5g carbs, 31.2g fat, 1420mg sodium, and 330mg potassium.",
+    desc_ID:
+      "Dada ayam juicy dengan lapisan saus mentai gurih creamy, disajikan dengan spesifikasi nutrisi lengkap 83.2g protein, 128.5g karbo, 31.2g lemak, 1420mg natrium, dan 330mg kalium.",
+    desc_EN:
+      "Juicy chicken topped with creamy, savory mentai sauce, served with full lab specs: 83.2g protein, 128.5g carbs, 31.2g fat, 1420mg sodium, and 330mg potassium.",
     available: true,
-    batch: "WED-03"
+    batch: "WED-03",
   },
   {
     id: "m4",
@@ -79,10 +85,12 @@ const INITIAL_MENU_ITEMS = [
     image: "/images/sate_padang.webp",
     tags_ID: ["Thursday / Kamis", "81.0g Protein", "1059.5 Kkal"],
     tags_EN: ["Thursday", "81.0g Protein", "1059.5 Kcal"],
-    desc_ID: "Dada ayam empuk dengan kuah sate Padang kaya rempah khas, disajikan dengan spesifikasi nutrisi lengkap 81.0g protein, 122g karbo, 27.5g lemak, 1360mg natrium, dan 370mg kalium.",
-    desc_EN: "Tender chicken coated in rich and aromatic Padang-style sauce, served with full lab specs: 81.0g protein, 122g carbs, 27.5g fat, 1360mg sodium, and 370mg potassium.",
+    desc_ID:
+      "Dada ayam empuk dengan kuah sate Padang kaya rempah khas, disajikan dengan spesifikasi nutrisi lengkap 81.0g protein, 122g karbo, 27.5g lemak, 1360mg natrium, dan 370mg kalium.",
+    desc_EN:
+      "Tender chicken coated in rich and aromatic Padang-style sauce, served with full lab specs: 81.0g protein, 122g carbs, 27.5g fat, 1360mg sodium, and 370mg potassium.",
     available: true,
-    batch: "THU-04"
+    batch: "THU-04",
   },
   {
     id: "m5",
@@ -99,10 +107,12 @@ const INITIAL_MENU_ITEMS = [
     image: "/images/oseng_ayam_kecombrang.webp",
     tags_ID: ["Friday / Jumat", "78.5g Protein", "1039 Kkal"],
     tags_EN: ["Friday", "78.5g Protein", "1039 Kcal"],
-    desc_ID: "Oseng ayam gurih bertabur irisan kecombrang harum, disajikan dengan spesifikasi nutrisi lengkap 78.5g protein, 125g karbo, 25g lemak, 1240mg natrium, dan 385mg kalium.",
-    desc_EN: "Savory stir-fried chicken infused with fragrant kecombrang, served with full lab specs: 78.5g protein, 125g carbs, 25g fat, 1240mg sodium, and 385mg potassium.",
+    desc_ID:
+      "Oseng ayam gurih bertabur irisan kecombrang harum, disajikan dengan spesifikasi nutrisi lengkap 78.5g protein, 125g karbo, 25g lemak, 1240mg natrium, dan 385mg kalium.",
+    desc_EN:
+      "Savory stir-fried chicken infused with fragrant kecombrang, served with full lab specs: 78.5g protein, 125g carbs, 25g fat, 1240mg sodium, and 385mg potassium.",
     available: true,
-    batch: "FRI-05"
+    batch: "FRI-05",
   },
   {
     id: "m6",
@@ -119,11 +129,13 @@ const INITIAL_MENU_ITEMS = [
     image: "/images/sweet_sour_crispy_chicken.webp",
     tags_ID: ["Saturday / Sabtu", "80.5g Protein", "1114 Kkal"],
     tags_EN: ["Saturday", "80.5g Protein", "1114 Kcal"],
-    desc_ID: "Ayam renyah berbalut saus asam manis buatan sendiri yang segar, disajikan dengan spesifikasi nutrisi lengkap 80.5g protein, 135g karbo, 28g lemak, 1310mg natrium, dan 345mg kalium.",
-    desc_EN: "Crispy chicken tossed in a sweet and tangy homemade sauce, served with full lab specs: 80.5g protein, 135g carbs, 28g fat, 1310mg sodium, and 345mg potassium.",
+    desc_ID:
+      "Ayam renyah berbalut saus asam manis buatan sendiri yang segar, disajikan dengan spesifikasi nutrisi lengkap 80.5g protein, 135g karbo, 28g lemak, 1310mg natrium, dan 345mg kalium.",
+    desc_EN:
+      "Crispy chicken tossed in a sweet and tangy homemade sauce, served with full lab specs: 80.5g protein, 135g carbs, 28g fat, 1310mg sodium, and 345mg potassium.",
     available: true,
-    batch: "SAT-06"
-  }
+    batch: "SAT-06",
+  },
 ];
 
 const INITIAL_ORDERS = [
@@ -136,7 +148,7 @@ const INITIAL_ORDERS = [
     address: "Senopati Suites Tower 2, Jakarta Selatan",
     date: "2026-08-02",
     status: "Approved",
-    amount: 350000
+    amount: 350000,
   },
   {
     id: "ord-102",
@@ -147,7 +159,7 @@ const INITIAL_ORDERS = [
     address: "Pacific Place Residences Lt. 12, SCBD",
     date: "2026-08-02",
     status: "Pending",
-    amount: 1850000
+    amount: 1850000,
   },
   {
     id: "ord-103",
@@ -158,28 +170,32 @@ const INITIAL_ORDERS = [
     address: "Gopay Tower, Jl. HR Rasuna Said, Jakarta",
     date: "2026-08-01",
     status: "Delivered",
-    amount: 6800000
-  }
+    amount: 6800000,
+  },
 ];
 
 export function CplProvider({ children }) {
   const [menuItems, setMenuItems] = useState(INITIAL_MENU_ITEMS);
   const [orders, setOrders] = useState(INITIAL_ORDERS);
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
-  const [announcementText, setAnnouncementText] = useState("100% Lab Verified High Protein Meal Prep • Free Delivery Jabodetabek");
+  const [announcementText, setAnnouncementText] = useState(
+    "100% Lab Verified High Protein Meal Prep • Free Delivery Jabodetabek",
+  );
   const [storedLanguage] = useState(migrateStoredLanguage);
-  const [language, setLanguageState] = useState(storedLanguage || 'EN');
-  const [hasSelectedLanguage, setHasSelectedLanguage] = useState(Boolean(storedLanguage));
+  const [language, setLanguageState] = useState(storedLanguage || "EN");
+  const [hasSelectedLanguage, setHasSelectedLanguage] = useState(
+    Boolean(storedLanguage),
+  );
 
   const setLanguage = useCallback((nextLanguage) => {
-    if (nextLanguage !== 'ID' && nextLanguage !== 'EN') return;
+    if (nextLanguage !== "ID" && nextLanguage !== "EN") return;
     setLanguageState(nextLanguage);
     setHasSelectedLanguage(true);
-    writeStoredState('language', nextLanguage);
+    writeStoredState("language", nextLanguage);
   }, []);
 
   useEffect(() => {
-    document.documentElement.lang = language === 'ID' ? 'id' : 'en';
+    document.documentElement.lang = language === "ID" ? "id" : "en";
   }, [language]);
 
   // Comprehensive i18n Translation dictionary
@@ -198,7 +214,8 @@ export function CplProvider({ children }) {
       english: "English",
 
       // Announcement
-      announcement: "🔥 KATERING TINGGI PROTEIN & PILIHAN PROTEIN FLEKSIBEL • 100% Homemade Fresh Makassar • WA +62 851-1121-5704",
+      announcement:
+        "🔥 KATERING TINGGI PROTEIN & PILIHAN PROTEIN FLEKSIBEL • 100% Homemade Fresh Makassar • WA +62 851-1121-5704",
 
       // Hero Section
       heroEyebrow: "Katering Harian Tinggi Protein Makassar",
@@ -207,7 +224,8 @@ export function CplProvider({ children }) {
       heroTitle1: "GOOD FOOD.",
       heroTitle2: "CLEAR DATA.",
       heroTitle3: "BETTER YOU.",
-      heroSubtitle: "Makanan tinggi protein yang dibuat dengan ilmu pangan, data nutrisi yang jelas, dan rasa yang benar-benar ingin kamu nikmati.",
+      heroSubtitle:
+        "Makanan tinggi protein yang dibuat dengan ilmu pangan, data nutrisi yang jelas, dan rasa yang benar-benar ingin kamu nikmati.",
       heroAvgProtein: "Pilihan Protein Fleksibel",
       heroAvgProteinDesc: "Bebas Pilih 25g, 40g, 60g, 80g & 100g",
       heroWholeFood: "Harga Mulai Dari",
@@ -242,13 +260,17 @@ export function CplProvider({ children }) {
       // Brand Pillars
       pillarsEyebrow: "Standar Utama Katering CPL",
       pillarsTitle: "MENGAPA CLEAN PLATE LAB",
-      pillarsSubtitle: "Bagaimana kami merevolusi katering sehat harian di Makassar dengan formulasi tinggi protein, custom porsi 25g - 100g, olahan rumahan (homemade), dan kemasan food-grade.",
+      pillarsSubtitle:
+        "Bagaimana kami merevolusi katering sehat harian di Makassar dengan formulasi tinggi protein, custom porsi 25g - 100g, olahan rumahan (homemade), dan kemasan food-grade.",
       pillar1Title: "Formulasi Tinggi Protein",
-      pillar1Desc: "Setiap porsi katering didesain khusus tinggi protein (hingga 100g per porsi) untuk mendukung pembentukan otot kering dan metabolisme harian.",
+      pillar1Desc:
+        "Setiap porsi katering didesain khusus tinggi protein (hingga 100g per porsi) untuk mendukung pembentukan otot kering dan metabolisme harian.",
       pillar2Title: "Pilihan Protein Fleksibel",
-      pillar2Desc: "Pilih tingkat protein harianmu secara bebas: 25g, 40g, 60g, 80g, atau 100g protein sesuai target energi dan fitness unik Anda.",
+      pillar2Desc:
+        "Pilih tingkat protein harianmu secara bebas: 25g, 40g, 60g, 80g, atau 100g protein sesuai target energi dan fitness unik Anda.",
       pillar3Title: "100% Olahan Rumahan (Homemade)",
-      pillar3Desc: "Setiap hidangan dikemas dalam wadah food-grade khusus yang terjamin kebersihan, higiene, dan aman dipanaskan.",
+      pillar3Desc:
+        "Setiap hidangan dikemas dalam wadah food-grade khusus yang terjamin kebersihan, higiene, dan aman dipanaskan.",
       pillar1H1: "Pilihan 25g, 40g, 60g, 80g & 100g Protein",
       pillar1H2: "Formulasi Tinggi Protein & Rendah Kalori",
       pillar1H3: "Dimasak Segar secara Rumahan Setiap Hari",
@@ -262,7 +284,8 @@ export function CplProvider({ children }) {
       // Label Inspector / Generator
       labelEyebrow: "Inspektor Label Interaktif",
       labelTitle: "TRANSPARANSI MAKRO TANPA RAHASIA",
-      labelSubtitle: "Pilih porsi protein untuk melihat spesifikasi nutrisi lengkap laboratorium, komposisi bahan, dan estimasi harga.",
+      labelSubtitle:
+        "Pilih porsi protein untuk melihat spesifikasi nutrisi lengkap laboratorium, komposisi bahan, dan estimasi harga.",
       labelSelectMeal: "Pilih Menu Produk:",
       labelCustomBuilder: "Pilihan Tingkat Protein",
       labelIngredients: "Komposisi Bahan:",
@@ -274,7 +297,8 @@ export function CplProvider({ children }) {
       labelProteinTarget: "TARGET PROTEIN",
       labelComplexCarbs: "KARBOHIDRAT KOMPLEKS",
       labelHealthyFats: "LEMAK SEHAT",
-      labelCustomDesc: "Formulasi lab kustom menggunakan protein grass-fed terverifikasi CPL, biji-bijian kompleks organik, dan lemak cold-pressed.",
+      labelCustomDesc:
+        "Formulasi lab kustom menggunakan protein grass-fed terverifikasi CPL, biji-bijian kompleks organik, dan lemak cold-pressed.",
       labelSpecTitle: "SPESIFIKASI PRODUK CLEAN PLATE LAB",
       labelStandardStr: "Standard: GOOD FOOD. CLEAR DATA. BETTER YOU.",
       labelRecommended: "Rekomendasi Utama",
@@ -296,13 +320,17 @@ export function CplProvider({ children }) {
       // Packaging Section
       packEyebrow: "Standar Kebersihan & Kualitas",
       packTitle: "STANDAR KEMASAN FOOD-GRADE HYGIENIC",
-      packSubtitle: "Setiap hidangan Clean Plate Lab dikirim dalam kemasan food-grade terisolasi yang terjamin higienis untuk menjaga kualitas nutrisi.",
+      packSubtitle:
+        "Setiap hidangan Clean Plate Lab dikirim dalam kemasan food-grade terisolasi yang terjamin higienis untuk menjaga kualitas nutrisi.",
       packItem1Title: "Jaminan Kesegaran & Higiene",
-      packItem1Desc: "Wadah khusus menjaga keutuhan bahan. Bebas racun, BPA-free, serta dirancang rapat agar makanan tetap segar dan bersih.",
+      packItem1Desc:
+        "Wadah khusus menjaga keutuhan bahan. Bebas racun, BPA-free, serta dirancang rapat agar makanan tetap segar dan bersih.",
       packItem2Title: "Pengiriman Segar & Hangat",
-      packItem2Desc: "Pengiriman terisolasi dalam tas khusus untuk menjaga hidangan tetap hangat, segar, dan siap langsung disantap saat tiba di pintu rumah Anda di Makassar.",
+      packItem2Desc:
+        "Pengiriman terisolasi dalam tas khusus untuk menjaga hidangan tetap hangat, segar, dan siap langsung disantap saat tiba di pintu rumah Anda di Makassar.",
       packItem3Title: "Kemasan Food-Grade Safe",
-      packItem3Desc: "Bebas dari racun berbahaya & BPA-free untuk menjamin keamanan konsumsi harian Anda.",
+      packItem3Desc:
+        "Bebas dari racun berbahaya & BPA-free untuk menjamin keamanan konsumsi harian Anda.",
       packBoxRef: "REF BOX: CPL-FOODGRADE-2026",
       pack100Biodegradable: "100% Food-Grade Safe",
       packBoxSlogan: "MAKANAN YANG MEMBERIKAN LEBIH DARI SEJADINYA KENYANG.",
@@ -313,13 +341,15 @@ export function CplProvider({ children }) {
       packMicrowave: "AMAN MICROWAVE:",
       packMicrowaveVal: "YA (30-45 DETIK)",
       packFeature1: "Lengan makanan tersegel kedap udara mencegah oksidasi air",
-      packFeature2: "Desain praktis dapat dipanaskan ulang via microwave atau oven",
+      packFeature2:
+        "Desain praktis dapat dipanaskan ulang via microwave atau oven",
       packFeature3: "Kode batch cetak langsung di kemasan untuk riwayat audit",
 
       // Macro Calculator
       calcEyebrow: "Perhitungan Berbasis Sains",
       calcTitle: "KALKULATOR MAKRO HARIAN",
-      calcSubtitle: "Hitung kebutuhan kalori dan target nutrisi harianmu secara akurat dengan kontrol interaktif.",
+      calcSubtitle:
+        "Hitung kebutuhan kalori dan target nutrisi harianmu secara akurat dengan kontrol interaktif.",
       calcInputSection: "Input Metrik Tubuh",
       calcGender: "Jenis Kelamin",
       calcMale: "Pria",
@@ -348,7 +378,8 @@ export function CplProvider({ children }) {
       calcPlanCut: "Paket 60g Protein",
       calcPlanWellness: "Paket 25g Protein",
       calcMealsPerDay: "Makan / Hari",
-      calcRecSummary: "Target: {protein}g protein. Direkomendasikan: {plan} ({meals} box makanan segar harian).",
+      calcRecSummary:
+        "Target: {protein}g protein. Direkomendasikan: {plan} ({meals} box makanan segar harian).",
       calcSubscribeBtn: "Pesan {plan}",
       calcProteinTargetDesc: "• Hingga {ratio}g protein / kg berat badan.",
       calcBmrEstimate: "• Estimasi BMR:",
@@ -357,11 +388,14 @@ export function CplProvider({ children }) {
       // B2B Corporate Catering
       b2bEyebrow: "Solusi Perusahaan & Acara",
       b2bTitle: "KATERING B2B & SEHAT KANTOR",
-      b2bSubtitle: "Tingkatkan produktivitas tim kantor atau pusat kebugaran Anda dengan box katering tinggi protein terverifikasi di Makassar.",
+      b2bSubtitle:
+        "Tingkatkan produktivitas tim kantor atau pusat kebugaran Anda dengan box katering tinggi protein terverifikasi di Makassar.",
       b2bHeadline: "NUTRISI YANG MEMBERIKAN ENERGI LEBIH UNTUK TIM",
-      b2bDesc: "Rasa kantuk setelah makan siang mengurangi produktivitas. Clean Plate Lab menggantikan katering berminyak dengan nutrisi tinggi protein yang menjaga fokus mental sepanjang hari.",
+      b2bDesc:
+        "Rasa kantuk setelah makan siang mengurangi produktivitas. Clean Plate Lab menggantikan katering berminyak dengan nutrisi tinggi protein yang menjaga fokus mental sepanjang hari.",
       b2bCard1Title: "Makan Siang Kantor Tech",
-      b2bCard1Desc: "Box ramah lingkungan harian berlabel nama karyawan dan makro lengkap.",
+      b2bCard1Desc:
+        "Box ramah lingkungan harian berlabel nama karyawan dan makro lengkap.",
       b2bCard2Title: "Pusat Gym & Kebugaran",
       b2bCard2Desc: "Kulkas kemitraan untuk gym CrossFit dan studio kebugaran.",
       b2bFeature1: "Dashboard makro perusahaan & portal preferensi karyawan",
@@ -385,11 +419,13 @@ export function CplProvider({ children }) {
       // Order Modal
       orderInquiryBadge: "Pemesanan Catering CPL Makassar",
       orderModalTitle: "Formulir Pemesanan Meal Plan CPL",
-      orderModalSub: "Pilih tingkat protein dan lengkapi data untuk memesan via WhatsApp.",
+      orderModalSub:
+        "Pilih tingkat protein dan lengkapi data untuk memesan via WhatsApp.",
       orderCustomerDetails: "Data pemesan",
       orderProteinTier: "Pilih porsi protein",
       orderDeliveryHighlight: "1–2 box segar, setiap hari",
-      orderDeliveryDetail: "Pilih 1 atau 2 porsi per hari. Pesanan disiapkan setiap Senin-Sabtu dan hari Minggu tidak dihitung.",
+      orderDeliveryDetail:
+        "Pilih 1 atau 2 porsi per hari. Pesanan disiapkan setiap Senin-Sabtu dan hari Minggu tidak dihitung.",
       orderDeliverySchedule: "Periode & jadwal katering",
       orderSummary: "Ringkasan pesanan",
       orderSelectedPlan: "Paket terpilih",
@@ -404,17 +440,20 @@ export function CplProvider({ children }) {
       orderPhonePlaceholder: "0812 3456 7890",
       orderNameReqError: "Nama lengkap wajib diisi",
       orderPhoneReqError: "Nomor WhatsApp wajib diisi",
-      orderPhoneMinError: "Nomor WhatsApp minimal 10 digit (contoh: 081234567890)",
+      orderPhoneMinError:
+        "Nomor WhatsApp minimal 10 digit (contoh: 081234567890)",
       orderAddressReqError: "Alamat pengiriman lengkap wajib diisi",
       orderMapsInvalidError: "Masukkan tautan Google Maps yang valid",
       orderStartDateError: "Tanggal mulai wajib dipilih",
       orderEndDateError: "Tanggal selesai wajib dipilih",
       orderPastDateError: "Tanggal mulai tidak boleh sebelum hari ini (WITA)",
-      orderDateRangeError: "Tanggal selesai harus sama atau setelah tanggal mulai",
+      orderDateRangeError:
+        "Tanggal selesai harus sama atau setelah tanggal mulai",
       orderFormErrorNotice: "Mohon lengkapi data pemesanan yang bertanda merah",
       orderPlan: "Pilih Porsi Protein",
       orderSelectProteinLabel: "Pilih Porsi Protein Katering:",
-      orderDailyDeliveryNote: "💡 Pilih 1 atau 2 box per hari sesuai kebutuhan katering Anda",
+      orderDailyDeliveryNote:
+        "💡 Pilih 1 atau 2 box per hari sesuai kebutuhan katering Anda",
       orderDeliveryPeriodLabel: "Periode Katering",
       orderDateRangeLabel: "Rentang Tanggal:",
       orderEstimatedTotalCostLabel: "Total Biaya",
@@ -426,10 +465,12 @@ export function CplProvider({ children }) {
       orderPlanOpt5: "100g Protein Plan - mulai Rp 65.000 / porsi",
       orderPlanOpt6: "Inquiry Katering Perusahaan / B2B Makassar",
       orderAddress: "Alamat Pengiriman Lengkap (Makassar)",
-      orderAddressPlaceholder: "Jl. G. Bulusaraung, nama gedung, atau alamat lengkap Anda...",
+      orderAddressPlaceholder:
+        "Jl. G. Bulusaraung, nama gedung, atau alamat lengkap Anda...",
       orderMapsLink: "Titik Google Maps (Opsional)",
       orderMapsPlaceholder: "Tempel link lokasi dari Google Maps...",
-      orderMapsHelp: "Buka Google Maps, pilih Bagikan, lalu tempel tautan lokasi di sini.",
+      orderMapsHelp:
+        "Buka Google Maps, pilih Bagikan, lalu tempel tautan lokasi di sini.",
       orderMapsSummary: "Titik Google Maps",
       orderStartDate: "Tanggal Mulai Katering",
       orderEndDate: "Tanggal Selesai Katering",
@@ -437,24 +478,28 @@ export function CplProvider({ children }) {
       orderTotalCost: "Total Biaya (Total Hari × Harga)",
       orderDaysUnit: "Hari",
       orderSubmit: "Kirim Pemesanan via WhatsApp",
-      orderGuaranteeNote: "Jaminan Kesegaran Lab • Langsung Terhubung ke WhatsApp CPL",
+      orderGuaranteeNote:
+        "Jaminan Kesegaran Lab • Langsung Terhubung ke WhatsApp CPL",
       orderSuccessMsg: "Pemesanan Berhasil Terkirim!",
       orderSuccessBadge: "Pemesanan Catering Terhubung",
-      orderSuccessDetail: "Terima kasih, {name}! Permintaan pesanan {plan} Anda telah diteruskan ke Concierge WhatsApp Clean Plate Lab.",
+      orderSuccessDetail:
+        "Terima kasih, {name}! Permintaan pesanan {plan} Anda telah diteruskan ke Concierge WhatsApp Clean Plate Lab.",
       orderOpenWaCta: "Buka Chat WhatsApp",
       orderTicketTitle: "Ringkasan Pesanan Meal Plan",
       orderBackBtn: "Kembali ke Beranda",
 
       // Footer
-      footerDesc: "Clean Plate Lab — Layanan katering tinggi protein terverifikasi laboratorium pertama di Kota Makassar.",
+      footerDesc:
+        "Clean Plate Lab — Layanan katering tinggi protein terverifikasi laboratorium pertama di Kota Makassar.",
       footerQuickLinks: "Navigasi Cepat",
       footerKitchenContact: "Dapur & Kontak",
-      footerCentralKitchen: "Jalan G. Bulusaraung no. 18AA, RW.01, Pisang Utara, Kec. Ujung Pandang, Kota Makassar, Sulawesi Selatan 90115",
+      footerCentralKitchen:
+        "Jalan G. Bulusaraung no. 18AA, RW.01, Pisang Utara, Kec. Ujung Pandang, Kota Makassar, Sulawesi Selatan 90115",
       footerKitchenMapsLink: "Buka di Google Maps",
       footerLegal: "Hak Cipta Dilindungi Undang-Undang.",
       footerMadeForTomorrow: "DIBUAT UNTUK HARI ESOK YANG LEBIH BAIK.",
       footerBackToTop: "Kembali Ke Atas",
-      adminPortal: "Portal Admin CMS"
+      adminPortal: "Portal Admin CMS",
     },
     EN: {
       // Navbar & General
@@ -468,7 +513,8 @@ export function CplProvider({ children }) {
       switchLanguage: "Select Language",
       indonesian: "Indonesia",
       english: "English",
-      announcement: "🔥 HIGH PROTEIN & CUSTOMIZABLE PROTEIN CATERING • 100% Homemade Fresh Makassar • WA +62 851-1121-5704",
+      announcement:
+        "🔥 HIGH PROTEIN & CUSTOMIZABLE PROTEIN CATERING • 100% Homemade Fresh Makassar • WA +62 851-1121-5704",
 
       // Hero Section
       heroEyebrow: "Daily High Protein Catering Makassar",
@@ -477,7 +523,8 @@ export function CplProvider({ children }) {
       heroTitle1: "GOOD FOOD.",
       heroTitle2: "CLEAR DATA.",
       heroTitle3: "BETTER YOU.",
-      heroSubtitle: "High-protein meals made with food science, clear nutrition data, and food you actually want to eat.",
+      heroSubtitle:
+        "High-protein meals made with food science, clear nutrition data, and food you actually want to eat.",
       heroAvgProtein: "Customizable Protein",
       heroAvgProteinDesc: "Select 25g, 40g, 60g, 80g & 100g",
       heroWholeFood: "Starting Price",
@@ -512,13 +559,17 @@ export function CplProvider({ children }) {
       // Brand Pillars
       pillarsEyebrow: "The CPL Difference",
       pillarsTitle: "WHY CLEAN PLATE LAB",
-      pillarsSubtitle: "How we revolutionize daily healthy catering in Makassar with high protein formulations, custom 25g - 100g protein tiers, fresh homemade cooking, and food-grade packaging.",
+      pillarsSubtitle:
+        "How we revolutionize daily healthy catering in Makassar with high protein formulations, custom 25g - 100g protein tiers, fresh homemade cooking, and food-grade packaging.",
       pillar1Title: "High Protein Formulations",
-      pillar1Desc: "Every meal portion is specially engineered to deliver high protein density (up to 100g per meal) for lean muscle growth and metabolic support.",
+      pillar1Desc:
+        "Every meal portion is specially engineered to deliver high protein density (up to 100g per meal) for lean muscle growth and metabolic support.",
       pillar2Title: "Customizable Protein Tiers",
-      pillar2Desc: "Tailor your daily protein intake: select 25g, 40g, 60g, 80g, or 100g protein to match your specific energy and fitness goals.",
+      pillar2Desc:
+        "Tailor your daily protein intake: select 25g, 40g, 60g, 80g, or 100g protein to match your specific energy and fitness goals.",
       pillar3Title: "100% Fresh Homemade Prep",
-      pillar3Desc: "Every meal is packed in food-grade safe containers ensuring cleanliness, safety, and reheating convenience.",
+      pillar3Desc:
+        "Every meal is packed in food-grade safe containers ensuring cleanliness, safety, and reheating convenience.",
       pillar1H1: "Choose 25g, 40g, 60g, 80g & 100g Protein",
       pillar1H2: "High Protein & Low Calorie Balance",
       pillar1H3: "Fresh Homemade Batch Cooking Daily",
@@ -532,7 +583,8 @@ export function CplProvider({ children }) {
       // Label Inspector / Generator
       labelEyebrow: "Interactive Label Inspector",
       labelTitle: "NO SECRETS. FULL MACRO TRANSPARENCY",
-      labelSubtitle: "Select protein tier to inspect complete lab nutrition specs, ingredients list, and price estimates.",
+      labelSubtitle:
+        "Select protein tier to inspect complete lab nutrition specs, ingredients list, and price estimates.",
       labelSelectMeal: "Select Meal Product:",
       labelCustomBuilder: "Protein Tier Selection",
       labelIngredients: "Ingredient Composition:",
@@ -544,7 +596,8 @@ export function CplProvider({ children }) {
       labelProteinTarget: "PROTEIN TARGET",
       labelComplexCarbs: "COMPLEX CARBS",
       labelHealthyFats: "HEALTHY FATS",
-      labelCustomDesc: "Custom lab formulation using CPL certified grass-fed proteins, organic complex grains, and cold-pressed fats.",
+      labelCustomDesc:
+        "Custom lab formulation using CPL certified grass-fed proteins, organic complex grains, and cold-pressed fats.",
       labelSpecTitle: "CLEAN PLATE LAB PRODUCT SPEC",
       labelStandardStr: "Standard: Good Food. Clear Data. Better You.",
       labelRecommended: "Main Recommendation",
@@ -566,13 +619,17 @@ export function CplProvider({ children }) {
       // Packaging Section
       packEyebrow: "Hygiene & Quality Standards",
       packTitle: "FOOD-GRADE HYGIENIC PACKAGING STANDARD",
-      packSubtitle: "Every Clean Plate Lab meal is delivered in food-grade insulated containers designed to preserve peak nutritional freshness and cleanliness.",
+      packSubtitle:
+        "Every Clean Plate Lab meal is delivered in food-grade insulated containers designed to preserve peak nutritional freshness and cleanliness.",
       packItem1Title: "Freshness & Hygiene Guarantee",
-      packItem1Desc: "Custom containers protect ingredient integrity. Non-toxic, BPA-free, and sealed so food stays pristine.",
+      packItem1Desc:
+        "Custom containers protect ingredient integrity. Non-toxic, BPA-free, and sealed so food stays pristine.",
       packItem2Title: "Fresh & Warm Daily Transit",
-      packItem2Desc: "Insulated thermal delivery keeping your meal warm, fresh, and ready to enjoy immediately upon arrival at your doorstep in Makassar.",
+      packItem2Desc:
+        "Insulated thermal delivery keeping your meal warm, fresh, and ready to enjoy immediately upon arrival at your doorstep in Makassar.",
       packItem3Title: "Food-Grade Safe Packaging",
-      packItem3Desc: "BPA-free non-toxic materials for maximum daily meal consumption safety.",
+      packItem3Desc:
+        "BPA-free non-toxic materials for maximum daily meal consumption safety.",
       packBoxRef: "BOX REF: CPL-FOODGRADE-2026",
       pack100Biodegradable: "100% Food-Grade Safe",
       packBoxSlogan: "MEALS THAT DO MORE THAN FILL.",
@@ -584,12 +641,14 @@ export function CplProvider({ children }) {
       packMicrowaveVal: "YES (30-45 SECS)",
       packFeature1: "Hermetically sealed meal sleeves prevent air oxidation",
       packFeature2: "Easy reheatable design for microwave or oven warming",
-      packFeature3: "Custom batch code printed directly on sleeve for audit trail",
+      packFeature3:
+        "Custom batch code printed directly on sleeve for audit trail",
 
       // Macro Calculator
       calcEyebrow: "Science-Backed Calculation",
       calcTitle: "DAILY MACRO CALCULATOR",
-      calcSubtitle: "Calculate your daily caloric expenditure and target macros using interactive controls.",
+      calcSubtitle:
+        "Calculate your daily caloric expenditure and target macros using interactive controls.",
       calcInputSection: "Input Body Metrics",
       calcGender: "Gender",
       calcMale: "Male",
@@ -618,7 +677,8 @@ export function CplProvider({ children }) {
       calcPlanCut: "60g Protein Plan",
       calcPlanWellness: "25g Protein Plan",
       calcMealsPerDay: "Meals / Day",
-      calcRecSummary: "Target: {protein}g protein. Recommended: {plan} ({meals} fresh meal boxes daily).",
+      calcRecSummary:
+        "Target: {protein}g protein. Recommended: {plan} ({meals} fresh meal boxes daily).",
       calcSubscribeBtn: "Order {plan}",
       calcProteinTargetDesc: "• Up to {ratio}g protein / kg body weight.",
       calcBmrEstimate: "• Estimated BMR:",
@@ -627,15 +687,21 @@ export function CplProvider({ children }) {
       // B2B Corporate Catering
       b2bEyebrow: "Corporate & Events Solution",
       b2bTitle: "B2B & OFFICE WELLNESS CATERING",
-      b2bSubtitle: "Fuel your tech team, fitness center, or corporate event with high-protein, laboratory-verified meal boxes delivered fresh in Makassar.",
+      b2bSubtitle:
+        "Fuel your tech team, fitness center, or corporate event with high-protein, laboratory-verified meal boxes delivered fresh in Makassar.",
       b2bHeadline: "MEALS THAT DO MORE THAN FILL YOUR TEAM",
-      b2bDesc: "Post-lunch brain fog costs companies hours of productivity. Clean Plate Lab replaces heavy, oily traditional catering with balanced, high-protein nutrition that sustains mental focus.",
+      b2bDesc:
+        "Post-lunch brain fog costs companies hours of productivity. Clean Plate Lab replaces heavy, oily traditional catering with balanced, high-protein nutrition that sustains mental focus.",
       b2bCard1Title: "Tech Office Lunch",
-      b2bCard1Desc: "Daily individual eco-boxes labeled with employee names & macros.",
+      b2bCard1Desc:
+        "Daily individual eco-boxes labeled with employee names & macros.",
       b2bCard2Title: "Gym & Fitness Hubs",
-      b2bCard2Desc: "Partner fridge placement for CrossFit boxes and boutique gyms.",
-      b2bFeature1: "Custom company macro dashboard & employee preference portal",
-      b2bFeature2: "Temperature-controlled thermal delivery at your exact requested hour",
+      b2bCard2Desc:
+        "Partner fridge placement for CrossFit boxes and boutique gyms.",
+      b2bFeature1:
+        "Custom company macro dashboard & employee preference portal",
+      b2bFeature2:
+        "Temperature-controlled thermal delivery at your exact requested hour",
       b2bFeature3: "Dedicated corporate nutrition concierge",
       b2bEstimatorTitle: "CORPORATE COST ESTIMATOR",
       b2bTierPricing: "B2B Tier Pricing",
@@ -655,11 +721,13 @@ export function CplProvider({ children }) {
       // Order Modal
       orderInquiryBadge: "CPL Order Inquiry Makassar",
       orderModalTitle: "CPL Meal Plan Inquiry Form",
-      orderModalSub: "Choose your protein tier and fill details to order via WhatsApp.",
+      orderModalSub:
+        "Choose your protein tier and fill details to order via WhatsApp.",
       orderCustomerDetails: "Customer details",
       orderProteinTier: "Choose protein portion",
       orderDeliveryHighlight: "1–2 fresh boxes, every day",
-      orderDeliveryDetail: "Choose one or two servings per day. Meals are prepared Monday-Saturday; Sundays are excluded.",
+      orderDeliveryDetail:
+        "Choose one or two servings per day. Meals are prepared Monday-Saturday; Sundays are excluded.",
       orderDeliverySchedule: "Catering period & schedule",
       orderSummary: "Order summary",
       orderSelectedPlan: "Selected plan",
@@ -674,7 +742,8 @@ export function CplProvider({ children }) {
       orderPhonePlaceholder: "0812 3456 7890",
       orderNameReqError: "Full name is required",
       orderPhoneReqError: "WhatsApp phone number is required",
-      orderPhoneMinError: "WhatsApp number must be at least 10 digits (e.g. 081234567890)",
+      orderPhoneMinError:
+        "WhatsApp number must be at least 10 digits (e.g. 081234567890)",
       orderAddressReqError: "Full delivery address is required",
       orderMapsInvalidError: "Enter a valid Google Maps link",
       orderStartDateError: "Catering start date is required",
@@ -684,7 +753,8 @@ export function CplProvider({ children }) {
       orderFormErrorNotice: "Please complete all highlighted fields correctly",
       orderPlan: "Select Protein Tier",
       orderSelectProteinLabel: "Select Catering Protein Portion:",
-      orderDailyDeliveryNote: "💡 Choose one or two boxes per day for your catering plan",
+      orderDailyDeliveryNote:
+        "💡 Choose one or two boxes per day for your catering plan",
       orderDeliveryPeriodLabel: "Catering Period",
       orderDateRangeLabel: "Date Range:",
       orderEstimatedTotalCostLabel: "Total Cost",
@@ -696,10 +766,12 @@ export function CplProvider({ children }) {
       orderPlanOpt5: "100g Protein Plan - from Rp 65,000 / portion",
       orderPlanOpt6: "Corporate / B2B Catering Inquiry Makassar",
       orderAddress: "Full Delivery Address (Makassar)",
-      orderAddressPlaceholder: "Street address, building name, unit number in Makassar...",
+      orderAddressPlaceholder:
+        "Street address, building name, unit number in Makassar...",
       orderMapsLink: "Google Maps Pin (Optional)",
       orderMapsPlaceholder: "Paste the Google Maps location link...",
-      orderMapsHelp: "Open Google Maps, choose Share, then paste the location link here.",
+      orderMapsHelp:
+        "Open Google Maps, choose Share, then paste the location link here.",
       orderMapsSummary: "Google Maps pin",
       orderStartDate: "Catering Start Date",
       orderEndDate: "Catering End Date",
@@ -707,29 +779,33 @@ export function CplProvider({ children }) {
       orderTotalCost: "Total Cost (Total Days × Price)",
       orderDaysUnit: "Days",
       orderSubmit: "Submit Order via WhatsApp",
-      orderGuaranteeNote: "Lab Fresh Guarantee • Direct Connect to CPL WhatsApp",
+      orderGuaranteeNote:
+        "Lab Fresh Guarantee • Direct Connect to CPL WhatsApp",
       orderSuccessMsg: "Order Request Sent Successfully!",
       orderSuccessBadge: "Catering Order Connected",
-      orderSuccessDetail: "Thank you, {name}! Your order request for {plan} has been forwarded to WhatsApp Clean Plate Lab Concierge.",
+      orderSuccessDetail:
+        "Thank you, {name}! Your order request for {plan} has been forwarded to WhatsApp Clean Plate Lab Concierge.",
       orderOpenWaCta: "Open WhatsApp Chat",
       orderTicketTitle: "Meal Plan Order Summary",
       orderBackBtn: "Back to Overview",
 
       // Footer
-      footerDesc: "Clean Plate Lab — Indonesia’s premier laboratory-verified high protein meal prep service based in Makassar City.",
+      footerDesc:
+        "Clean Plate Lab — Indonesia’s premier laboratory-verified high protein meal prep service based in Makassar City.",
       footerQuickLinks: "Quick Navigation",
       footerKitchenContact: "Kitchen & Contact",
-      footerCentralKitchen: "Jalan G. Bulusaraung no. 18AA, RW.01, Pisang Utara, Ujung Pandang, Makassar City, South Sulawesi 90115",
+      footerCentralKitchen:
+        "Jalan G. Bulusaraung no. 18AA, RW.01, Pisang Utara, Ujung Pandang, Makassar City, South Sulawesi 90115",
       footerKitchenMapsLink: "Open in Google Maps",
       footerLegal: "All rights reserved.",
       footerMadeForTomorrow: "MADE FOR A BETTER TOMORROW.",
       footerBackToTop: "Back To Top",
-      adminPortal: "CMS Admin Portal"
-    }
+      adminPortal: "CMS Admin Portal",
+    },
   };
 
   const t = (key) => {
-    return translations[language]?.[key] || translations['EN']?.[key] || key;
+    return translations[language]?.[key] || translations["EN"]?.[key] || key;
   };
 
   // Add new meal item
@@ -738,19 +814,23 @@ export function CplProvider({ children }) {
       ...item,
       id: `m${Date.now()}`,
       code: item.code || `CPL-0${menuItems.length + 14}`,
-      available: true
+      available: true,
     };
-    setMenuItems(prev => [newItem, ...prev]);
+    setMenuItems((prev) => [newItem, ...prev]);
   };
 
   // Update existing meal item
   const updateMenuItem = (id, updatedFields) => {
-    setMenuItems(prev => prev.map(item => item.id === id ? { ...item, ...updatedFields } : item));
+    setMenuItems((prev) =>
+      prev.map((item) =>
+        item.id === id ? { ...item, ...updatedFields } : item,
+      ),
+    );
   };
 
   // Delete meal item
   const deleteMenuItem = (id) => {
-    setMenuItems(prev => prev.filter(item => item.id !== id));
+    setMenuItems((prev) => prev.filter((item) => item.id !== id));
   };
 
   // Add new order
@@ -760,34 +840,38 @@ export function CplProvider({ children }) {
       id: `ord-${Date.now()}`,
       refCode: `CPL-SUB-2026-${Math.floor(10 + Math.random() * 90)}`,
       date: getDateInputValueInTimeZone(),
-      status: "Pending"
+      status: "Pending",
     };
-    setOrders(prev => [newOrder, ...prev]);
+    setOrders((prev) => [newOrder, ...prev]);
   };
 
   // Update order status
   const updateOrderStatus = (id, status) => {
-    setOrders(prev => prev.map(ord => ord.id === id ? { ...ord, status } : ord));
+    setOrders((prev) =>
+      prev.map((ord) => (ord.id === id ? { ...ord, status } : ord)),
+    );
   };
 
   return (
-    <CplContext.Provider value={{
-      menuItems,
-      addMenuItem,
-      updateMenuItem,
-      deleteMenuItem,
-      orders,
-      addOrder,
-      updateOrderStatus,
-      isAdminLoggedIn,
-      setIsAdminLoggedIn,
-      announcementText,
-      setAnnouncementText,
-      language,
-      setLanguage,
-      hasSelectedLanguage,
-      t
-    }}>
+    <CplContext.Provider
+      value={{
+        menuItems,
+        addMenuItem,
+        updateMenuItem,
+        deleteMenuItem,
+        orders,
+        addOrder,
+        updateOrderStatus,
+        isAdminLoggedIn,
+        setIsAdminLoggedIn,
+        announcementText,
+        setAnnouncementText,
+        language,
+        setLanguage,
+        hasSelectedLanguage,
+        t,
+      }}
+    >
       {children}
     </CplContext.Provider>
   );
