@@ -49,7 +49,7 @@ export function MacroCalculator({ onOpenOrder }) {
 
   const recommendedMealsPerDay = 2;
   const recommendedTierData = proteinTiers.find((tier) => tier.protein === recommendedProteinTier) || proteinTiers[0];
-  const recommendedPlanName = `${recommendedProteinTier}g ${language === 'ID' ? 'Protein' : 'Protein Plan'} (${formatCurrency(recommendedTierData.prices.daily)})`;
+  const recommendedPlanName = `${recommendedProteinTier}g ${language === 'ID' ? 'Protein' : 'Protein Plan'}`;
   const upToLabel = language === 'ID' ? 'Hingga' : 'Up to';
   const activityOptions = [
     { value: 1.2, label: t('calcActivitySedentary') },
