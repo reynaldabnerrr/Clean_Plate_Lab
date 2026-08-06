@@ -34,6 +34,24 @@ function fmtDate(value, locale) {
   };
 }
 
+function countDeliveryDays(start, end) {
+  if (!start || !end) return 0;
+
+  const startDate = new Date(`${start}T00:00:00Z`);
+  const endDate = new Date(`${end}T00:00:00Z`);
+  if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime()) || endDate < startDate) return 0;
+
+  let days = 0;
+  const cursor = new Date(startDate);
+
+  while (cursor <= endDate) {
+    if (cursor.getUTCDay() !== 0) days += 1;
+    cursor.setUTCDate(cursor.getUTCDate() + 1);
+  }
+
+  return days;
+}
+
 function getMonthOffset(value, baseYear, baseMonth) {
   if (!value) return 0;
 
@@ -282,10 +300,7 @@ export function DateRangePicker({
   const locale = isIndonesian ? 'id-ID' : 'en-GB';
   const sp = fmtDate(startDate, locale);
   const ep = fmtDate(endDate, locale);
-  const totalDays = (() => {
-    if (!startDate || !endDate) return 0;
-    return Math.max(0, Math.round((new Date(`${endDate}T00:00:00Z`) - new Date(`${startDate}T00:00:00Z`)) / 86400000));
-  })();
+  const totalDays = countDeliveryDays(startDate, endDate);
 
   const dayLabel = isIndonesian ? `${totalDays} hari` : `${totalDays} ${totalDays === 1 ? 'day' : 'days'}`;
   const periodLabel = isIndonesian ? 'Periode Katering' : 'Catering Period';
