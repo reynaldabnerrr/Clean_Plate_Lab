@@ -213,7 +213,7 @@ export function Navbar({ onOpenOrder }) {
               variant="default"
               size="default"
               onClick={onOpenOrder}
-              className="hidden md:flex items-center gap-2 rounded-full bg-[#D1954E] hover:bg-[#B8803C] active:scale-[0.98] text-[#FEFDF9] font-extrabold text-xs shadow-md hover:shadow-lg transition-all transform hover:scale-[1.02] min-h-[40px] px-4.5 shrink-0 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-[#D1954E]"
+              className="hidden md:flex items-center gap-2 rounded-full bg-[#8A9C7A] hover:bg-[#647554] active:scale-[0.98] text-white font-extrabold text-xs shadow-md hover:shadow-lg transition-all transform hover:scale-[1.02] min-h-[40px] px-4.5 shrink-0 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-[#8A9C7A]"
             >
               <span>{copy.nav.build}</span>
               <ArrowRight size={14} />
@@ -296,7 +296,7 @@ export function Navbar({ onOpenOrder }) {
               <Button 
                 variant="default" 
                 onClick={() => { setMobileMenuOpen(false); onOpenOrder(); }} 
-                className="flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[#D1954E] px-5 text-xs font-extrabold text-[#FEFDF9] shadow-md transition-transform hover:bg-[#B8803C] active:scale-[0.98]"
+                className="flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[#8A9C7A] px-5 text-xs font-extrabold text-white shadow-md transition-transform hover:bg-[#647554] active:scale-[0.98]"
               >
                 <span>{copy.nav.build}</span>
                 <ArrowRight size={16} />

@@ -5,6 +5,7 @@ export const WHATSAPP_NUMBER = '6285111215704';
 export const WHATSAPP_DISPLAY = '+62 851-1121-5704';
 export const CONTACT_EMAIL = 'cleanplatelab.id@gmail.com';
 export const ORDER_TIME_ZONE = 'Asia/Makassar';
+export const CENTRAL_KITCHEN_MAPS_LINK = 'https://maps.app.goo.gl/jdJGvQTAin6SwYgq7';
 
 export function getDateInputValueInTimeZone(date = new Date(), timeZone = ORDER_TIME_ZONE) {
   const dateParts = new Intl.DateTimeFormat('en-US', {

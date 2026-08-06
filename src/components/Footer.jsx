@@ -3,7 +3,7 @@ import { CplPrimaryLogo } from './CplLogo';
 import { Mail, MapPin, Phone, ArrowUp } from 'lucide-react';
 import { useCpl } from '../hooks/useCpl';
 import { useSiteCopy } from '../hooks/useSiteCopy';
-import { CONTACT_EMAIL, WHATSAPP_DISPLAY, WHATSAPP_NUMBER } from '../lib/order';
+import { CONTACT_EMAIL, WHATSAPP_DISPLAY, WHATSAPP_NUMBER, CENTRAL_KITCHEN_MAPS_LINK } from '../lib/order';
 
 const InstagramIcon = ({ size = 18, className = "" }) => (
   <svg 
@@ -75,10 +75,17 @@ export function Footer() {
               {t('footerKitchenContact')}
             </h4>
             <div className="space-y-3 text-xs text-gray-300 font-sans">
-              <div className="flex items-start gap-2.5">
-                <MapPin size={18} className="text-[#8D9B7D] flex-shrink-0 mt-0.5" />
-                <span className="leading-relaxed">{t('footerCentralKitchen')}</span>
-              </div>
+                <div className="flex items-start gap-2.5">
+                  <MapPin size={18} className="text-[#8D9B7D] flex-shrink-0 mt-0.5" />
+                  <a
+                    href={CENTRAL_KITCHEN_MAPS_LINK}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="leading-relaxed hover:text-[#8D9B7D] hover:underline"
+                  >
+                    {t('footerCentralKitchen')}
+                  </a>
+                </div>
               
               <div className="flex items-center gap-2.5">
                 <Phone size={18} className="text-[#8D9B7D] flex-shrink-0" />

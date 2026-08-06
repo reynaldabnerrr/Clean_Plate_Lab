@@ -10,9 +10,10 @@ import { addons, proteinTiers } from '../data/site';
 import { analytics } from '../lib/analytics';
 import { readStoredState, writeStoredState } from '../lib/storage';
 import {
-  addDaysToDateInputValue,
+   addDaysToDateInputValue,
   getDateInputValueInTimeZone,
   WHATSAPP_NUMBER,
+  CENTRAL_KITCHEN_MAPS_LINK,
 } from '../lib/order';
 import {
   AlertCircle,
@@ -21,6 +22,7 @@ import {
   Check,
   CheckCircle,
   Clock3,
+  Copy,
   Link2,
   MapPin,
   MessageCircle,
@@ -131,7 +133,7 @@ export function OrderModal({ isOpen, onClose, initialProteinTier = 40, initialMe
   const [addonIds, setAddonIds] = useState(storedDraft?.addonIds ?? []);
   const [fulfillment, setFulfillment] = useState(storedDraft?.fulfillment ?? 'Self-arranged');
   const [address, setAddress] = useState('');
-  const [mapsUrl, setMapsUrl] = useState('');
+  const [mapsUrl, setMapsUrl] = useState(storedDraft?.mapsUrl ?? '');
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState({});
   const [selectedPeriod, setSelectedPeriod] = useState(null);
@@ -853,7 +855,8 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
                   </div>
                 </div> : <div className="mt-3 rounded-lg border border-[#8D9B7D]/40 bg-[#E1ECD3] px-3 py-2 text-[9px] font-semibold leading-4 text-[#6B7860]">
                   <p>{orderCopy.selfArrangedNote}</p>
-                  <p className="mt-1.5 flex items-start gap-1.5 font-bold text-[#3A4A30]"><MapPin size={12} className="mt-0.5 shrink-0" /><span>{centralKitchenAddress}</span></p>
+                  <p className="mt-1.5 flex items-start gap-1.5 font-bold text-[#3A4A30]"><MapPin size={12} className="mt-0.5 shrink-0" /><a href={CENTRAL_KITCHEN_MAPS_LINK} target="_blank" rel="noopener noreferrer" className="hover:text-[#8D9B7D] hover:underline">{centralKitchenAddress}</a></p>
+                  <button type="button" onClick={() => navigator.clipboard.writeText(CENTRAL_KITCHEN_MAPS_LINK)} className="mt-1.5 inline-flex items-center gap-1 rounded bg-[#1E1E1E]/10 px-2 py-1 font-mono text-[8px] font-bold text-[#3A4A30] hover:bg-[#1E1E1E]/20">Copy link <Copy size={10} /></button>
                 </div>}
 
                 <div className="mt-5 overflow-hidden rounded-2xl border-2 border-[#8D9B7D] bg-[#E1ECD3]" aria-live="polite">
@@ -1026,14 +1029,28 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
                   <div>
                     <p className="font-display text-[9px] font-bold uppercase tracking-wider text-[#6B7860]">{orderCopy.fulfillment}</p>
                     <p className="mt-0.5 text-[10px] font-bold text-[#1E1E1E]">{selectedFulfillmentLabel}</p>
+                    {requiresDeliveryAddress ? (
+                      <div className="sm:col-span-2">
+                        <p className="font-display text-[9px] font-bold uppercase tracking-wider text-[#6B7860]">{orderCopy.deliveryDestination}</p>
+                        <p className="mt-0.5 text-[10px] font-bold leading-4 text-[#1E1E1E]">{address}</p>
+                        {mapsUrl.trim() ? (
+                          <div className="mt-1 flex items-center justify-between gap-2 break-all">
+                            <a href={mapsUrl.trim()} target="_blank" rel="noopener noreferrer" className="inline-flex items-start gap-1 text-[9px] font-semibold text-[#6B7860] underline underline-offset-2"><Link2 size={10} className="mt-0.5 shrink-0" />{mapsUrl.trim()}</a>
+                            <button type="button" onClick={() => navigator.clipboard.writeText(mapsUrl.trim())} className="inline-flex items-center gap-1 rounded bg-[#1E1E1E]/10 px-2 py-1 font-mono text-[8px] font-bold text-[#6B7860] hover:bg-[#1E1E1E]/20">Copy {t('orderMapsSummary')}</button>
+                          </div>
+                        ) : null}
+                      </div>
+                    ) : (
+                      <div className="mt-1">
+                        <p className="font-display text-[9px] font-bold uppercase tracking-wider text-[#6B7860]">{orderCopy.centralKitchen}</p>
+                        <p className="mt-0.5 break-words text-[10px] font-bold leading-4 text-[#1E1E1E]">{centralKitchenAddress}</p>
+                        <div className="mt-1 flex items-center justify-between gap-2 break-all">
+                          <a href={CENTRAL_KITCHEN_MAPS_LINK} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-[9px] font-semibold text-[#6B7860] underline underline-offset-2"><Link2 size={10} />{t('footerKitchenMapsLink')}</a>
+                          <button type="button" onClick={() => navigator.clipboard.writeText(CENTRAL_KITCHEN_MAPS_LINK)} className="inline-flex items-center gap-1 rounded bg-[#1E1E1E]/10 px-2 py-1 font-mono text-[8px] font-bold text-[#6B7860] hover:bg-[#1E1E1E]/20">Copy {t('orderMapsSummary')}</button>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                  {requiresDeliveryAddress ? (
-                    <div className="sm:col-span-2">
-                      <p className="font-display text-[9px] font-bold uppercase tracking-wider text-[#6B7860]">{orderCopy.deliveryDestination}</p>
-                      <p className="mt-0.5 text-[10px] font-bold leading-4 text-[#1E1E1E]">{address}</p>
-                      {mapsUrl.trim() ? <a href={mapsUrl.trim()} target="_blank" rel="noopener noreferrer" className="mt-1 inline-flex items-start gap-1 break-all text-[9px] font-semibold text-[#6B7860] underline underline-offset-2"><Link2 size={10} className="mt-0.5 shrink-0" />{mapsUrl.trim()}</a> : null}
-                    </div>
-                  ) : null}
                 </div>
 
                 <div className="mt-4 flex items-center justify-between rounded-xl border border-[#1E1E1E]/15 bg-white px-4 py-3 shadow-xs">

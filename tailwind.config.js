@@ -30,11 +30,9 @@ export default {
         }
       },
       fontFamily: {
-        /* Inktera = display heading (bold, chunky, retro) */
-        display: ['Inktera', 'Lilita One', '-apple-system', 'sans-serif'],
-        /* Tavero = body UI (clean, modern, minimalis) */
-        sans: ['Tavero', 'Plus Jakarta Sans', 'DM Sans', '-apple-system', 'sans-serif'],
-        mono: ['Tavero', 'Plus Jakarta Sans', 'monospace'],
+        display: ['Space Grotesk', '-apple-system', 'sans-serif'],
+        sans: ['Plus Jakarta Sans', '-apple-system', 'sans-serif'],
+        mono: ['Space Grotesk', 'monospace'],
       }
     },
   },

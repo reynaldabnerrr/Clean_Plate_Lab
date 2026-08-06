@@ -110,7 +110,7 @@ export function Hero({ onOpenOrder, onScrollToLabel }) {
                 variant="default"
                 size="lg"
                 onClick={onOpenOrder}
-                className="bg-[#D1954E] hover:bg-[#B8803C] text-[#FEFDF9] font-extrabold rounded-full flex items-center justify-center gap-2 min-h-[44px]"
+                className="bg-[#8A9C7A] hover:bg-[#647554] text-white font-extrabold rounded-full flex items-center justify-center gap-2 min-h-[44px]"
               >
                 <span>{t('heroCtaPrimary')}</span>
                 <ArrowRight size={18} />

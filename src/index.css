@@ -1,24 +1,5 @@
-/* Plus Jakarta Sans — fallback body font */
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
-
-/* ─── Self-hosted Fonts ──────────────────────────────────────────── */
-@font-face {
-  font-family: 'Inktera';
-  src: url('/fonts/Inktera.woff2') format('woff2');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Tavero';
-  src: url('/fonts/Tavero.woff2') format('woff2');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
 
 @layer base {
   :root {
@@ -38,9 +19,8 @@
     --cpl-border: #1E1E1E;
     --cpl-border-muted: rgba(30, 30, 30, 0.15);
 
-    /* Inktera = display/heading | Tavero = body/UI */
-    --font-display: 'Inktera', 'Lilita One', -apple-system, BlinkMacSystemFont, sans-serif;
-    --font-body: 'Tavero', 'Plus Jakarta Sans', 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-display: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
 
     --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.05);
     --shadow-label: 0 20px 50px rgba(0, 0, 0, 0.15);
