@@ -24,9 +24,9 @@ class ErrorBoundary extends React.Component {
   render() {
     if (this.state.hasError) {
       return (
-        <main className="grid min-h-screen place-items-center bg-[#F5F2EA] p-6 text-center">
+        <main className="grid min-h-screen place-items-center bg-[#FEFDF9] p-6 text-center">
           <div className="max-w-lg border-2 border-[#1E1E1E] bg-white p-8 shadow-[6px_6px_0_#1E1E1E]">
-            <p className="font-mono text-[10px] font-bold uppercase tracking-widest text-[#647554]">System notice</p>
+            <p className="font-mono text-[10px] font-bold uppercase tracking-widest text-[#6B7860]">System notice</p>
             <h1 className="mt-4 font-display text-3xl font-extrabold uppercase">This page could not be displayed.</h1>
             <button type="button" onClick={() => window.location.reload()} className="mt-7 min-h-12 bg-[#1E1E1E] px-6 text-xs font-bold uppercase tracking-wider text-white">Reload page</button>
           </div>

@@ -81,9 +81,9 @@ export function Hero({ onOpenOrder, onScrollToLabel }) {
                 return (
                   <div
                     key={metric.title}
-                    className="group flex min-h-[118px] min-w-0 flex-col items-start border-2 border-[#1E1E1E] bg-white p-2.5 shadow-[2px_2px_0px_0px_#1E1E1E] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[4px_4px_0px_0px_#8A9C7A] sm:min-h-[168px] sm:p-4"
+                    className="group flex min-h-[118px] min-w-0 flex-col items-start border-2 border-[#1E1E1E] bg-white p-2.5 shadow-[2px_2px_0px_0px_#1E1E1E] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[4px_4px_0px_0px_#8D9B7D] sm:min-h-[168px] sm:p-4"
                   >
-                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-[#8A9C7A]/40 bg-[#EBF0E6] text-[#647554] transition-colors group-hover:bg-[#8A9C7A] group-hover:text-white sm:h-8 sm:w-8">
+                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-[#8D9B7D]/40 bg-[#E1ECD3] text-[#6B7860] transition-colors group-hover:bg-[#8D9B7D] group-hover:text-white sm:h-8 sm:w-8">
                       <MetricIcon size={14} />
                     </div>
 
@@ -110,7 +110,7 @@ export function Hero({ onOpenOrder, onScrollToLabel }) {
                 variant="default"
                 size="lg"
                 onClick={onOpenOrder}
-                className="bg-[#8A9C7A] hover:bg-[#647554] text-white font-extrabold rounded-full flex items-center justify-center gap-2 min-h-[44px]"
+                className="bg-[#D1954E] hover:bg-[#B8803C] text-[#FEFDF9] font-extrabold rounded-full flex items-center justify-center gap-2 min-h-[44px]"
               >
                 <span>{t('heroCtaPrimary')}</span>
                 <ArrowRight size={18} />
@@ -152,55 +152,55 @@ export function Hero({ onOpenOrder, onScrollToLabel }) {
                   transition: isHeroHovered ? 'transform 0.1s ease-out, box-shadow 0.3s ease' : 'transform 0.5s ease-out, box-shadow 0.5s ease',
                   boxShadow: isHeroHovered ? '0 25px 50px -12px rgba(0, 0, 0, 0.3)' : '0 10px 25px -5px rgba(0, 0, 0, 0.12)'
                 }}
-                className={`cpl-label-paper p-5 sm:p-6 rounded-none relative z-10 border-2 border-[#1E1E1E] bg-[#F5F2EA] transition-all duration-300 ${!isHeroHovered ? 'cpl-3d-idle-float' : ''}`}
+                className={`cpl-label-paper p-5 sm:p-6 rounded-none relative z-10 border-2 border-[#1E1E1E] bg-[#FEFDF9] transition-all duration-300 ${!isHeroHovered ? 'cpl-3d-idle-float' : ''}`}
               >
                 {/* Glossy Sheen Reflection Pass */}
                 <div className="cpl-gloss-sheen" />
 
                 <div className="flex justify-between items-center border-b-2 border-[#1E1E1E] pb-3 mb-4 pr-12">
-                  <span className="font-extrabold text-xs sm:text-sm tracking-wider">CPL-014</span>
-                  <Badge variant="solid" className="px-2 py-0.5 text-[10px] sm:text-xs font-extrabold uppercase tracking-widest bg-[#8A9C7A] text-white">
+                  <span className="font-sans font-semibold text-xs sm:text-sm tracking-wider">Clean Plate Lab</span>
+                  <Badge variant="solid" className="px-2 py-0.5 text-[10px] sm:text-xs font-sans font-semibold uppercase tracking-widest bg-[#8D9B7D] text-white">
                     MEAL PREP
                   </Badge>
                 </div>
 
-                <h3 className="font-extrabold text-2xl sm:text-3xl tracking-tight text-[#1E1E1E] uppercase leading-none mb-1">
+                <h3 className="font-display font-normal text-2xl sm:text-3xl tracking-tight text-[#1E1E1E] uppercase leading-none mb-1">
                   {t('heroLabelTitle')}
                 </h3>
-                <p className="text-[9px] sm:text-[10px] font-bold text-[#647554] tracking-widest uppercase mb-4">
+                <p className="text-[9px] sm:text-[10px] font-sans font-medium text-[#6B7860] tracking-widest uppercase mb-4">
                   {t('heroLabelSub')}
                 </p>
 
                 {/* Macro Table Grid */}
-                <div className="border border-[#1E1E1E] mb-4 text-xs font-bold bg-white/80">
+                <div className="border border-[#1E1E1E] mb-4 text-xs font-sans bg-white/80">
                   <div className="grid grid-cols-2 border-b border-[#1E1E1E] p-1.5 sm:p-2">
-                    <span className="text-gray-700">{t('heroProtein')}</span>
-                    <span className="text-right text-[#8A9C7A] font-black text-sm">81.6g</span>
+                    <span className="text-gray-600 font-medium">{t('heroProtein')}</span>
+                    <span className="text-right text-[#8D9B7D] font-bold text-sm">81.6g</span>
                   </div>
                   <div className="grid grid-cols-2 border-b border-[#1E1E1E] p-1.5 sm:p-2 bg-white/60">
-                    <span className="text-gray-700">{t('heroCarbs')}</span>
-                    <span className="text-right font-extrabold">127.7g</span>
+                    <span className="text-gray-600 font-medium">{t('heroCarbs')}</span>
+                    <span className="text-right font-semibold">127.7g</span>
                   </div>
                   <div className="grid grid-cols-2 border-b border-[#1E1E1E] p-1.5 sm:p-2">
-                    <span className="text-gray-700">{t('heroFat')}</span>
-                    <span className="text-right font-extrabold">28.2g</span>
+                    <span className="text-gray-600 font-medium">{t('heroFat')}</span>
+                    <span className="text-right font-semibold">28.2g</span>
                   </div>
                   <div className="grid grid-cols-2 border-b border-[#1E1E1E] p-1.5 sm:p-2 bg-white/60">
-                    <span className="text-gray-700">{t('heroSodium')}</span>
-                    <span className="text-right font-extrabold">1344.1 mg</span>
+                    <span className="text-gray-600 font-medium">{t('heroSodium')}</span>
+                    <span className="text-right font-semibold">1344.1 mg</span>
                   </div>
                   <div className="grid grid-cols-2 border-b border-[#1E1E1E] p-1.5 sm:p-2">
-                    <span className="text-gray-700">{t('heroPotassium')}</span>
-                    <span className="text-right font-extrabold">340 mg</span>
+                    <span className="text-gray-600 font-medium">{t('heroPotassium')}</span>
+                    <span className="text-right font-semibold">340 mg</span>
                   </div>
-                  <div className="grid grid-cols-2 p-1.5 sm:p-2 bg-[#8A9C7A]/20">
-                    <span className="text-[#1E1E1E] font-black">{t('heroCalories')}</span>
-                    <span className="text-right font-black text-sm text-[#1E1E1E]">1111.3 KCAL</span>
+                  <div className="grid grid-cols-2 p-1.5 sm:p-2 bg-[#8D9B7D]/20">
+                    <span className="text-[#1E1E1E] font-bold">{t('heroCalories')}</span>
+                    <span className="text-right font-bold text-sm text-[#1E1E1E]">1111.3 KCAL</span>
                   </div>
                 </div>
 
                 {/* Neat Label Info Badges */}
-                <div className="flex flex-wrap items-center justify-between gap-1.5 border-b border-[#1E1E1E] pb-3 mb-3 text-[9px] sm:text-[10px] font-mono font-bold text-gray-800 uppercase tracking-tight">
+                <div className="flex flex-wrap items-center justify-between gap-1.5 border-b border-[#1E1E1E] pb-3 mb-3 text-[9px] sm:text-[10px] font-sans font-medium text-gray-700 uppercase tracking-tight">
                   <span className="bg-white/90 border border-[#1E1E1E]/30 px-2 py-1 rounded shadow-xs">100% FRESH HOMEMADE</span>
                   <span className="bg-white/90 border border-[#1E1E1E]/30 px-2 py-1 rounded shadow-xs">FOOD-GRADE SAFE</span>
                   <span className="bg-white/90 border border-[#1E1E1E]/30 px-2 py-1 rounded shadow-xs">REHEAT 30-45S</span>
@@ -208,8 +208,8 @@ export function Hero({ onOpenOrder, onScrollToLabel }) {
 
                 {/* Stamp & Barcode */}
                 <div className="flex items-center justify-between pt-1">
-                  <div className="flex items-center gap-2 text-[9px] sm:text-[10px] font-bold tracking-wider text-[#1E1E1E]">
-                    <CplFlaskIcon size={18} color="#8A9C7A" />
+                  <div className="flex items-center gap-2 text-[9px] sm:text-[10px] font-sans font-medium tracking-wider text-[#1E1E1E]/70">
+                    <CplFlaskIcon size={18} color="#8D9B7D" />
                     <div>
                       <div>{t('heroTitle1')}</div>
                       <div>{t('heroTitle2')}</div>

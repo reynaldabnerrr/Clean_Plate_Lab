@@ -1,37 +1,60 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+/* Plus Jakarta Sans — fallback body font */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
 @import "tailwindcss";
+
+/* ─── Self-hosted Fonts ──────────────────────────────────────────── */
+@font-face {
+  font-family: 'Inktera';
+  src: url('/fonts/Inktera.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Tavero';
+  src: url('/fonts/Tavero.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 
 @layer base {
   :root {
-    --cpl-sage: #8A9C7A;
-    --cpl-sage-dark: #526049;
-    --cpl-sage-light: #EBF0E6;
-    --cpl-cream: #F5F2EA;
-    --cpl-sand: #D6C7B0;
-    --cpl-sand-light: #F0EAE1;
-    --cpl-dark: #1E1E1E;
-    --cpl-dark-muted: #555555;
-    --cpl-white: #FFFFFF;
-    
+    /* New CPL Palette */
+    --cpl-sage: #8D9B7D;          /* Olive Green — secondary */
+    --cpl-sage-dark: #6B7860;     /* Darker Olive — hovers / accents */
+    --cpl-sage-light: #E1ECD3;    /* Soft Sage — bg alt / badge */
+    --cpl-cream: #FEFDF9;         /* Off White — main background */
+    --cpl-sand: #EABB85;          /* Soft Apricot — accent bg / card */
+    --cpl-sand-light: #EABB85;    /* Soft Apricot (light usage) */
+    --cpl-amber: #D1954E;         /* Amber — primary / CTA */
+    --cpl-amber-dark: #B8803C;    /* Amber hover */
+    --cpl-dark: #1E1E1E;          /* Charcoal — text / dark bg */
+    --cpl-dark-muted: #555555;    /* Muted text */
+    --cpl-white: #FEFDF9;         /* Off White surfaces */
+
     --cpl-border: #1E1E1E;
     --cpl-border-muted: rgba(30, 30, 30, 0.15);
 
-    --font-display: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
-    --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    /* Inktera = display/heading | Tavero = body/UI */
+    --font-display: 'Inktera', 'Lilita One', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-body: 'Tavero', 'Plus Jakarta Sans', 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
 
     --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.05);
     --shadow-label: 0 20px 50px rgba(0, 0, 0, 0.15);
   }
 
   .dark-mode {
-    --cpl-cream: #121411;
-    --cpl-white: #1A1D18;
-    --cpl-dark: #F5F2EA;
+    --cpl-cream: #141412;
+    --cpl-white: #1C1B18;
+    --cpl-dark: #FEFDF9;
     --cpl-dark-muted: #A8ABA4;
-    --cpl-sand: #36322B;
-    --cpl-sand-light: #24211C;
-    --cpl-border: #F5F2EA;
-    --cpl-border-muted: rgba(245, 242, 234, 0.2);
+    --cpl-sand: #3A2E1E;
+    --cpl-sand-light: #2A221A;
+    --cpl-border: #FEFDF9;
+    --cpl-border-muted: rgba(254, 253, 249, 0.2);
   }
 }
 
@@ -91,8 +114,8 @@ img {
 }
 
 ::selection {
-  background: var(--cpl-sage);
-  color: white;
+  background: var(--cpl-amber);
+  color: #FEFDF9;
 }
 
 .section-shell {
@@ -108,7 +131,7 @@ img {
   gap: 0.5rem;
   width: fit-content;
   color: var(--cpl-sage-dark);
-  font-family: var(--font-display);
+  font-family: var(--font-body);
   font-size: 0.625rem;
   font-weight: 700;
   letter-spacing: 0.18em;
@@ -117,7 +140,7 @@ img {
 }
 
 .section-kicker.section-kicker-inverted {
-  color: #C4D3B7;
+  color: #C8D8B8;
 }
 
 .nutrition-panel {
@@ -139,7 +162,7 @@ img {
   max-width: 100%;
   border: 2px solid var(--cpl-dark);
   border-radius: 0;
-  background: white;
+  background: var(--cpl-white);
   padding: 1.25rem;
   box-shadow: 4px 4px 0 var(--cpl-dark);
 }
@@ -194,11 +217,11 @@ img {
 }
 
 .choice-card:hover {
-  border-color: var(--cpl-sage);
+  border-color: var(--cpl-amber);
 }
 
 .choice-card:focus-visible {
-  outline: 2px solid var(--cpl-sage);
+  outline: 2px solid var(--cpl-amber);
   outline-offset: 2px;
 }
 
@@ -248,8 +271,8 @@ img {
 }
 
 .field-input:focus {
-  border-color: var(--cpl-sage);
-  box-shadow: 0 0 0 2px rgba(138, 156, 122, 0.25);
+  border-color: var(--cpl-amber);
+  box-shadow: 0 0 0 2px rgba(209, 149, 78, 0.25);
 }
 
 @media (min-width: 640px) {
@@ -293,7 +316,7 @@ img {
 
 /* Authentic CPL Label Styling from CPL_Guideline.JPG */
 .cpl-label-paper {
-  background: #F4F1EA;
+  background: #FEFDF9;
   color: #1E1E1E;
   font-family: var(--font-display);
   border: 2px solid #1E1E1E;
@@ -498,7 +521,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   cursor: pointer;
   transition: border-color 180ms, box-shadow 180ms;
 }
-.cpl-drp-trigger:hover { border-color: var(--cpl-sage); box-shadow: 0 0 0 1px rgba(138, 156, 122, 0.18); }
+.cpl-drp-trigger:hover { border-color: var(--cpl-amber); box-shadow: 0 0 0 1px rgba(209, 149, 78, 0.18); }
 .cpl-drp-trigger.open  { border-color: #1E1E1E; box-shadow: 0 0 0 2px rgba(30,30,30,0.12); }
 .cpl-drp-trigger.error { border: 2px solid #C93B2B; background: #FDF5F5; }
 
@@ -521,7 +544,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   font-weight: 800;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #4D4D4D;
+  color: #555555;
 }
 
 .cpl-drp-cal-icon { color: var(--cpl-sage-dark); flex-shrink: 0; }
@@ -531,10 +554,10 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   align-items: center;
   gap: 0.25rem;
   background: #1E1E1E;
-  color: #B8C8AA;
+  color: #C8D8B8;
   border-radius: 999px;
   padding: 0.2rem 0.6rem;
-  font-family: var(--font-display);
+  font-family: var(--font-body);
   font-size: 0.6rem;
   font-weight: 700;
   letter-spacing: 0.05em;
@@ -560,16 +583,16 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   text-align: left;
   min-width: 0;
 }
-.cpl-drp-slot.active { background: #EBF0E6; }
-.cpl-drp-slot:focus-visible { outline: 2px solid var(--cpl-sage); outline-offset: -2px; border-radius: 8px; }
+.cpl-drp-slot.active { background: #E1ECD3; }
+.cpl-drp-slot:focus-visible { outline: 2px solid var(--cpl-amber); outline-offset: -2px; border-radius: 8px; }
 
 .cpl-drp-slot-label {
-  font-family: var(--font-display);
+  font-family: var(--font-body);
   font-size: 0.6rem;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #647554;
+  color: #6B7860;
 }
 
 .cpl-drp-slot-date {
@@ -592,7 +615,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   font-family: var(--font-body);
   font-size: 0.65rem;
   font-weight: 600;
-  color: #555;
+  color: #555555;
   white-space: nowrap;
 }
 
@@ -682,12 +705,12 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   border-radius: 999px;
 }
 .cpl-cal-selecting-badge.badge-start {
-  background: #EBF0E6;
-  color: #33402B;
+  background: #E1ECD3;
+  color: #3A4A30;
 }
 .cpl-cal-selecting-badge.badge-end {
-  background: #F0EAE1;
-  color: #4D3B28;
+  background: #F3E0C5;
+  color: #7A4E20;
 }
 
 .cpl-cal-clear-btn {
@@ -698,14 +721,14 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   border: 1px solid rgba(30,30,30,0.2);
   border-radius: 999px;
   padding: 0.2rem 0.6rem;
-  font-family: var(--font-display);
+  font-family: var(--font-body);
   font-size: 0.6rem;
   font-weight: 700;
-  color: #555;
+  color: #555555;
   cursor: pointer;
   transition: background 150ms, color 150ms;
 }
-.cpl-cal-clear-btn:hover { background: #F5F2EA; color: #1E1E1E; }
+.cpl-cal-clear-btn:hover { background: #FEFDF9; color: #1E1E1E; }
 
 /* Month nav */
 .cpl-cal-nav {
@@ -716,7 +739,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 }
 
 .cpl-cal-nav-label {
-  font-family: var(--font-display);
+  font-family: var(--font-body);
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -732,13 +755,13 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   height: 2rem;
   border-radius: 8px;
   border: 1px solid rgba(30,30,30,0.15);
-  background: #fff;
+  background: #FEFDF9;
   color: #1E1E1E;
   cursor: pointer;
   flex-shrink: 0;
   transition: background 150ms, border-color 150ms;
 }
-.cpl-cal-nav-btn:hover:not(:disabled) { background: #F5F2EA; border-color: var(--cpl-sage); }
+.cpl-cal-nav-btn:hover:not(:disabled) { background: #F0EDD8; border-color: var(--cpl-amber); }
 .cpl-cal-nav-btn:disabled { opacity: 0.3; cursor: default; }
 
 /* Two-month grid */
@@ -756,7 +779,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 .cpl-cal-month { min-width: 0; }
 
 .cpl-cal-month-title {
-  font-family: var(--font-display);
+  font-family: var(--font-body);
   font-size: 0.7rem;
   font-weight: 800;
   text-transform: uppercase;
@@ -772,12 +795,12 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   margin-bottom: 0.2rem;
 }
 .cpl-cal-weekday {
-  font-family: var(--font-display);
+  font-family: var(--font-body);
   font-size: 0.55rem;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #999;
+  color: #999999;
   text-align: center;
   padding: 0.2rem 0;
 }
@@ -803,7 +826,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   top: 50%;
   transform: translateY(-50%);
   height: 2rem;
-  background: #EBF0E6;
+  background: #E1ECD3;
   z-index: 0;
 }
 
@@ -834,16 +857,16 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   -webkit-tap-highlight-color: transparent;
 }
 .cpl-cal-day:hover:not(:disabled):not(.start):not(.end):not(.in-range) {
-  background: #F5F2EA;
+  background: #F0EDD8;
   transform: scale(1.08);
 }
-.cpl-cal-day.past       { color: #ccc; cursor: default; }
-.cpl-cal-day.sunday      { color: #ccc; cursor: not-allowed; }
-.cpl-cal-day.today      { font-weight: 800; color: var(--cpl-sage-dark); box-shadow: inset 0 0 0 1.5px var(--cpl-sage); }
-.cpl-cal-day.hovered    { background: #EBF0E6; }
-.cpl-cal-day.in-range   { background: transparent; color: #33402B; font-weight: 700; }
+.cpl-cal-day.past       { color: #cccccc; cursor: default; }
+.cpl-cal-day.sunday      { color: #cccccc; cursor: not-allowed; }
+.cpl-cal-day.today      { font-weight: 800; color: var(--cpl-amber); box-shadow: inset 0 0 0 1.5px var(--cpl-amber); }
+.cpl-cal-day.hovered    { background: #E1ECD3; }
+.cpl-cal-day.in-range   { background: transparent; color: #3A4A30; font-weight: 700; }
 .cpl-cal-day.start,
-.cpl-cal-day.end        { background: #1E1E1E; color: #fff; font-weight: 800; }
+.cpl-cal-day.end        { background: #1E1E1E; color: #FEFDF9; font-weight: 800; }
 .cpl-cal-day.start:hover,
 .cpl-cal-day.end:hover  { background: #3a3a3a; }
 
@@ -856,7 +879,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   flex-wrap: wrap;
   padding: 0.6rem 1rem 0.75rem;
   border-top: 1px solid rgba(30,30,30,0.08);
-  background: #F7F5EF;
+  background: #F5F2E0;
 }
 
 .cpl-cal-footer-dates {
@@ -873,12 +896,12 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 }
 
 .cpl-cal-footer-label {
-  font-family: var(--font-display);
+  font-family: var(--font-body);
   font-size: 0.55rem;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #647554;
+  color: #6B7860;
 }
 
 .cpl-cal-footer-item strong {
@@ -888,17 +911,17 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   color: #1E1E1E;
 }
 
-.cpl-cal-footer-arrow { color: #999; font-size: 0.8rem; }
+.cpl-cal-footer-arrow { color: #999999; font-size: 0.8rem; }
 
 .cpl-cal-footer-nights {
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
   background: #1E1E1E;
-  color: #B8C8AA;
+  color: #C8D8B8;
   border-radius: 999px;
   padding: 0.3rem 0.75rem;
-  font-family: var(--font-display);
+  font-family: var(--font-body);
   font-size: 0.625rem;
   font-weight: 700;
   white-space: nowrap;
@@ -943,7 +966,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   left: 0;
   right: 0;
   z-index: 9999;
-  background: #fff;
+  background: #FEFDF9;
   border-radius: 20px 20px 0 0;
   max-height: 92dvh;
   overflow-y: auto;
@@ -979,13 +1002,13 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   height: 2rem;
   border-radius: 50%;
   border: 1px solid rgba(30, 30, 30, 0.15);
-  background: #F5F2EA;
+  background: #FEFDF9;
   color: #1E1E1E;
   cursor: pointer;
   flex-shrink: 0;
   transition: background 150ms;
 }
-.cpl-cal-close-btn:hover { background: #EBE7DE; }
+.cpl-cal-close-btn:hover { background: #F0EDD8; }
 
 /* Single-month layout inside sheet */
 .cpl-cal-months-mobile {

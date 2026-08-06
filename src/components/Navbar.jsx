@@ -110,7 +110,7 @@ export function Navbar({ onOpenOrder }) {
       {/* Accessibility Skip Link */}
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 z-[100] px-4 py-2 bg-[#8A9C7A] text-white font-bold text-xs rounded-md shadow-lg outline-none ring-2 ring-white"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 z-[100] px-4 py-2 bg-[#8D9B7D] text-white font-bold text-xs rounded-md shadow-lg outline-none ring-2 ring-white"
       >
         {t('skipContent')}
       </a>
@@ -128,10 +128,10 @@ export function Navbar({ onOpenOrder }) {
       <header
         className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
           mobileMenuOpen
-            ? 'bg-[#F5F2EA] shadow-md border-b border-[#1E1E1E]/15 py-3'
+            ? 'bg-[#FEFDF9] shadow-md border-b border-[#1E1E1E]/15 py-3'
             : scrolled
-            ? 'bg-[#F5F2EA]/95 shadow-md border-b border-[#1E1E1E]/12 backdrop-blur-md py-3'
-            : 'bg-[#F5F2EA]/90 border-b border-[#1E1E1E]/10 backdrop-blur-sm py-4'
+            ? 'bg-[#FEFDF9]/95 shadow-md border-b border-[#1E1E1E]/12 backdrop-blur-md py-3'
+            : 'bg-[#FEFDF9]/90 border-b border-[#1E1E1E]/10 backdrop-blur-sm py-4'
         }`}
       >
         <div className="mx-auto flex max-w-[90rem] items-center justify-between gap-2 px-4 sm:gap-4 sm:px-6 xl:gap-3 xl:px-5 2xl:gap-5 2xl:px-8 relative z-50">
@@ -139,7 +139,7 @@ export function Navbar({ onOpenOrder }) {
           {/* Brand Logo */}
           <a 
             href="#main-content"
-            className="flex items-center shrink-0 hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8A9C7A] rounded-lg"
+            className="flex items-center shrink-0 hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8D9B7D] rounded-lg"
             aria-label="Clean Plate Lab Home"
           >
             <div className="origin-left scale-95 transform sm:scale-100 xl:scale-[0.88] 2xl:scale-100">
@@ -161,14 +161,14 @@ export function Navbar({ onOpenOrder }) {
                   href={item.href}
                   aria-current={isActive ? 'location' : undefined}
                   onClick={() => setActiveHref(item.href)}
-                  className={`group relative whitespace-nowrap rounded py-1.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8A9C7A] ${
-                    isActive ? 'text-[#526049]' : 'hover:text-[#647554]'
+                  className={`group relative whitespace-nowrap rounded py-1.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8D9B7D] ${
+                    isActive ? 'text-[#6B7860]' : 'hover:text-[#6B7860]'
                   }`}
                 >
                   <span>{item.label}</span>
                   <span
                     aria-hidden="true"
-                    className={`absolute bottom-0 left-0 h-[2px] bg-[#647554] transition-all duration-200 ${
+                    className={`absolute bottom-0 left-0 h-[2px] bg-[#6B7860] transition-all duration-200 ${
                       isActive ? 'w-full' : 'w-0 group-hover:w-full'
                     }`}
                   />
@@ -187,7 +187,7 @@ export function Navbar({ onOpenOrder }) {
                 onClick={() => setLanguage('ID')}
                 className={`rounded-full px-2.5 py-1 text-[11px] font-black transition-all duration-200 ${
                   language === 'ID'
-                    ? 'bg-[#8A9C7A] text-white shadow-sm scale-[1.02]'
+                    ? 'bg-[#8D9B7D] text-white shadow-sm scale-[1.02]'
                     : 'text-[#1E1E1E]/70 hover:text-[#1E1E1E]'
                 }`}
                 aria-label="Bahasa Indonesia"
@@ -199,7 +199,7 @@ export function Navbar({ onOpenOrder }) {
                 onClick={() => setLanguage('EN')}
                 className={`rounded-full px-2.5 py-1 text-[11px] font-black transition-all duration-200 ${
                   language === 'EN'
-                    ? 'bg-[#8A9C7A] text-white shadow-sm scale-[1.02]'
+                    ? 'bg-[#8D9B7D] text-white shadow-sm scale-[1.02]'
                     : 'text-[#1E1E1E]/70 hover:text-[#1E1E1E]'
                 }`}
                 aria-label="English Language"
@@ -213,7 +213,7 @@ export function Navbar({ onOpenOrder }) {
               variant="default"
               size="default"
               onClick={onOpenOrder}
-              className="hidden md:flex items-center gap-2 rounded-full bg-[#8A9C7A] hover:bg-[#647554] active:scale-[0.98] text-white font-extrabold text-xs shadow-md hover:shadow-lg transition-all transform hover:scale-[1.02] min-h-[40px] px-4.5 shrink-0 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-[#8A9C7A]"
+              className="hidden md:flex items-center gap-2 rounded-full bg-[#D1954E] hover:bg-[#B8803C] active:scale-[0.98] text-[#FEFDF9] font-extrabold text-xs shadow-md hover:shadow-lg transition-all transform hover:scale-[1.02] min-h-[40px] px-4.5 shrink-0 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-[#D1954E]"
             >
               <span>{copy.nav.build}</span>
               <ArrowRight size={14} />
@@ -226,7 +226,7 @@ export function Navbar({ onOpenOrder }) {
               aria-expanded={mobileMenuOpen}
               aria-controls="mobile-menu-drawer"
               aria-label={mobileMenuOpen ? "Close Menu" : "Open Navigation Menu"}
-              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[#1E1E1E]/15 bg-[#1E1E1E]/5 text-[#1E1E1E] transition-colors hover:bg-[#1E1E1E]/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8A9C7A] xl:hidden"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[#1E1E1E]/15 bg-[#1E1E1E]/5 text-[#1E1E1E] transition-colors hover:bg-[#1E1E1E]/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8D9B7D] xl:hidden"
             >
               {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
             </button>
@@ -238,7 +238,7 @@ export function Navbar({ onOpenOrder }) {
         {mobileMenuOpen && (
           <div 
             id="mobile-menu-drawer"
-            className="absolute left-0 right-0 top-full z-50 max-h-[calc(100vh-80px)] origin-top space-y-4 overflow-y-auto border-b-2 border-[#1E1E1E] bg-[#F5F2EA] px-4 py-4 font-display text-xs font-bold uppercase tracking-wider text-[#1E1E1E] shadow-[0_18px_35px_rgba(30,30,30,0.16)] animate-cpl-slide-down sm:px-6 sm:py-5 xl:hidden"
+            className="absolute left-0 right-0 top-full z-50 max-h-[calc(100vh-80px)] origin-top space-y-4 overflow-y-auto border-b-2 border-[#1E1E1E] bg-[#FEFDF9] px-4 py-4 font-display text-xs font-bold uppercase tracking-wider text-[#1E1E1E] shadow-[0_18px_35px_rgba(30,30,30,0.16)] animate-cpl-slide-down sm:px-6 sm:py-5 xl:hidden"
           >
             <div className="flex items-center justify-between gap-4 border-b border-[#1E1E1E]/20 pb-4 sm:hidden">
               <span className="font-display text-[10px] font-extrabold uppercase tracking-wider text-[#1E1E1E]/65">
@@ -248,7 +248,7 @@ export function Navbar({ onOpenOrder }) {
                 <button
                   type="button"
                   onClick={() => setLanguage('ID')}
-                  className={`rounded-full px-3 py-1 text-[10px] font-black transition-all ${language === 'ID' ? 'bg-[#8A9C7A] text-white shadow-sm' : 'text-[#1E1E1E]/70 hover:text-[#1E1E1E]'}`}
+                  className={`rounded-full px-3 py-1 text-[10px] font-black transition-all ${language === 'ID' ? 'bg-[#8D9B7D] text-white shadow-sm' : 'text-[#1E1E1E]/70 hover:text-[#1E1E1E]'}`}
                   aria-label="Bahasa Indonesia"
                 >
                   ID
@@ -256,7 +256,7 @@ export function Navbar({ onOpenOrder }) {
                 <button
                   type="button"
                   onClick={() => setLanguage('EN')}
-                  className={`rounded-full px-3 py-1 text-[10px] font-black transition-all ${language === 'EN' ? 'bg-[#8A9C7A] text-white shadow-sm' : 'text-[#1E1E1E]/70 hover:text-[#1E1E1E]'}`}
+                  className={`rounded-full px-3 py-1 text-[10px] font-black transition-all ${language === 'EN' ? 'bg-[#8D9B7D] text-white shadow-sm' : 'text-[#1E1E1E]/70 hover:text-[#1E1E1E]'}`}
                   aria-label="English Language"
                 >
                   EN
@@ -275,16 +275,16 @@ export function Navbar({ onOpenOrder }) {
                     href={item.href}
                     aria-current={isActive ? 'location' : undefined}
                     onClick={(event) => handleMobileNavigation(event, item.href)}
-                    className={`group flex min-h-12 items-center justify-between gap-3 border-b border-[#1E1E1E]/20 py-3 text-xs font-extrabold transition-all focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#8A9C7A] sm:min-h-14 sm:text-sm ${
+                    className={`group flex min-h-12 items-center justify-between gap-3 border-b border-[#1E1E1E]/20 py-3 text-xs font-extrabold transition-all focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#8D9B7D] sm:min-h-14 sm:text-sm ${
                       isActive
-                        ? 'border-l-4 border-l-[#647554] bg-[#DDE6D5] px-3 text-[#46533D]'
-                        : 'border-l-4 border-l-transparent px-2 text-[#1E1E1E] hover:bg-white/50 hover:px-3 hover:text-[#647554]'
+                        ? 'border-l-4 border-l-[#6B7860] bg-[#E1ECD3] px-3 text-[#3A4A30]'
+                        : 'border-l-4 border-l-transparent px-2 text-[#1E1E1E] hover:bg-white/50 hover:px-3 hover:text-[#6B7860]'
                     }`}
                   >
                     <span>{item.label}</span>
                     <ArrowRight
                       size={14}
-                      className={`shrink-0 transition-transform group-hover:translate-x-0.5 ${isActive ? 'text-[#526049]' : 'text-[#8A9C7A]'}`}
+                      className={`shrink-0 transition-transform group-hover:translate-x-0.5 ${isActive ? 'text-[#6B7860]' : 'text-[#8D9B7D]'}`}
                     />
                   </a>
                 );
@@ -296,7 +296,7 @@ export function Navbar({ onOpenOrder }) {
               <Button 
                 variant="default" 
                 onClick={() => { setMobileMenuOpen(false); onOpenOrder(); }} 
-                className="flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[#8A9C7A] px-5 text-xs font-extrabold text-white shadow-md transition-transform hover:bg-[#647554] active:scale-[0.98]"
+                className="flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[#D1954E] px-5 text-xs font-extrabold text-[#FEFDF9] shadow-md transition-transform hover:bg-[#B8803C] active:scale-[0.98]"
               >
                 <span>{copy.nav.build}</span>
                 <ArrowRight size={16} />

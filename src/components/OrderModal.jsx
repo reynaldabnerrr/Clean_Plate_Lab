@@ -379,7 +379,7 @@ export function OrderModal({ isOpen, onClose, initialProteinTier = 40, initialMe
         particleCount: 120,
         spread: 80,
         origin: { y: 0.6 },
-        colors: ['#8A9C7A', '#1E1E1E', '#F5F2EA'],
+        colors: ['#8D9B7D', '#1E1E1E', '#FEFDF9'],
       });
     } catch (error) {
       console.log('Confetti trigger error', error);
@@ -465,7 +465,7 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
             event.preventDefault();
           }
         }}
-        className="max-h-[calc(100dvh-1.5rem)] overflow-x-hidden overflow-y-auto rounded-[28px] border border-black/10 bg-[#F7F5EF] p-0 text-[#1E1E1E] shadow-2xl sm:rounded-[32px] [&>button]:right-3 [&>button]:top-3 [&>button]:z-30 [&>button]:grid [&>button]:size-11 [&>button]:place-items-center [&>button]:rounded-full [&>button]:border-2 [&>button]:border-white/70 [&>button]:bg-white [&>button]:p-0 [&>button]:text-[#1E1E1E] [&>button]:opacity-100 [&>button]:shadow-[0_8px_24px_rgba(0,0,0,0.28)] [&>button]:transition-[transform,background-color,box-shadow] [&>button:hover]:scale-105 [&>button:hover]:bg-[#EBF0E6] [&>button:active]:scale-95 [&>button:focus-visible]:ring-2 [&>button:focus-visible]:ring-[#B8C8AA] [&>button:focus-visible]:ring-offset-2 [&>button:focus-visible]:ring-offset-[#1E1E1E] sm:[&>button]:right-4 sm:[&>button]:top-4"
+        className="max-h-[calc(100dvh-1.5rem)] overflow-x-hidden overflow-y-auto rounded-[28px] border border-black/10 bg-[#FEFDF9] p-0 text-[#1E1E1E] shadow-2xl sm:rounded-[32px] [&>button]:right-3 [&>button]:top-3 [&>button]:z-30 [&>button]:grid [&>button]:size-11 [&>button]:place-items-center [&>button]:rounded-full [&>button]:border-2 [&>button]:border-white/70 [&>button]:bg-white [&>button]:p-0 [&>button]:text-[#1E1E1E] [&>button]:opacity-100 [&>button]:shadow-[0_8px_24px_rgba(0,0,0,0.28)] [&>button]:transition-[transform,background-color,box-shadow] [&>button:hover]:scale-105 [&>button:hover]:bg-[#E1ECD3] [&>button:active]:scale-95 [&>button:focus-visible]:ring-2 [&>button:focus-visible]:ring-[#C8D8B8] [&>button:focus-visible]:ring-offset-2 [&>button:focus-visible]:ring-offset-[#1E1E1E] sm:[&>button]:right-4 sm:[&>button]:top-4"
       >
         {!submitted ? (
           <form noValidate onSubmit={handleSubmit} className="min-w-0">
@@ -481,7 +481,7 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
               <div className="relative flex items-center gap-2.5">
                 <CplLogoImage size={42} className="border-white/40 shadow-none" />
                 <div className="min-w-0">
-                  <p className="truncate font-display text-[10px] font-bold uppercase text-[#B8C8AA]">
+                  <p className="truncate font-display text-[10px] font-bold uppercase text-[#C8D8B8]">
                     {t('orderInquiryBadge')}
                   </p>
                   <DialogTitle className="mt-1 text-xl font-black uppercase leading-tight text-white sm:text-2xl">
@@ -511,7 +511,7 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
                         {t('orderName')}
                       </label>
                       <div className="relative">
-                        <User size={15} className={`pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 transition-colors ${errors.name ? 'text-[#C93B2B]' : 'text-[#647554]'}`} />
+                        <User size={15} className={`pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 transition-colors ${errors.name ? 'text-[#C93B2B]' : 'text-[#6B7860]'}`} />
                         <Input
                           id={`${fieldId}-name`}
                           type="text"
@@ -548,7 +548,7 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
                         {t('orderPhone')}
                       </label>
                       <div className="relative">
-                        <Phone size={15} className={`pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 transition-colors ${errors.phone ? 'text-[#C93B2B]' : 'text-[#647554]'}`} />
+                        <Phone size={15} className={`pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 transition-colors ${errors.phone ? 'text-[#C93B2B]' : 'text-[#6B7860]'}`} />
                         <Input
                           id={`${fieldId}-phone`}
                           type="tel"
@@ -606,22 +606,22 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
                             setProteinTier(option.tier);
                             analytics.proteinTierSelected(option.tier);
                           }}
-                          className={`min-h-24 min-w-0 rounded-lg border-2 p-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8A9C7A] ${
+                          className={`min-h-24 min-w-0 rounded-lg border-2 p-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8D9B7D] ${
                             isSelected
                               ? 'border-[#1E1E1E] bg-[#1E1E1E] text-white'
-                              : 'border-[#1E1E1E]/15 bg-white text-[#1E1E1E] hover:border-[#8A9C7A]'
+                              : 'border-[#1E1E1E]/15 bg-white text-[#1E1E1E] hover:border-[#8D9B7D]'
                           }`}
                         >
                           <span className="flex items-center justify-between gap-1">
                             <strong className="font-display text-xl font-black leading-none">{option.tier}g</strong>
                             {isSelected ? (
-                              <span className="flex items-center gap-0.5 rounded-full bg-[#B8C8AA] px-1.5 py-0.5 font-display text-[7px] font-extrabold uppercase text-[#1E1E1E]">
+                              <span className="flex items-center gap-0.5 rounded-full bg-[#C8D8B8] px-1.5 py-0.5 font-display text-[7px] font-extrabold uppercase text-[#1E1E1E]">
                                 <Check size={9} strokeWidth={3} />
                                 {isIndonesian ? 'Dipilih' : 'Selected'}
                               </span>
                             ) : null}
                           </span>
-                          <span className={`mt-2 block font-mono text-[10px] font-bold ${isSelected ? 'text-[#B8C8AA]' : 'text-[#647554]'}`}>
+                          <span className={`mt-2 block font-mono text-[10px] font-bold ${isSelected ? 'text-[#C8D8B8]' : 'text-[#6B7860]'}`}>
                             Rp {option.prices[displayPeriod].toLocaleString('id-ID')}
                           </span>
                           <span className={`mt-1 block text-[8px] font-bold uppercase tracking-wide ${isSelected ? 'text-white/55' : 'text-black/40'}`}>{displayPeriodLabel}</span>
@@ -643,25 +643,25 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
                           className={`p-2 transition-colors ${isSelectedPlan ? 'bg-[#1E1E1E] text-white' : ''} ${borderClass}`}
                         >
                           <span className="block">{option.label}</span>
-                          <span className={`mt-0.5 block font-sans text-[8px] font-normal normal-case ${isSelectedPlan ? 'text-white/70' : 'text-[#647554]'}`}>{option.subtitle}</span>
+                          <span className={`mt-0.5 block font-sans text-[8px] font-normal normal-case ${isSelectedPlan ? 'text-white/70' : 'text-[#6B7860]'}`}>{option.subtitle}</span>
                         </button>
                       );
                     })}
                   </div>
 
-                  <div className="mt-3 flex min-w-0 items-start gap-3 rounded-lg border border-[#8A9C7A]/50 bg-[#E7EEE1] p-3.5">
-                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#647554] text-white">
+                  <div className="mt-3 flex min-w-0 items-start gap-3 rounded-lg border border-[#8D9B7D]/50 bg-[#E1ECD3] p-3.5">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#6B7860] text-white">
                       <Truck size={17} aria-hidden="true" />
                     </span>
                     <div className="min-w-0 flex-1">
-                      <p className="font-display text-[11px] font-extrabold uppercase text-[#33402B]">
+                      <p className="font-display text-[11px] font-extrabold uppercase text-[#3A4A30]">
                         {mealsPerDay} {isIndonesian ? `box segar setiap hari` : `fresh ${mealsPerDay === 1 ? 'box' : 'boxes'} every day`}
                       </p>
-                      <p className="mt-1 text-[10px] leading-relaxed text-[#526049]">
+                      <p className="mt-1 text-[10px] leading-relaxed text-[#6B7860]">
                         {mealsPerDay === 2 ? orderCopy.sameMenu : t('orderDeliveryDetail')}
                       </p>
                     </div>
-                    <div className="hidden shrink-0 flex-col gap-1 font-mono text-[8px] font-bold uppercase text-[#647554] sm:flex">
+                    <div className="hidden shrink-0 flex-col gap-1 font-mono text-[8px] font-bold uppercase text-[#6B7860] sm:flex">
                       <span className="inline-flex items-center gap-1"><Clock3 size={10} /> {mealsPerDay}x / day</span>
                       <span className="inline-flex items-center gap-1"><UtensilsCrossed size={10} /> {mealsPerDay} {mealsPerDay === 1 ? 'box' : 'boxes'} / day</span>
                     </div>
@@ -678,14 +678,14 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
                     {addons.map((addon) => {
                       const selected = addonIds.includes(addon.id);
                       return (
-                        <button key={addon.id} type="button" aria-pressed={selected} onClick={() => toggleAddon(addon.id)} className={`flex min-h-16 items-center justify-between gap-3 rounded-lg border-2 p-3 text-left transition-colors ${selected ? 'border-[#1E1E1E] bg-[#1E1E1E] text-white' : 'border-[#1E1E1E]/15 bg-white hover:border-[#8A9C7A]'}`}>
-                          <span className="min-w-0"><strong className="block font-display text-[10px] font-extrabold uppercase leading-tight">{isIndonesian ? addon.nameID : addon.name}</strong><span className={`mt-1 block font-mono text-[9px] font-bold ${selected ? 'text-[#B8C8AA]' : 'text-[#647554]'}`}>+ Rp {addon.price.toLocaleString('id-ID')} / box</span></span>
-                          {selected ? <Check size={16} className="shrink-0 text-[#B8C8AA]" /> : null}
+                        <button key={addon.id} type="button" aria-pressed={selected} onClick={() => toggleAddon(addon.id)} className={`flex min-h-16 items-center justify-between gap-3 rounded-lg border-2 p-3 text-left transition-colors ${selected ? 'border-[#1E1E1E] bg-[#1E1E1E] text-white' : 'border-[#1E1E1E]/15 bg-white hover:border-[#8D9B7D]'}`}>
+                          <span className="min-w-0"><strong className="block font-display text-[10px] font-extrabold uppercase leading-tight">{isIndonesian ? addon.nameID : addon.name}</strong><span className={`mt-1 block font-mono text-[9px] font-bold ${selected ? 'text-[#C8D8B8]' : 'text-[#6B7860]'}`}>+ Rp {addon.price.toLocaleString('id-ID')} / box</span></span>
+                          {selected ? <Check size={16} className="shrink-0 text-[#C8D8B8]" /> : null}
                         </button>
                       );
                     })}
                   </div>
-                  <p className="mt-2 text-[9px] leading-4 text-[#647554]">{orderCopy.addonsHelp}</p>
+                  <p className="mt-2 text-[9px] leading-4 text-[#6B7860]">{orderCopy.addonsHelp}</p>
                 </section>
               </div>
 
@@ -731,14 +731,14 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
                     <span className="h-px min-w-[8px] flex-1 bg-[#1E1E1E]/15" />
                   </div>
                   <div className="mt-2 grid grid-cols-2 gap-2" role="radiogroup" aria-label={orderCopy.servingsPerDay}>
-                    <button type="button" role="radio" aria-checked={mealsPerDay === 1} onClick={() => setMealsPerDay(1)} className={`min-h-11 rounded-lg border-2 px-3 font-display text-[10px] font-extrabold uppercase transition-all duration-200 hover:-translate-y-0.5 hover:border-[#8A9C7A] hover:shadow-sm ${mealsPerDay === 1 ? 'border-[#1E1E1E] bg-[#1E1E1E] text-white' : 'border-[#1E1E1E]/20 bg-white'}`}>{orderCopy.oneServing}</button>
-                    <button type="button" role="radio" aria-checked={mealsPerDay === 2} onClick={() => setMealsPerDay(2)} className={`min-h-11 rounded-lg border-2 px-3 font-display text-[10px] font-extrabold uppercase transition-all duration-200 hover:-translate-y-0.5 hover:border-[#8A9C7A] hover:shadow-sm ${mealsPerDay === 2 ? 'border-[#1E1E1E] bg-[#1E1E1E] text-white' : 'border-[#1E1E1E]/20 bg-white'}`}>{orderCopy.twoServings}</button>
+                    <button type="button" role="radio" aria-checked={mealsPerDay === 1} onClick={() => setMealsPerDay(1)} className={`min-h-11 rounded-lg border-2 px-3 font-display text-[10px] font-extrabold uppercase transition-all duration-200 hover:-translate-y-0.5 hover:border-[#8D9B7D] hover:shadow-sm ${mealsPerDay === 1 ? 'border-[#1E1E1E] bg-[#1E1E1E] text-white' : 'border-[#1E1E1E]/20 bg-white'}`}>{orderCopy.oneServing}</button>
+                    <button type="button" role="radio" aria-checked={mealsPerDay === 2} onClick={() => setMealsPerDay(2)} className={`min-h-11 rounded-lg border-2 px-3 font-display text-[10px] font-extrabold uppercase transition-all duration-200 hover:-translate-y-0.5 hover:border-[#8D9B7D] hover:shadow-sm ${mealsPerDay === 2 ? 'border-[#1E1E1E] bg-[#1E1E1E] text-white' : 'border-[#1E1E1E]/20 bg-white'}`}>{orderCopy.twoServings}</button>
                   </div>
-                  {mealsPerDay === 2 ? <p className="mt-2 rounded-lg border border-[#8A9C7A]/40 bg-[#E7EEE1] px-3 py-2 text-[10px] font-semibold leading-4 text-[#526049]">{orderCopy.sameMenu}</p> : null}
+                  {mealsPerDay === 2 ? <p className="mt-2 rounded-lg border border-[#8D9B7D]/40 bg-[#E1ECD3] px-3 py-2 text-[10px] font-semibold leading-4 text-[#6B7860]">{orderCopy.sameMenu}</p> : null}
                 </div>
 
                 <div className="mt-4 rounded-lg border border-[#1E1E1E]/20 bg-white p-3">
-                  <p className="flex items-center gap-1.5 font-display text-[10px] font-bold uppercase text-[#4D4D4D]"><Clock3 size={13} className="text-[#647554]" />{scheduleLabel}</p>
+                  <p className="flex items-center gap-1.5 font-display text-[10px] font-bold uppercase text-[#4D4D4D]"><Clock3 size={13} className="text-[#6B7860]" />{scheduleLabel}</p>
                   {mealsPerDay === 1 ? (
                     <div className="mt-2 grid grid-cols-2 gap-2" role="radiogroup" aria-label={orderCopy.singleScheduleNote}>
                       {[
@@ -754,9 +754,9 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
                             role="radio"
                             aria-checked={isSelected}
                             onClick={() => setSingleMealReadyTime(time)}
-                            className={`flex min-h-11 items-center justify-between rounded-lg border-2 px-3 transition-all duration-200 hover:-translate-y-0.5 hover:border-[#8A9C7A] hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8A9C7A] ${isSelected ? 'border-[#1E1E1E] bg-[#1E1E1E] text-white' : 'border-[#1E1E1E]/15 bg-[var(--cpl-cream)] text-[#1E1E1E]'}`}
+                            className={`flex min-h-11 items-center justify-between rounded-lg border-2 px-3 transition-all duration-200 hover:-translate-y-0.5 hover:border-[#8D9B7D] hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8D9B7D] ${isSelected ? 'border-[#1E1E1E] bg-[#1E1E1E] text-white' : 'border-[#1E1E1E]/15 bg-[var(--cpl-cream)] text-[#1E1E1E]'}`}
                           >
-                            <span className={`font-display text-[9px] font-bold uppercase ${isSelected ? 'text-[#B8C8AA]' : 'text-[#647554]'}`}>{label}</span>
+                            <span className={`font-display text-[9px] font-bold uppercase ${isSelected ? 'text-[#C8D8B8]' : 'text-[#6B7860]'}`}>{label}</span>
                             <strong className="font-mono text-xs">{time.replace(':', '.')}</strong>
                           </button>
                         );
@@ -764,11 +764,11 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
                     </div>
                   ) : (
                     <div className="mt-2 grid grid-cols-2 gap-2">
-                      <div className="flex items-center justify-between rounded-md bg-[var(--cpl-cream)] px-3 py-2"><span className="font-display text-[9px] font-bold uppercase text-[#647554]">{orderCopy.lunch}</span><strong className="font-mono text-xs">12.00</strong></div>
-                      <div className="flex items-center justify-between rounded-md bg-[var(--cpl-cream)] px-3 py-2"><span className="font-display text-[9px] font-bold uppercase text-[#647554]">{orderCopy.dinner}</span><strong className="font-mono text-xs">18.00</strong></div>
+                      <div className="flex items-center justify-between rounded-md bg-[var(--cpl-cream)] px-3 py-2"><span className="font-display text-[9px] font-bold uppercase text-[#6B7860]">{orderCopy.lunch}</span><strong className="font-mono text-xs">12.00</strong></div>
+                      <div className="flex items-center justify-between rounded-md bg-[var(--cpl-cream)] px-3 py-2"><span className="font-display text-[9px] font-bold uppercase text-[#6B7860]">{orderCopy.dinner}</span><strong className="font-mono text-xs">18.00</strong></div>
                     </div>
                   )}
-                  <p className="mt-2 text-[9px] leading-4 text-[#647554]">{mealsPerDay === 1 ? orderCopy.singleScheduleNote : orderCopy.scheduleNote}</p>
+                  <p className="mt-2 text-[9px] leading-4 text-[#6B7860]">{mealsPerDay === 1 ? orderCopy.singleScheduleNote : orderCopy.scheduleNote}</p>
                 </div>
 
                 <div className="mt-4">
@@ -778,7 +778,7 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
                     <span className="h-px min-w-[8px] flex-1 bg-[#1E1E1E]/15" />
                   </div>
                   <div className="grid grid-cols-2 gap-2">
-                    {fulfillmentOptions.map((option) => <button key={option.id} type="button" aria-pressed={fulfillment === option.id} onClick={() => { setFulfillment(option.id); setErrors((current) => ({ ...current, address: undefined, mapsUrl: undefined })); }} className={`min-h-11 rounded-lg border-2 px-2 font-display text-[9px] font-extrabold uppercase leading-tight transition-all duration-200 hover:-translate-y-0.5 hover:border-[#8A9C7A] hover:shadow-sm ${fulfillment === option.id ? 'border-[#1E1E1E] bg-[#1E1E1E] text-white' : 'border-[#1E1E1E]/20 bg-white'}`}>{option.label}</button>)}
+                    {fulfillmentOptions.map((option) => <button key={option.id} type="button" aria-pressed={fulfillment === option.id} onClick={() => { setFulfillment(option.id); setErrors((current) => ({ ...current, address: undefined, mapsUrl: undefined })); }} className={`min-h-11 rounded-lg border-2 px-2 font-display text-[9px] font-extrabold uppercase leading-tight transition-all duration-200 hover:-translate-y-0.5 hover:border-[#8D9B7D] hover:shadow-sm ${fulfillment === option.id ? 'border-[#1E1E1E] bg-[#1E1E1E] text-white' : 'border-[#1E1E1E]/20 bg-white'}`}>{option.label}</button>)}
                   </div>
                 </div>
 
@@ -788,7 +788,7 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
                       {t('orderAddress')}
                     </label>
                     <div className="relative">
-                      <MapPin size={15} className={`pointer-events-none absolute left-3 top-3 transition-colors ${errors.address ? 'text-[#C93B2B]' : 'text-[#647554]'}`} />
+                      <MapPin size={15} className={`pointer-events-none absolute left-3 top-3 transition-colors ${errors.address ? 'text-[#C93B2B]' : 'text-[#6B7860]'}`} />
                       <textarea
                         id={`${fieldId}-address`}
                         rows={2}
@@ -805,7 +805,7 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
                         className={`block h-20 w-full resize-none rounded-lg py-3 pl-9 pr-3 font-sans text-xs font-semibold outline-none transition-all duration-200 placeholder:font-normal placeholder:text-gray-400 ${
                           errors.address
                             ? 'border-2 border-[#C93B2B] bg-[#FDF5F5] text-[#1E1E1E] focus:ring-2 focus:ring-[#C93B2B]/20'
-                            : 'border border-[#1E1E1E]/25 bg-white text-[#1E1E1E] focus:ring-2 focus:ring-[#8A9C7A]'
+                            : 'border border-[#1E1E1E]/25 bg-white text-[#1E1E1E] focus:ring-2 focus:ring-[#8D9B7D]'
                         }`}
                       />
                       {errors.address && (
@@ -825,7 +825,7 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
                       {t('orderMapsLink')}
                     </label>
                     <div className="relative">
-                      <Link2 size={15} className="pointer-events-none absolute left-3 top-3 text-[#647554]" />
+                      <Link2 size={15} className="pointer-events-none absolute left-3 top-3 text-[#6B7860]" />
                       <Input
                         id={`${fieldId}-maps-url`}
                         type="url"
@@ -848,17 +848,17 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
                     {errors.mapsUrl ? (
                       <p id={`${fieldId}-maps-help`} role="alert" className="flex items-center gap-1.5 text-[10px] font-bold leading-4 text-[#8A1F17]"><AlertCircle size={12} className="shrink-0 text-[#C93B2B]" />{errors.mapsUrl}</p>
                     ) : (
-                      <p id={`${fieldId}-maps-help`} className="text-[9px] leading-4 text-[#647554]">{t('orderMapsHelp')}</p>
+                      <p id={`${fieldId}-maps-help`} className="text-[9px] leading-4 text-[#6B7860]">{t('orderMapsHelp')}</p>
                     )}
                   </div>
-                </div> : <div className="mt-3 rounded-lg border border-[#8A9C7A]/40 bg-[#E7EEE1] px-3 py-2 text-[9px] font-semibold leading-4 text-[#526049]">
+                </div> : <div className="mt-3 rounded-lg border border-[#8D9B7D]/40 bg-[#E1ECD3] px-3 py-2 text-[9px] font-semibold leading-4 text-[#6B7860]">
                   <p>{orderCopy.selfArrangedNote}</p>
-                  <p className="mt-1.5 flex items-start gap-1.5 font-bold text-[#33402B]"><MapPin size={12} className="mt-0.5 shrink-0" /><span>{centralKitchenAddress}</span></p>
+                  <p className="mt-1.5 flex items-start gap-1.5 font-bold text-[#3A4A30]"><MapPin size={12} className="mt-0.5 shrink-0" /><span>{centralKitchenAddress}</span></p>
                 </div>}
 
-                <div className="mt-5 overflow-hidden rounded-2xl border-2 border-[#8A9C7A] bg-[#E7EEE1]" aria-live="polite">
-                  <div className="flex items-center gap-3 border-b border-[#8A9C7A]/35 px-3.5 py-3 sm:px-4">
-                    <p className="flex min-w-0 items-center gap-2 font-display text-[10px] font-extrabold uppercase text-[#33402B]">
+                <div className="mt-5 overflow-hidden rounded-2xl border-2 border-[#8D9B7D] bg-[#E1ECD3]" aria-live="polite">
+                  <div className="flex items-center gap-3 border-b border-[#8D9B7D]/35 px-3.5 py-3 sm:px-4">
+                    <p className="flex min-w-0 items-center gap-2 font-display text-[10px] font-extrabold uppercase text-[#3A4A30]">
                       <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-[#1E1E1E] font-mono text-[9px] text-white">07</span>
                       <PackageCheck size={15} className="shrink-0" />
                       <span>{t('orderSummary')}</span>
@@ -867,64 +867,64 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
 
                   <div className="space-y-2.5 p-3 sm:p-3.5">
                     <div className="grid grid-cols-2 gap-2">
-                      <div className="rounded-xl border border-[#8A9C7A]/25 bg-white p-3">
-                        <p className="font-display text-[8px] font-bold uppercase tracking-wide text-[#647554]">{orderCopy.weeklyRotation}</p>
+                      <div className="rounded-xl border border-[#8D9B7D]/25 bg-white p-3">
+                        <p className="font-display text-[8px] font-bold uppercase tracking-wide text-[#6B7860]">{orderCopy.weeklyRotation}</p>
                         <p className="mt-1 font-display text-xs font-black leading-tight text-[#1E1E1E] sm:text-sm">{selectedTier.tier}g Protein · {periodLabel}</p>
-                        <p className="mt-0.5 text-[9px] leading-4 text-[#647554]">{dayCountLabel} · {boxCountLabel}</p>
+                        <p className="mt-0.5 text-[9px] leading-4 text-[#6B7860]">{dayCountLabel} · {boxCountLabel}</p>
                       </div>
-                      <div className="rounded-xl border border-[#8A9C7A]/25 bg-white p-3">
-                        <p className="font-display text-[8px] font-bold uppercase tracking-wide text-[#647554]">{orderCopy.servingsPerDay}</p>
+                      <div className="rounded-xl border border-[#8D9B7D]/25 bg-white p-3">
+                        <p className="font-display text-[8px] font-bold uppercase tracking-wide text-[#6B7860]">{orderCopy.servingsPerDay}</p>
                         <p className="mt-1 font-display text-sm font-black text-[#1E1E1E]">{mealsPerDay}x / {isIndonesian ? 'hari' : 'day'}</p>
-                        <p className="mt-0.5 text-[9px] leading-4 text-[#647554]">{t('orderSundayExcluded')}</p>
+                        <p className="mt-0.5 text-[9px] leading-4 text-[#6B7860]">{t('orderSundayExcluded')}</p>
                       </div>
                     </div>
 
-                    <div className="divide-y divide-[#1E1E1E]/10 rounded-xl border border-[#8A9C7A]/25 bg-white px-3">
+                    <div className="divide-y divide-[#1E1E1E]/10 rounded-xl border border-[#8D9B7D]/25 bg-white px-3">
                       <div className="flex items-start gap-2.5 py-2.5">
-                        <CalendarDays size={14} className="mt-0.5 shrink-0 text-[#647554]" />
+                        <CalendarDays size={14} className="mt-0.5 shrink-0 text-[#6B7860]" />
                         <div className="min-w-0">
-                          <p className="font-display text-[8px] font-bold uppercase tracking-wide text-[#647554]">{isIndonesian ? 'Tanggal katering' : 'Catering dates'}</p>
+                          <p className="font-display text-[8px] font-bold uppercase tracking-wide text-[#6B7860]">{isIndonesian ? 'Tanggal katering' : 'Catering dates'}</p>
                           <p className="mt-0.5 text-[10px] font-semibold text-[#1E1E1E]">{formatOrderDate(startDate, locale)} – {formatOrderDate(endDate, locale)}</p>
                         </div>
                       </div>
                       <div className="flex items-start gap-2.5 py-2.5">
-                        <Truck size={14} className="mt-0.5 shrink-0 text-[#647554]" />
+                        <Truck size={14} className="mt-0.5 shrink-0 text-[#6B7860]" />
                         <div className="min-w-0">
-                          <p className="font-display text-[8px] font-bold uppercase tracking-wide text-[#647554]">{orderCopy.fulfillment}</p>
+                          <p className="font-display text-[8px] font-bold uppercase tracking-wide text-[#6B7860]">{orderCopy.fulfillment}</p>
                           <p className="mt-0.5 text-[10px] font-bold text-[#1E1E1E]">{selectedFulfillmentLabel}</p>
                         </div>
                       </div>
                       <div className="flex items-start gap-2.5 py-2.5">
-                        <MapPin size={14} className="mt-0.5 shrink-0 text-[#647554]" />
+                        <MapPin size={14} className="mt-0.5 shrink-0 text-[#6B7860]" />
                         <div className="min-w-0">
-                          <p className="font-display text-[8px] font-bold uppercase tracking-wide text-[#647554]">{requiresDeliveryAddress ? orderCopy.deliveryDestination : orderCopy.centralKitchen}</p>
+                          <p className="font-display text-[8px] font-bold uppercase tracking-wide text-[#6B7860]">{requiresDeliveryAddress ? orderCopy.deliveryDestination : orderCopy.centralKitchen}</p>
                           <p className="mt-0.5 break-words text-[9px] leading-4 text-[#1E1E1E]">{requiresDeliveryAddress ? (address || '-') : centralKitchenAddress}</p>
-                          {requiresDeliveryAddress && mapsUrl.trim() ? <p className="mt-1 flex min-w-0 items-start gap-1 text-[9px] text-[#647554]"><Link2 size={10} className="mt-0.5 shrink-0" /><span className="break-all">{mapsUrl.trim()}</span></p> : null}
+                          {requiresDeliveryAddress && mapsUrl.trim() ? <p className="mt-1 flex min-w-0 items-start gap-1 text-[9px] text-[#6B7860]"><Link2 size={10} className="mt-0.5 shrink-0" /><span className="break-all">{mapsUrl.trim()}</span></p> : null}
                         </div>
                       </div>
                       <div className="flex items-start gap-2.5 py-2.5">
-                        <Clock3 size={14} className="mt-0.5 shrink-0 text-[#647554]" />
+                        <Clock3 size={14} className="mt-0.5 shrink-0 text-[#6B7860]" />
                         <div className="min-w-0">
-                          <p className="font-display text-[8px] font-bold uppercase tracking-wide text-[#647554]">{scheduleLabel}</p>
+                          <p className="font-display text-[8px] font-bold uppercase tracking-wide text-[#6B7860]">{scheduleLabel}</p>
                           <p className="mt-0.5 text-[9px] font-semibold leading-4 text-[#1E1E1E]">{mealsPerDay === 1 ? `${singleMealReadyTime === '12:00' ? orderCopy.lunch : orderCopy.dinner} ${orderCopy.ready} ${formatReadyTime(readyTimeMeal1)}` : `${orderCopy.lunch} ${orderCopy.ready} ${formatReadyTime(readyTimeMeal1)} · ${orderCopy.dinner} ${orderCopy.ready} ${formatReadyTime(readyTimeMeal2)}`}</p>
                         </div>
                       </div>
                     </div>
 
-                    <div className="overflow-hidden rounded-xl border border-[#8A9C7A]/25 bg-white font-mono text-[9px]">
+                    <div className="overflow-hidden rounded-xl border border-[#8D9B7D]/25 bg-white font-mono text-[9px]">
                       <div className="flex items-start justify-between gap-3 px-3 py-2.5">
-                        <span className="text-[#647554]">{orderCopy.basePrice}<br /><span>Rp {selectedPrice.toLocaleString('id-ID')} × {totalBoxes} box</span></span>
-                        <strong className="whitespace-nowrap text-[#33402B]">Rp {(selectedPrice * totalBoxes).toLocaleString('id-ID')}</strong>
+                        <span className="text-[#6B7860]">{orderCopy.basePrice}<br /><span>Rp {selectedPrice.toLocaleString('id-ID')} × {totalBoxes} box</span></span>
+                        <strong className="whitespace-nowrap text-[#3A4A30]">Rp {(selectedPrice * totalBoxes).toLocaleString('id-ID')}</strong>
                       </div>
                       <div className="border-t border-[#1E1E1E]/10 px-3 py-2.5">
-                        <p className="font-sans text-[8px] font-bold uppercase tracking-wide text-[#647554]">{orderCopy.addons}</p>
+                        <p className="font-sans text-[8px] font-bold uppercase tracking-wide text-[#6B7860]">{orderCopy.addons}</p>
                         {selectedAddons.length ? selectedAddons.map((addon) => (
                           <div key={addon.id} className="mt-1.5 flex items-start justify-between gap-3">
-                            <span>{isIndonesian ? addon.nameID : addon.name}<br /><span className="text-[#647554]">Rp {addon.price.toLocaleString('id-ID')} / box × {totalBoxes}</span></span>
-                            <strong className="whitespace-nowrap text-[#33402B]">Rp {(addon.price * totalBoxes).toLocaleString('id-ID')}</strong>
+                            <span>{isIndonesian ? addon.nameID : addon.name}<br /><span className="text-[#6B7860]">Rp {addon.price.toLocaleString('id-ID')} / box × {totalBoxes}</span></span>
+                            <strong className="whitespace-nowrap text-[#3A4A30]">Rp {(addon.price * totalBoxes).toLocaleString('id-ID')}</strong>
                           </div>
                         )) : <p className="mt-1 font-sans text-[10px] font-semibold text-[#1E1E1E]">{orderCopy.none}</p>}
-                        {selectedAddons.length ? <div className="mt-2 flex justify-between gap-3 border-t border-[#1E1E1E]/10 pt-2 font-bold text-[#33402B]"><span>{orderCopy.addonTotal}</span><span className="whitespace-nowrap">Rp {(addonsPerBox * totalBoxes).toLocaleString('id-ID')}</span></div> : null}
+                        {selectedAddons.length ? <div className="mt-2 flex justify-between gap-3 border-t border-[#1E1E1E]/10 pt-2 font-bold text-[#3A4A30]"><span>{orderCopy.addonTotal}</span><span className="whitespace-nowrap">Rp {(addonsPerBox * totalBoxes).toLocaleString('id-ID')}</span></div> : null}
                       </div>
                     </div>
 
@@ -934,20 +934,20 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
                     </div>
                   </div>
                 </div>
-                <p className="mt-2 text-center text-[9px] leading-4 text-[#647554]">{orderCopy.courierNote}</p>
+                <p className="mt-2 text-center text-[9px] leading-4 text-[#6B7860]">{orderCopy.courierNote}</p>
 
                 <Button
                   type="submit"
                   variant="dark"
                   disabled={totalDays === 0}
-                  className="mt-4 h-auto min-h-12 w-full min-w-0 whitespace-normal rounded-lg bg-[#1E1E1E] px-4 py-3 text-center text-xs leading-tight text-white hover:bg-[#647554]"
+                  className="mt-4 h-auto min-h-12 w-full min-w-0 whitespace-normal rounded-lg bg-[#D1954E] px-4 py-3 text-center text-xs leading-tight text-[#FEFDF9] hover:bg-[#B8803C]"
                 >
                   <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-white/15 font-mono text-[9px] font-bold text-white">08</span>
                   <span className="min-w-0 break-words">{t('orderSubmit')}</span>
                   <ArrowRight size={17} className="hidden min-[430px]:block" />
                 </Button>
 
-                <div className="mt-2 flex items-center justify-center gap-1.5 text-center text-[9px] leading-tight text-[#526049]">
+                <div className="mt-2 flex items-center justify-center gap-1.5 text-center text-[9px] leading-tight text-[#6B7860]">
                   <ShieldCheck size={12} className="shrink-0" />
                   <span>{t('orderGuaranteeNote')}</span>
                 </div>
@@ -955,18 +955,18 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
             </div>
           </form>
         ) : (
-          <div className="min-w-0 bg-[#F7F5EF] p-5 text-[#1E1E1E] sm:p-8">
+          <div className="min-w-0 bg-[#F5F2E0] p-5 text-[#1E1E1E] sm:p-8">
             <div className="relative mx-auto max-w-xl text-center">
-              <div className="relative mx-auto flex h-16 w-16 items-center justify-center rounded-full border-2 border-[#8A9C7A]/40 bg-[#E7EEE1] text-[#647554] shadow-md animate-in zoom-in-50 duration-300 sm:h-20 sm:w-20">
-                <CheckCircle size={38} strokeWidth={2.5} className="text-[#647554] sm:size-11" />
-                <span className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-[#1E1E1E] text-[#B8C8AA] shadow-sm">
+              <div className="relative mx-auto flex h-16 w-16 items-center justify-center rounded-full border-2 border-[#8D9B7D]/40 bg-[#E1ECD3] text-[#6B7860] shadow-md animate-in zoom-in-50 duration-300 sm:h-20 sm:w-20">
+                <CheckCircle size={38} strokeWidth={2.5} className="text-[#6B7860] sm:size-11" />
+                <span className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-[#1E1E1E] text-[#C8D8B8] shadow-sm">
                   <MessageCircle size={13} />
                 </span>
               </div>
 
               <div className="mt-3 flex items-center justify-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-[#647554] animate-pulse" />
-                <p className="font-display text-[10px] font-extrabold uppercase tracking-wider text-[#647554]">
+                <span className="h-2 w-2 rounded-full bg-[#6B7860] animate-pulse" />
+                <p className="font-display text-[10px] font-extrabold uppercase tracking-wider text-[#6B7860]">
                   {t('orderSuccessBadge')}
                 </p>
               </div>
@@ -975,69 +975,69 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
                 {t('orderSuccessMsg')}
               </h3>
 
-              <p className="mx-auto mt-2 max-w-md font-sans text-xs leading-relaxed text-[#526049]">
+              <p className="mx-auto mt-2 max-w-md font-sans text-xs leading-relaxed text-[#6B7860]">
                 {t('orderSuccessDetail').replace('{name}', name).replace('{plan}', planString)}
               </p>
 
-              <div className="mt-5 rounded-2xl border border-[#8A9C7A]/40 bg-[#E7EEE1] p-4 text-left shadow-xs sm:p-5">
-                <div className="border-b border-[#8A9C7A]/25 pb-3">
-                  <span className="font-display text-[10px] font-extrabold uppercase tracking-wider text-[#33402B]">
+              <div className="mt-5 rounded-2xl border border-[#8D9B7D]/40 bg-[#E1ECD3] p-4 text-left shadow-xs sm:p-5">
+                <div className="border-b border-[#8D9B7D]/25 pb-3">
+                  <span className="font-display text-[10px] font-extrabold uppercase tracking-wider text-[#3A4A30]">
                     {t('orderTicketTitle')}
                   </span>
                 </div>
 
                 <div className="mt-3.5 grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <div>
-                    <p className="font-display text-[9px] font-bold uppercase tracking-wider text-[#647554]">{t('orderName')}</p>
+                    <p className="font-display text-[9px] font-bold uppercase tracking-wider text-[#6B7860]">{t('orderName')}</p>
                     <p className="mt-0.5 font-sans text-xs font-bold text-[#1E1E1E]">{name}</p>
                   </div>
 
                   <div>
-                    <p className="font-display text-[9px] font-bold uppercase tracking-wider text-[#647554]">{t('orderPhone')}</p>
+                    <p className="font-display text-[9px] font-bold uppercase tracking-wider text-[#6B7860]">{t('orderPhone')}</p>
                     <p className="mt-0.5 font-sans text-xs font-bold text-[#1E1E1E]">{phone}</p>
                   </div>
 
                   <div>
-                    <p className="font-display text-[9px] font-bold uppercase tracking-wider text-[#647554]">{t('orderDeliveryPeriodLabel')}</p>
-                    <p className="mt-0.5 font-mono text-[10px] font-bold text-[#33402B]">
+                    <p className="font-display text-[9px] font-bold uppercase tracking-wider text-[#6B7860]">{t('orderDeliveryPeriodLabel')}</p>
+                    <p className="mt-0.5 font-mono text-[10px] font-bold text-[#3A4A30]">
                       {formatOrderDate(startDate, locale)} – {formatOrderDate(endDate, locale)}
                     </p>
                   </div>
 
                   <div>
-                    <p className="font-display text-[9px] font-bold uppercase tracking-wider text-[#647554]">{orderCopy.weeklyRotation}</p>
+                    <p className="font-display text-[9px] font-bold uppercase tracking-wider text-[#6B7860]">{orderCopy.weeklyRotation}</p>
                     <p className="mt-0.5 font-mono text-[10px] font-bold text-[#1E1E1E]">{selectedTier.tier}g Protein · {periodLabel}</p>
                   </div>
 
                   <div className="sm:col-span-2">
-                    <p className="font-display text-[9px] font-bold uppercase tracking-wider text-[#647554]">{t('orderSummary')}</p>
+                    <p className="font-display text-[9px] font-bold uppercase tracking-wider text-[#6B7860]">{t('orderSummary')}</p>
                     <p className="mt-0.5 font-mono text-[10px] font-bold text-[#1E1E1E]">
                       {dayCountLabel} · {mealsPerDay}x/{isIndonesian ? 'hari' : 'day'} · {boxCountLabel}
                     </p>
                   </div>
                   <div className="sm:col-span-2">
-                    <p className="font-display text-[9px] font-bold uppercase tracking-wider text-[#647554]">{scheduleLabel}</p>
+                    <p className="font-display text-[9px] font-bold uppercase tracking-wider text-[#6B7860]">{scheduleLabel}</p>
                     <p className="mt-0.5 font-mono text-[10px] font-bold text-[#1E1E1E]">{mealsPerDay === 1 ? `${singleMealReadyTime === '12:00' ? orderCopy.lunch : orderCopy.dinner} ${orderCopy.ready} ${formatReadyTime(readyTimeMeal1)}` : `${orderCopy.lunch} ${orderCopy.ready} ${formatReadyTime(readyTimeMeal1)} · ${orderCopy.dinner} ${orderCopy.ready} ${formatReadyTime(readyTimeMeal2)} · ${orderCopy.sameMenu}`}</p>
                   </div>
                   <div>
-                    <p className="font-display text-[9px] font-bold uppercase tracking-wider text-[#647554]">{orderCopy.addons}</p>
+                    <p className="font-display text-[9px] font-bold uppercase tracking-wider text-[#6B7860]">{orderCopy.addons}</p>
                     <p className="mt-0.5 text-[10px] font-bold text-[#1E1E1E]">{selectedAddonNames.length ? selectedAddonNames.join(', ') : orderCopy.none}</p>
                   </div>
                   <div>
-                    <p className="font-display text-[9px] font-bold uppercase tracking-wider text-[#647554]">{orderCopy.fulfillment}</p>
+                    <p className="font-display text-[9px] font-bold uppercase tracking-wider text-[#6B7860]">{orderCopy.fulfillment}</p>
                     <p className="mt-0.5 text-[10px] font-bold text-[#1E1E1E]">{selectedFulfillmentLabel}</p>
                   </div>
                   {requiresDeliveryAddress ? (
                     <div className="sm:col-span-2">
-                      <p className="font-display text-[9px] font-bold uppercase tracking-wider text-[#647554]">{orderCopy.deliveryDestination}</p>
+                      <p className="font-display text-[9px] font-bold uppercase tracking-wider text-[#6B7860]">{orderCopy.deliveryDestination}</p>
                       <p className="mt-0.5 text-[10px] font-bold leading-4 text-[#1E1E1E]">{address}</p>
-                      {mapsUrl.trim() ? <a href={mapsUrl.trim()} target="_blank" rel="noopener noreferrer" className="mt-1 inline-flex items-start gap-1 break-all text-[9px] font-semibold text-[#526049] underline underline-offset-2"><Link2 size={10} className="mt-0.5 shrink-0" />{mapsUrl.trim()}</a> : null}
+                      {mapsUrl.trim() ? <a href={mapsUrl.trim()} target="_blank" rel="noopener noreferrer" className="mt-1 inline-flex items-start gap-1 break-all text-[9px] font-semibold text-[#6B7860] underline underline-offset-2"><Link2 size={10} className="mt-0.5 shrink-0" />{mapsUrl.trim()}</a> : null}
                     </div>
                   ) : null}
                 </div>
 
                 <div className="mt-4 flex items-center justify-between rounded-xl border border-[#1E1E1E]/15 bg-white px-4 py-3 shadow-xs">
-                  <span className="font-display text-xs font-bold uppercase tracking-wider text-[#526049]">{t('orderEstimatedTotal')}</span>
+                  <span className="font-display text-xs font-bold uppercase tracking-wider text-[#6B7860]">{t('orderEstimatedTotal')}</span>
                   <span className="font-display text-xl font-black text-[#1E1E1E] sm:text-2xl">Rp {totalCost.toLocaleString('id-ID')}</span>
                 </div>
               </div>
@@ -1046,7 +1046,7 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
                 <Button
                   variant="dark"
                   onClick={handleReopenWhatsApp}
-                  className="h-11 w-full rounded-xl bg-[#1E1E1E] px-6 text-xs font-bold text-white shadow-md transition-all hover:bg-[#647554] sm:w-auto"
+                  className="h-11 w-full rounded-xl bg-[#1E1E1E] px-6 text-xs font-bold text-white shadow-md transition-all hover:bg-[#6B7860] sm:w-auto"
                 >
                   <MessageCircle size={17} />
                   <span>{t('orderOpenWaCta')}</span>
@@ -1055,7 +1055,7 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
                 <Button
                   variant="outline"
                   onClick={handleReset}
-                  className="h-11 w-full rounded-xl border-[#1E1E1E]/25 bg-white px-6 text-xs font-bold text-[#1E1E1E] hover:bg-[#E7EEE1] sm:w-auto"
+                  className="h-11 w-full rounded-xl border-[#1E1E1E]/25 bg-white px-6 text-xs font-bold text-[#1E1E1E] hover:bg-[#E1ECD3] sm:w-auto"
                 >
                   {t('orderBackBtn')}
                 </Button>

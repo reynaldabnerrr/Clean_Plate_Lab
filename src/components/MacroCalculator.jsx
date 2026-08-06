@@ -99,7 +99,7 @@ export function MacroCalculator({ onOpenOrder }) {
                   type="button"
                   variant={gender === "male" ? "default" : "outline"}
                   onClick={() => setGender("male")}
-                  className={`min-h-11 min-w-0 rounded-xl px-2 ${gender === "male" ? "bg-[#8A9C7A] text-white font-extrabold" : ""}`}
+                  className={`min-h-11 min-w-0 rounded-xl px-2 ${gender === "male" ? "bg-[#8D9B7D] text-white font-extrabold" : ""}`}
                 >
                   {t('calcMale')}
                 </Button>
@@ -107,7 +107,7 @@ export function MacroCalculator({ onOpenOrder }) {
                   type="button"
                   variant={gender === "female" ? "default" : "outline"}
                   onClick={() => setGender("female")}
-                  className={`min-h-11 min-w-0 rounded-xl px-2 ${gender === "female" ? "bg-[#8A9C7A] text-white font-extrabold" : ""}`}
+                  className={`min-h-11 min-w-0 rounded-xl px-2 ${gender === "female" ? "bg-[#8D9B7D] text-white font-extrabold" : ""}`}
                 >
                   {t('calcFemale')}
                 </Button>
@@ -161,14 +161,14 @@ export function MacroCalculator({ onOpenOrder }) {
 
             {/* Activity Level Selector */}
             <div>
-              <label id="activity-level-label" className="mb-2 block font-display text-xs font-bold uppercase tracking-widest text-[var(--cpl-dark-muted)]">
+              <label id="activity-level-label" className="mb-2 block font-sans text-xs font-bold uppercase tracking-widest text-[var(--cpl-dark-muted)]">
                 {t('calcActivity')}
               </label>
               <Select value={String(activity)} onValueChange={(value) => setActivity(Number(value))}>
-                <SelectTrigger aria-labelledby="activity-level-label" className="group min-h-14 rounded-xl border-2 border-[#1E1E1E] bg-[var(--cpl-cream)] px-3 py-2 text-left hover:bg-[#E7EEE1] sm:min-h-16 sm:rounded-2xl sm:py-2.5">
+                <SelectTrigger aria-labelledby="activity-level-label" className="group min-h-14 rounded-xl border-2 border-[#1E1E1E] bg-[var(--cpl-cream)] px-3 py-2 text-left hover:bg-[#E1ECD3] sm:min-h-16 sm:rounded-2xl sm:py-2.5">
                   <span className="min-w-0 flex-1">
                     <strong className="block truncate font-display text-[11px] font-extrabold uppercase text-[#1E1E1E]">{activeActivity.label}</strong>
-                    <span className="mt-0.5 block font-mono text-[9px] font-bold uppercase tracking-wider text-[#647554]">Activity factor · {activity}×</span>
+                    <span className="mt-0.5 block font-mono text-[9px] font-bold uppercase tracking-wider text-[#6B7860]">Activity factor · {activity}×</span>
                   </span>
                 </SelectTrigger>
                 <SelectContent aria-label={t('calcActivity')}>
@@ -281,7 +281,7 @@ export function MacroCalculator({ onOpenOrder }) {
                 <h4 className="min-w-0 wrap-break-word font-display text-lg font-extrabold uppercase text-[var(--cpl-dark)] sm:text-2xl">
                   {recommendedPlanName}
                 </h4>
-                <Badge variant="solid" className="bg-[#8A9C7A] text-white w-fit">
+                <Badge variant="solid" className="bg-[#8D9B7D] text-white w-fit">
                   {recommendedProteinTier}g tier
                 </Badge>
               </div>
@@ -306,7 +306,7 @@ export function MacroCalculator({ onOpenOrder }) {
                   });
                   onOpenOrder(recommendedProteinTier);
                 }}
-                className="flex h-auto min-h-12 w-full items-center justify-center gap-2 whitespace-normal bg-[#8A9C7A] px-4 py-3 text-center text-xs font-extrabold leading-tight text-white hover:bg-[#647554]"
+                className="flex h-auto min-h-12 w-full items-center justify-center gap-2 whitespace-normal bg-[#8D9B7D] px-4 py-3 text-center text-xs font-extrabold leading-tight text-white hover:bg-[#6B7860]"
               >
                 <span>{copy.calculatorCta.replace('{tier}', recommendedProteinTier)}</span>
                 <ArrowRight size={16} />

@@ -72,7 +72,7 @@ export function MenuArchiveSection() {
               <Select value={activeMobileMealId} onValueChange={setSelectedMobileMealId}>
                 <SelectTrigger
                   aria-label={copy.menu.selectMenu}
-                  className="group min-h-14 rounded-none border-2 border-[#1E1E1E] bg-[var(--cpl-cream)] px-3 font-display text-xs font-extrabold uppercase text-[#1E1E1E] shadow-[3px_3px_0_#8A9C7A]"
+                  className="group min-h-14 rounded-none border-2 border-[#1E1E1E] bg-[var(--cpl-cream)] px-3 font-display text-xs font-extrabold uppercase text-[#1E1E1E] shadow-[3px_3px_0_#8D9B7D]"
                 >
                   <SelectValue />
                 </SelectTrigger>
@@ -97,7 +97,7 @@ export function MenuArchiveSection() {
                   <div className="relative h-40 overflow-hidden bg-[var(--cpl-cream)] sm:h-56">
                     <img src={meal.photo} alt={`${meal.name} plated meal`} loading="lazy" decoding="async" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
                     <span className="absolute left-3 top-3 bg-[#1E1E1E] px-2.5 py-1 font-mono text-[10px] font-bold uppercase text-white">W{meal.week} · {meal.id.toUpperCase()}</span>
-                    <span className="absolute right-3 top-3 bg-[#8A9C7A] px-3 py-1 font-display text-[10px] font-extrabold uppercase text-white sm:text-xs">{isIndonesian ? meal.dayID : meal.day}</span>
+                    <span className="absolute right-3 top-3 bg-[#8D9B7D] px-3 py-1 font-display text-[10px] font-extrabold uppercase text-white sm:text-xs">{isIndonesian ? meal.dayID : meal.day}</span>
                   </div>
 
                   <div className="flex flex-col p-4 sm:p-6">

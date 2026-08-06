@@ -46,7 +46,7 @@ export function Footer() {
               {t('footerDesc')}
             </p>
 
-            <div className="flex items-center gap-3 text-xs font-display uppercase tracking-widest text-[#8A9C7A]">
+            <div className="flex items-center gap-3 text-xs font-display uppercase tracking-widest text-[#8D9B7D]">
               <span>REAL FOOD</span>
               <span>•</span>
               <span>CLEAR DATA</span>
@@ -57,10 +57,10 @@ export function Footer() {
 
           {/* Col 2: Navigation Links */}
           <div className="md:col-span-3 space-y-4">
-            <h4 className="font-display font-extrabold text-sm uppercase tracking-wider text-[#8A9C7A]">
+            <h4 className="font-display font-extrabold text-sm uppercase tracking-wider text-[#8D9B7D]">
               {t('footerQuickLinks')}
             </h4>
-            <ul className="space-y-2.5 text-xs font-display uppercase tracking-wider text-gray-400">
+            <ul className="space-y-2.5 text-xs font-sans uppercase tracking-wider text-gray-400">
               <li><a href="#protein-tiers" className="hover:text-white transition-colors">{copy.nav.protein}</a></li>
               <li><a href="#how-it-works" className="hover:text-white transition-colors">{copy.nav.how}</a></li>
               <li><a href="#menu" className="hover:text-white transition-colors">{copy.nav.menu}</a></li>
@@ -71,44 +71,44 @@ export function Footer() {
 
           {/* Col 3: Contact & Kitchen Location */}
           <div className="md:col-span-4 space-y-4">
-            <h4 className="font-display font-extrabold text-sm uppercase tracking-wider text-[#8A9C7A]">
+            <h4 className="font-display font-extrabold text-sm uppercase tracking-wider text-[#8D9B7D]">
               {t('footerKitchenContact')}
             </h4>
             <div className="space-y-3 text-xs text-gray-300 font-sans">
               <div className="flex items-start gap-2.5">
-                <MapPin size={18} className="text-[#8A9C7A] flex-shrink-0 mt-0.5" />
+                <MapPin size={18} className="text-[#8D9B7D] flex-shrink-0 mt-0.5" />
                 <span className="leading-relaxed">{t('footerCentralKitchen')}</span>
               </div>
               
               <div className="flex items-center gap-2.5">
-                <Phone size={18} className="text-[#8A9C7A] flex-shrink-0" />
+                <Phone size={18} className="text-[#8D9B7D] flex-shrink-0" />
                 <a 
                   href={`https://wa.me/${WHATSAPP_NUMBER}`}
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="hover:text-[#8A9C7A] transition-colors font-medium"
+                  className="hover:text-[#8D9B7D] transition-colors font-medium"
                 >
                   WhatsApp: {WHATSAPP_DISPLAY}
                 </a>
               </div>
 
               <div className="flex items-center gap-2.5">
-                <InstagramIcon size={18} className="text-[#8A9C7A] flex-shrink-0" />
+                <InstagramIcon size={18} className="text-[#8D9B7D] flex-shrink-0" />
                 <a 
                   href="https://www.instagram.com/cleanplatelab.id/" 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="hover:text-[#8A9C7A] transition-colors font-medium font-mono text-[11px]"
+                  className="hover:text-[#8D9B7D] transition-colors font-medium font-mono text-[11px]"
                 >
                   Instagram: @cleanplatelab.id
                 </a>
               </div>
 
               <div className="flex items-center gap-2.5">
-                <Mail size={18} className="text-[#8A9C7A] flex-shrink-0" />
+                <Mail size={18} className="text-[#8D9B7D] flex-shrink-0" />
                 <a
                   href={`mailto:${CONTACT_EMAIL}`}
-                  className="break-all font-medium transition-colors hover:text-[#8A9C7A]"
+                  className="break-all font-medium transition-colors hover:text-[#8D9B7D]"
                 >
                   {CONTACT_EMAIL}
                 </a>
@@ -126,7 +126,7 @@ export function Footer() {
 
           <button
             onClick={scrollToTop}
-            className="flex items-center gap-2 px-3 py-1.5 bg-white/10 hover:bg-[#8A9C7A] hover:text-white text-gray-300 transition-colors"
+            className="flex items-center gap-2 px-3 py-1.5 bg-white/10 hover:bg-[#8D9B7D] hover:text-white text-gray-300 transition-colors"
           >
             <span>{t('footerBackToTop')}</span>
             <ArrowUp size={12} />

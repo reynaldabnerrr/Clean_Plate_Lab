@@ -6,7 +6,7 @@ export function SectionHeader({ eyebrow, title, description, align = 'left', act
 
   return (
     <div className={`flex max-w-3xl flex-col ${alignment}`}>
-      {eyebrow ? <Badge variant={inverted ? 'solid' : 'default'} className={inverted ? 'bg-[#8A9C7A] text-white' : ''}>{eyebrow}</Badge> : null}
+      {eyebrow ? <Badge variant={inverted ? 'solid' : 'default'} className={inverted ? 'bg-[#8D9B7D] text-white' : ''}>{eyebrow}</Badge> : null}
       <h2 className={`mt-3 font-display text-2xl font-extrabold uppercase leading-tight tracking-tight sm:mt-4 sm:text-5xl ${inverted ? 'text-white' : 'text-[var(--cpl-dark)]'}`}>
         {title}
       </h2>

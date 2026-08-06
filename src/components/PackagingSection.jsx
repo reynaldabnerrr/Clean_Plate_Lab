@@ -29,31 +29,31 @@ export function PackagingSection() {
           
           {/* Packaging Box Visual Mockup */}
           <div className="lg:col-span-6 flex justify-center">
-            <div className="w-full max-w-md bg-[#D6C7B0]/30 border-4 border-[#1E1E1E] p-8 relative shadow-2xl space-y-6">
+            <div className="w-full max-w-md bg-[#EABB85]/30 border-4 border-[#1E1E1E] p-8 relative shadow-2xl space-y-6">
               
               {/* Top Badge */}
               <div className="flex justify-between items-center border-b-2 border-[#1E1E1E] pb-4">
                 <span className="font-mono text-xs font-bold uppercase tracking-widest text-[#1E1E1E]">
                   {t('packBoxRef')}
                 </span>
-                <span className="bg-[#8A9C7A] text-white text-[10px] font-bold px-2 py-1 uppercase">
+                <span className="bg-[#8D9B7D] text-white text-[10px] font-bold px-2 py-1 uppercase">
                   {t('pack100Biodegradable')}
                 </span>
               </div>
 
               {/* Main Typography Print */}
               <div className="py-4 space-y-2 text-center">
-                <CplPrimaryLogo size="large" color="#647554" className="items-center justify-center" />
+                <CplPrimaryLogo size="large" color="#6B7860" className="items-center justify-center" />
                 <div className="text-xs font-display font-extrabold uppercase tracking-widest text-[#1E1E1E] pt-2">
                   {t('packBoxSlogan')}
                 </div>
               </div>
 
               {/* Box Details Strip (Rounded) */}
-              <div className="p-4 bg-[#F5F2EA] border-2 border-[#1E1E1E] text-xs font-mono space-y-1 text-gray-800 rounded-2xl shadow-sm">
+              <div className="p-4 bg-[#FEFDF9] border-2 border-[#1E1E1E] text-xs font-mono space-y-1 text-gray-800 rounded-2xl shadow-sm">
                 <div className="flex justify-between">
                   <span>{t('packThermalSeal')}</span>
-                  <span className="font-bold text-[#8A9C7A]">{t('packThermalSealVal')}</span>
+                  <span className="font-bold text-[#8D9B7D]">{t('packThermalSealVal')}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>{t('packMaterial')}</span>
@@ -73,7 +73,7 @@ export function PackagingSection() {
                   <div>{t('heroTitle3')}</div>
                 </div>
 
-                <CplBadgeLogo size={80} color="#8A9C7A" className="bg-white/80" />
+                <CplBadgeLogo size={80} color="#8D9B7D" className="bg-white/80" />
               </div>
 
             </div>

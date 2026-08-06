@@ -57,7 +57,7 @@ export function FaqSection() {
             <button
               type="button"
               onClick={() => setShowAllOnMobile((current) => !current)}
-              className="mt-1 min-h-11 border-2 border-[#1E1E1E] bg-white px-4 font-display text-[10px] font-extrabold uppercase tracking-wider text-[#1E1E1E] shadow-[2px_2px_0_#8A9C7A] transition-colors hover:bg-[#EBF0E6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8A9C7A] sm:hidden"
+              className="mt-1 min-h-11 border-2 border-[#1E1E1E] bg-white px-4 font-display text-[10px] font-extrabold uppercase tracking-wider text-[#1E1E1E] shadow-[2px_2px_0_#8D9B7D] transition-colors hover:bg-[#E1ECD3] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8D9B7D] sm:hidden"
             >
               {showAllOnMobile ? copy.faq.showLess : copy.faq.showAll}
             </button>

@@ -89,7 +89,7 @@ export function CorporateCatering({ onOpenOrder }) {
               <h3 className="font-display text-xl font-extrabold uppercase text-[var(--cpl-dark)]">
                 {t('b2bEstimatorTitle')}
               </h3>
-              <Badge variant="solid" className="bg-[#8A9C7A] text-white rounded-full px-3 py-1">
+              <Badge variant="solid" className="bg-[#8D9B7D] text-white rounded-full px-3 py-1">
                 {t('b2bTierPricing')}
               </Badge>
             </div>
@@ -144,11 +144,11 @@ export function CorporateCatering({ onOpenOrder }) {
                     className={`flex h-auto min-h-11.5 min-w-0 flex-col items-center justify-center rounded-xl border-2 p-3 transition-all ${
                       proteinTier === item.tier 
                         ? "bg-[#1E1E1E] text-white font-extrabold border-[#1E1E1E]" 
-                        : "bg-white text-[#1E1E1E] font-bold border-gray-300 hover:border-[#8A9C7A]"
+                        : "bg-white text-[#1E1E1E] font-bold border-gray-300 hover:border-[#8D9B7D]"
                     }`}
                   >
                     <span className="text-xs">{item.label}</span>
-                    <span className={`text-[10px] ${proteinTier === item.tier ? "text-[#8A9C7A]" : "text-gray-500"}`}>{item.price}</span>
+                    <span className={`text-[10px] ${proteinTier === item.tier ? "text-[#8D9B7D]" : "text-gray-500"}`}>{item.price}</span>
                   </Button>
                 ))}
               </div>
@@ -176,7 +176,7 @@ export function CorporateCatering({ onOpenOrder }) {
               variant="default"
               size="lg"
               onClick={onOpenOrder}
-                className="flex h-auto min-h-12 w-full items-center justify-center gap-2 whitespace-normal bg-[#8A9C7A] px-4 py-3 text-center text-xs font-extrabold leading-tight text-white hover:bg-[#647554]"
+                className="flex h-auto min-h-12 w-full items-center justify-center gap-2 whitespace-normal bg-[#8D9B7D] px-4 py-3 text-center text-xs font-extrabold leading-tight text-white hover:bg-[#6B7860]"
             >
               <Send size={16} />
               <span>{t('b2bCta')}</span>

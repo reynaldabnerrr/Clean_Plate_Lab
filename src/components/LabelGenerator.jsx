@@ -93,7 +93,7 @@ export function LabelGenerator({ onOpenOrder }) {
                 <span className="text-xs font-display font-extrabold uppercase text-[var(--cpl-dark)]">
                   {t('labelCustomBuilder')}
                 </span>
-                <Badge variant="solid" className="bg-[#8A9C7A] text-white rounded-full px-3 py-1">
+                <Badge variant="solid" className="bg-[#8D9B7D] text-white rounded-full px-3 py-1">
                   {t('labelMainTierBadge')}
                 </Badge>
               </div>
@@ -105,17 +105,17 @@ export function LabelGenerator({ onOpenOrder }) {
                     onClick={() => handleSelectTier(tier)}
                     className={`p-3.5 cursor-pointer transition-all border-2 text-center rounded-xl relative ${
                       protein === tier.g
-                        ? 'border-[#1E1E1E] bg-[#EBF0E6] shadow-[2px_2px_0px_0px_#1E1E1E]'
-                        : 'border-gray-200 bg-white hover:border-[#8A9C7A]'
+                        ? 'border-[#1E1E1E] bg-[#E1ECD3] shadow-[2px_2px_0px_0px_#1E1E1E]'
+                        : 'border-gray-200 bg-white hover:border-[#8D9B7D]'
                     }`}
                   >
                     {tier.recommended && (
-                      <span className="absolute -top-2.5 right-2 bg-[#8A9C7A] text-white text-[9px] font-black uppercase px-2 py-0.5 rounded-full shadow-xs">
+                      <span className="absolute -top-2.5 right-2 bg-[#8D9B7D] text-white text-[9px] font-black uppercase px-2 py-0.5 rounded-full shadow-xs">
                         {t('labelRecommended')}
                       </span>
                     )}
                     <div className="text-sm font-display font-black text-[#1E1E1E]">{tier.g}g Protein</div>
-                    <div className="text-xs font-extrabold text-[#647554] mt-0.5">{tier.price}</div>
+                    <div className="text-xs font-extrabold text-[#6B7860] mt-0.5">{tier.price}</div>
                   </Card>
                 ))}
               </div>
@@ -144,7 +144,7 @@ export function LabelGenerator({ onOpenOrder }) {
               <Button
                 variant="default"
                 onClick={onOpenOrder}
-                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-[#8A9C7A] hover:bg-[#647554] text-white min-h-[44px]"
+                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-[#8D9B7D] hover:bg-[#6B7860] text-white min-h-[44px]"
               >
                 <span>{t('labelInspectCta')}</span>
               </Button>
@@ -171,14 +171,14 @@ export function LabelGenerator({ onOpenOrder }) {
                   transition: isLabelHovered ? 'transform 0.1s ease-out, box-shadow 0.3s ease' : 'transform 0.5s ease-out, box-shadow 0.5s ease',
                   boxShadow: isLabelHovered ? '0 25px 50px -12px rgba(0, 0, 0, 0.3)' : '0 10px 25px -5px rgba(0, 0, 0, 0.12)'
                 }}
-                className={`cpl-label-paper p-5 sm:p-8 rounded-none border-2 border-[#1E1E1E] bg-[#F5F2EA] relative transition-all duration-300 ${!isLabelHovered ? 'cpl-3d-idle-float' : ''}`}
+                className={`cpl-label-paper p-5 sm:p-8 rounded-none border-2 border-[#1E1E1E] bg-[#FEFDF9] relative transition-all duration-300 ${!isLabelHovered ? 'cpl-3d-idle-float' : ''}`}
               >
                 {/* Glossy Sheen Reflection Pass */}
                 <div className="cpl-gloss-sheen" />
                 
                 <div className="flex justify-between items-center border-b-2 border-[#1E1E1E] pb-3 mb-5 sm:mb-6">
                   <span className="font-extrabold text-sm sm:text-base tracking-wider">{currentCode}</span>
-                  <Badge variant="solid" className="px-2.5 py-1 text-[10px] sm:text-xs font-extrabold uppercase tracking-widest bg-[#8A9C7A] text-white">
+                  <Badge variant="solid" className="px-2.5 py-1 text-[10px] sm:text-xs font-extrabold uppercase tracking-widest bg-[#8D9B7D] text-white">
                     MEAL PREP
                   </Badge>
                 </div>
@@ -187,7 +187,7 @@ export function LabelGenerator({ onOpenOrder }) {
                   {currentTitle}
                 </h3>
                 
-                <p className="text-[10px] sm:text-xs font-bold text-[#647554] tracking-widest uppercase mb-5 sm:mb-6">
+                <p className="text-[10px] sm:text-xs font-bold text-[#6B7860] tracking-widest uppercase mb-5 sm:mb-6">
                   {t('heroLabelSub')}
                 </p>
 
@@ -195,7 +195,7 @@ export function LabelGenerator({ onOpenOrder }) {
                 <div className="border-2 border-[#1E1E1E] mb-5 sm:mb-6 text-xs sm:text-sm font-bold bg-white/80">
                   <div className="grid grid-cols-2 border-b border-[#1E1E1E] p-2 sm:p-2.5">
                     <span className="text-gray-700">{t('heroProtein')}</span>
-                    <span className="text-right text-[#8A9C7A] font-black text-sm sm:text-base">{protein}g</span>
+                    <span className="text-right text-[#8D9B7D] font-black text-sm sm:text-base">{protein}g</span>
                   </div>
                   <div className="grid grid-cols-2 border-b border-[#1E1E1E] p-2 sm:p-2.5 bg-white/60">
                     <span className="text-gray-700">{t('heroCarbs')}</span>
@@ -213,7 +213,7 @@ export function LabelGenerator({ onOpenOrder }) {
                     <span className="text-gray-700">{t('heroPotassium')}</span>
                     <span className="text-right font-extrabold">{potassium} mg</span>
                   </div>
-                  <div className="grid grid-cols-2 p-2 sm:p-2.5 bg-[#8A9C7A]/20">
+                  <div className="grid grid-cols-2 p-2 sm:p-2.5 bg-[#8D9B7D]/20">
                     <span className="text-[#1E1E1E] font-black">{t('heroCalories')}</span>
                     <span className="text-right font-black text-sm sm:text-base text-[#1E1E1E]">{calculatedKcal} KCAL</span>
                   </div>
@@ -229,7 +229,7 @@ export function LabelGenerator({ onOpenOrder }) {
                 {/* Stamp */}
                 <div className="flex items-end justify-between pt-1 sm:pt-2">
                   <div className="flex items-center gap-2 sm:gap-3">
-                    <CplFlaskIcon size={24} color="#8A9C7A" className="sm:w-7 sm:h-7" />
+                    <CplFlaskIcon size={24} color="#8D9B7D" className="sm:w-7 sm:h-7" />
                     <div className="text-[9px] sm:text-[11px] font-black tracking-wider text-[#1E1E1E] uppercase leading-tight">
                       <div>{t('heroTitle1')}</div>
                       <div>{t('heroTitle2')}</div>

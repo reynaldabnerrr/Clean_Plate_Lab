@@ -27,7 +27,7 @@ export function CplPrimaryLogo({ className = "", size = "normal", inverted = fal
         <div className={`font-display font-black tracking-tighter uppercase ${inverted ? 'text-white' : 'text-[#1E1E1E]'} ${isLarge ? 'text-2xl' : 'text-base min-[360px]:text-lg sm:text-xl'}`}>
           CLEAN PLATE LAB
         </div>
-        <div className={`mt-1 font-display font-bold uppercase tracking-widest ${inverted ? 'text-[#B8C8AA]' : 'text-[#647554]'} ${isLarge ? 'text-xs' : 'hidden text-[8px] min-[360px]:block sm:text-[10px]'}`}>
+        <div className={`mt-1 font-display font-bold uppercase tracking-widest ${inverted ? 'text-[#C8D8B8]' : 'text-[#6B7860]'} ${isLarge ? 'text-xs' : 'hidden text-[8px] min-[360px]:block sm:text-[10px]'}`}>
           GOOD FOOD. CLEAR DATA. BETTER YOU.
         </div>
       </div>
@@ -53,7 +53,7 @@ export function CplBadgeLogo({ size = 90, className = "" }) {
   );
 }
 
-export function CplFlaskIcon({ size = 20, color = "#8A9C7A" }) {
+export function CplFlaskIcon({ size = 20, color = "#8D9B7D" }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M10 2v7.5L4.5 18a2 2 0 0 0 1.7 3h11.6a2 2 0 0 0 1.7-3L14 9.5V2" />

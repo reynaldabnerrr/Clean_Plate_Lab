@@ -37,14 +37,14 @@ export function LanguageWelcomeModal() {
         aria-describedby="language-welcome-description"
         onEscapeKeyDown={(event) => event.preventDefault()}
         onPointerDownOutside={(event) => event.preventDefault()}
-        className="w-[calc(100%_-_2rem)] max-w-[25rem] gap-0 rounded-3xl border border-[#1E1E1E]/15 bg-[#F5F2EA] p-6 text-center shadow-[0_24px_70px_rgba(30,30,30,0.22)] sm:w-[calc(100%_-_3rem)] sm:p-8"
+        className="w-[calc(100%_-_2rem)] max-w-[25rem] gap-0 rounded-3xl border border-[#1E1E1E]/15 bg-[#FEFDF9] p-6 text-center shadow-[0_24px_70px_rgba(30,30,30,0.22)] sm:w-[calc(100%_-_3rem)] sm:p-8"
       >
         <CplLogoImage size={62} className="mx-auto" />
         <DialogTitle className="mt-4 text-2xl leading-none sm:text-[1.7rem]">
           Pilih bahasa
-          <span className="mt-1 block text-[#647554]">Choose language</span>
+          <span className="mt-1 block text-[#6B7860]">Choose language</span>
         </DialogTitle>
-        <DialogDescription id="language-welcome-description" className="mx-auto mt-3 max-w-xs font-sans text-[11px] leading-5 text-[#526049]">
+        <DialogDescription id="language-welcome-description" className="mx-auto mt-3 max-w-xs font-sans text-[11px] leading-5 text-[#6B7860]">
           Pilih bahasa untuk melanjutkan.
         </DialogDescription>
 
@@ -55,9 +55,9 @@ export function LanguageWelcomeModal() {
               type="button"
               autoFocus={option.id === 'ID'}
               onClick={() => selectLanguage(option.id)}
-              className="flex min-h-13 items-center gap-3 rounded-xl border border-[#1E1E1E]/20 bg-white px-4 py-3 text-left transition-colors hover:border-[#8A9C7A] hover:bg-[#E7EEE1] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8A9C7A] focus-visible:ring-offset-2"
+              className="flex min-h-13 items-center gap-3 rounded-xl border border-[#1E1E1E]/20 bg-white px-4 py-3 text-left transition-colors hover:border-[#8D9B7D] hover:bg-[#E1ECD3] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8D9B7D] focus-visible:ring-offset-2"
             >
-              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#E7EEE1] font-mono text-[9px] font-black text-[#526049]">
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#E1ECD3] font-mono text-[9px] font-black text-[#6B7860]">
                 {option.shortLabel}
               </span>
               <strong className="font-display text-xs font-black uppercase">{option.name}</strong>

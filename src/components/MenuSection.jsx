@@ -52,7 +52,7 @@ export function MenuSection({ onSelectMeal }) {
                   <div className="absolute left-3 top-3 bg-[#1E1E1E] px-2.5 py-1 font-mono text-[10px] font-bold uppercase text-white">
                     {meal.code}
                   </div>
-                  <Badge variant="solid" className="absolute right-3 top-3 bg-[#8A9C7A] px-3 py-1 text-xs font-extrabold text-white">
+                  <Badge variant="solid" className="absolute right-3 top-3 bg-[#8D9B7D] px-3 py-1 text-xs font-extrabold text-white">
                     {meal.protein}g Protein
                   </Badge>
                 </div>
@@ -81,8 +81,8 @@ export function MenuSection({ onSelectMeal }) {
 
                   <div className="mt-auto pt-4">
                     {/* Spacious 2-Row Nutrition Facts Box */}
-                    <div className="rounded-xl border border-[#1E1E1E]/20 bg-[#F5F2EA]/70 p-3 text-xs space-y-2">
-                      <div className="flex items-center justify-between border-b border-[#1E1E1E]/15 pb-1.5 font-mono text-[9px] font-black uppercase tracking-wider text-[#647554]">
+                    <div className="rounded-xl border border-[#1E1E1E]/20 bg-[#FEFDF9]/70 p-3 text-xs space-y-2">
+                      <div className="flex items-center justify-between border-b border-[#1E1E1E]/15 pb-1.5 font-mono text-[9px] font-black uppercase tracking-wider text-[#6B7860]">
                         <span>NUTRITION FACTS</span>
                         <span>LAB SPECS</span>
                       </div>
@@ -91,7 +91,7 @@ export function MenuSection({ onSelectMeal }) {
                       <div className="grid grid-cols-3 gap-2 text-center font-display">
                         <div className="rounded-lg border border-gray-200/90 bg-white p-2 shadow-2xs">
                           <div className="text-[9px] font-bold uppercase text-gray-500 tracking-tight">{t('heroProtein')}</div>
-                          <div className="text-xs sm:text-sm font-black text-[#647554] mt-0.5">{meal.protein}g</div>
+                          <div className="text-xs sm:text-sm font-black text-[#6B7860] mt-0.5">{meal.protein}g</div>
                         </div>
                         <div className="rounded-lg border border-gray-200/90 bg-white p-2 shadow-2xs">
                           <div className="text-[9px] font-bold uppercase text-gray-500 tracking-tight">{t('heroCarbs')}</div>
@@ -119,7 +119,7 @@ export function MenuSection({ onSelectMeal }) {
                     <Button
                       variant="default"
                       onClick={onSelectMeal}
-                      className="mt-4 min-h-11 w-full justify-between rounded-lg bg-[#8A9C7A] px-4 text-xs font-extrabold text-white hover:bg-[#647554]"
+                      className="mt-4 min-h-11 w-full justify-between rounded-lg bg-[#8D9B7D] px-4 text-xs font-extrabold text-white hover:bg-[#6B7860]"
                     >
                       <span>{t('menuSelectCta')}</span>
                       <ArrowRight size={15} />
