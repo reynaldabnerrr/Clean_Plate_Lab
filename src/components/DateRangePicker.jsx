@@ -84,13 +84,14 @@ function MonthGrid({ year, month, startDate, endDate, hoverDate, today, onDayCli
 
           const ds = toStr(year, month, day);
           const isPast = ds < today;
+          const isSunday = new Date(`${ds}T00:00:00Z`).getUTCDay() === 0;
           const isStart = ds === startDate;
           const isEnd = Boolean(effectiveEnd && ds === effectiveEnd && effectiveEnd !== startDate);
           const isInRange = Boolean(startDate && effectiveEnd && effectiveEnd !== startDate && ds > startDate && ds < effectiveEnd);
           const isHovered = !endDate && ds === hoverDate && Boolean(startDate && ds > startDate);
 
           let wrapperClass = 'cpl-cal-day-wrapper';
-          if (!isPast && startDate && effectiveEnd && effectiveEnd !== startDate) {
+          if (!isPast && !isSunday && startDate && effectiveEnd && effectiveEnd !== startDate) {
             if (isStart) wrapperClass += ' range-start-cap';
             else if (isEnd) wrapperClass += ' range-end-cap';
             else if (isInRange) wrapperClass += ' range-mid';
@@ -98,6 +99,7 @@ function MonthGrid({ year, month, startDate, endDate, hoverDate, today, onDayCli
 
           let buttonClass = 'cpl-cal-day';
           if (isPast) buttonClass += ' past';
+          else if (isSunday) buttonClass += ' sunday';
           else if (isStart) buttonClass += ' start';
           else if (isEnd) buttonClass += ' end';
           else if (isInRange) buttonClass += ' in-range';
@@ -108,10 +110,10 @@ function MonthGrid({ year, month, startDate, endDate, hoverDate, today, onDayCli
             <div key={ds} className={wrapperClass}>
               <button
                 type="button"
-                disabled={isPast}
+                disabled={isPast || isSunday}
                 className={buttonClass}
                 onPointerDown={(event) => {
-                  if (isPast) return;
+                  if (isPast || isSunday) return;
                   if (event.pointerType === 'mouse' && event.button !== 0) return;
                   event.preventDefault();
                   event.stopPropagation();
@@ -121,7 +123,7 @@ function MonthGrid({ year, month, startDate, endDate, hoverDate, today, onDayCli
                   event.preventDefault();
                   event.stopPropagation();
                 }}
-                onMouseEnter={() => !isPast && onDayHover(ds)}
+                onMouseEnter={() => !isPast && !isSunday && onDayHover(ds)}
                 onMouseLeave={() => onDayHover(null)}
                 aria-label={ds}
                 aria-pressed={isStart || isEnd}
