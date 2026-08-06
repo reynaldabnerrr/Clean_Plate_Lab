@@ -137,7 +137,9 @@ export function OrderModal({ isOpen, onClose, initialProteinTier = 40, initialMe
   const [selectedPeriod, setSelectedPeriod] = useState(null);
 
   const totalDays = calculateDeliveryDays(startDate, endDate);
-  const cateringPeriod = selectedPeriod ?? getCateringPeriod(totalDays);
+  const autoCateringPeriod = getCateringPeriod(totalDays);
+  const displayPeriod = selectedPeriod ?? autoCateringPeriod;
+  const cateringPeriod = autoCateringPeriod;
   const selectedTier = TIER_OPTIONS.find((option) => option.tier === proteinTier) || TIER_OPTIONS[0];
   const selectedPrice = selectedTier.prices[cateringPeriod];
   const selectedAddons = addons.filter((addon) => addonIds.includes(addon.id));
@@ -152,6 +154,7 @@ export function OrderModal({ isOpen, onClose, initialProteinTier = 40, initialMe
     ? { daily: 'Harian', weekly: 'Mingguan', monthly: 'Bulanan' }
     : { daily: 'Daily', weekly: 'Weekly', monthly: 'Monthly' };
   const periodLabel = periodLabels[cateringPeriod];
+  const displayPeriodLabel = periodLabels[displayPeriod];
   const periodOptions = [
     { key: 'daily', label: periodLabels.daily, subtitle: `1–5 ${isIndonesian ? 'hari' : 'days'}` },
     { key: 'weekly', label: periodLabels.weekly, subtitle: `6–23 ${isIndonesian ? 'hari' : 'days'}` },
@@ -619,9 +622,9 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
                             ) : null}
                           </span>
                           <span className={`mt-2 block font-mono text-[10px] font-bold ${isSelected ? 'text-[#B8C8AA]' : 'text-[#647554]'}`}>
-                            Rp {option.prices[cateringPeriod].toLocaleString('id-ID')}
+                            Rp {option.prices[displayPeriod].toLocaleString('id-ID')}
                           </span>
-                          <span className={`mt-1 block text-[8px] font-bold uppercase tracking-wide ${isSelected ? 'text-white/55' : 'text-black/40'}`}>{periodLabel}</span>
+                          <span className={`mt-1 block text-[8px] font-bold uppercase tracking-wide ${isSelected ? 'text-white/55' : 'text-black/40'}`}>{displayPeriodLabel}</span>
                         </button>
                       );
                     })}
@@ -629,7 +632,7 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
 
                   <div className="mt-3 grid grid-cols-3 overflow-hidden rounded-lg border border-[#1E1E1E]/20 bg-white text-center font-mono text-[9px] font-bold uppercase">
                     {periodOptions.map((option) => {
-                      const isSelectedPlan = cateringPeriod === option.key;
+                      const isSelectedPlan = displayPeriod === option.key;
                       const borderClass = option.key === 'weekly' ? 'border-x border-[#1E1E1E]/20' : '';
 
                       return (
