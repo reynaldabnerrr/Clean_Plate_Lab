@@ -1,9 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   darkMode: "class",
   theme: {
     extend: {
@@ -27,14 +24,14 @@ export default {
           "dark-muted": "#555555",
           /* Off White surfaces */
           white: "#FFFFFF",
-        }
+        },
       },
       fontFamily: {
-        display: ['Space Grotesk', '-apple-system', 'sans-serif'],
-        sans: ['Plus Jakarta Sans', '-apple-system', 'sans-serif'],
-        mono: ['Space Grotesk', 'monospace'],
-      }
+        display: ["Space Grotesk", "-apple-system", "sans-serif"],
+        sans: ["Plus Jakarta Sans", "-apple-system", "sans-serif"],
+        mono: ["Space Grotesk", "monospace"],
+      },
     },
   },
   plugins: [],
-}
+};
