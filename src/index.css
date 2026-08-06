@@ -838,7 +838,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   transform: scale(1.08);
 }
 .cpl-cal-day.past       { color: #ccc; cursor: default; }
-.cpl-cal-day.sunday      { color: #ccc; cursor: not-allowed; text-decoration: line-through; }
+.cpl-cal-day.sunday      { color: #ccc; cursor: not-allowed; }
 .cpl-cal-day.today      { font-weight: 800; color: var(--cpl-sage-dark); box-shadow: inset 0 0 0 1.5px var(--cpl-sage); }
 .cpl-cal-day.hovered    { background: #EBF0E6; }
 .cpl-cal-day.in-range   { background: transparent; color: #33402B; font-weight: 700; }
