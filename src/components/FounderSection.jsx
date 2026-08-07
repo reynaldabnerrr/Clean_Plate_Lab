@@ -26,7 +26,7 @@ export function FounderSection() {
             <div className="relative border-2 border-[#1E1E1E] bg-white p-3 shadow-[8px_8px_0_#1E1E1E] sm:p-4">
               <div className="relative aspect-[4/5] overflow-hidden border border-[#1E1E1E]">
                 <img
-                  src="/images/founder.jpg"
+                  src="/images/founder.webp"
                   alt={founder.name}
                   loading="lazy"
                   decoding="async"
