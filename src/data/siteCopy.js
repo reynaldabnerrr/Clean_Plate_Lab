@@ -89,12 +89,6 @@ export const siteCopy = {
       bio: "A Food Science graduate from Universitas Brawijaya with hands-on R&D and QA experience in the food industry. Clive founded Clean Plate Lab to bridge food science precision with daily healthy eating—ensuring every meal delivers verified high protein, sensory-tested taste, and clear nutrition transparency.",
       quote:
         "“Healthy eating shouldn't feel like a compromise. We use food science so you know exactly what fuels your body.”",
-      highlights: [
-        "Bachelor of Food Science & Technology",
-        "Industrial R&D & Quality Control Experience",
-        "Top 10 National Finalist — BPDP Innovation",
-        "Gold Medalist — International Youth Summit 2024",
-      ],
     },
     final: {
       title: "Your next meal starts with a few clear choices.",
@@ -266,12 +260,6 @@ export const siteCopy = {
       bio: "Lulusan Teknologi Pangan Universitas Brawijaya dengan pengalaman riset & kontrol kualitas di industri pangan. Clive mendirikan Clean Plate Lab untuk menjembatani presisi sains dan gaya hidup sehat harian—memastikan setiap porsi memiliki kadar protein terukur, rasa yang teruji secara sensori, dan transparansi nutrisi penuh.",
       quote:
         "“Makan sehat tidak boleh terasa seperti kompromi. Kami memakai ilmu pangan agar Anda tahu persis nutrisi yang masuk ke tubuh Anda.”",
-      highlights: [
-        "Sarjana Teknologi Pangan (UB)",
-        "Pengalaman Riset & Quality Control Industri",
-        "Top 10 Nasional — BPDP Palm Oil Research Project",
-        "Gold Medalist — International Youth Summit 2024",
-      ],
     },
     final: {
       title: "Makanan berikutnya dimulai dari beberapa pilihan yang jelas.",

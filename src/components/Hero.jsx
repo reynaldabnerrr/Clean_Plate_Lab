@@ -185,39 +185,45 @@ export function Hero({ onOpenOrder, onScrollToLabel }) {
                       {t("heroProtein")}
                     </span>
                     <span className="text-right text-[#8D9B7D] font-bold text-sm">
-                      81.6g
+                      80.67g
                     </span>
                   </div>
                   <div className="grid grid-cols-2 border-b border-[#1E1E1E] p-1.5 sm:p-2 bg-white/60">
                     <span className="text-gray-600 font-medium">
                       {t("heroCarbs")}
                     </span>
-                    <span className="text-right font-semibold">127.7g</span>
+                    <span className="text-right font-semibold">104.58g</span>
                   </div>
                   <div className="grid grid-cols-2 border-b border-[#1E1E1E] p-1.5 sm:p-2">
                     <span className="text-gray-600 font-medium">
                       {t("heroFat")}
                     </span>
-                    <span className="text-right font-semibold">28.2g</span>
+                    <span className="text-right font-semibold">25.39g</span>
                   </div>
                   <div className="grid grid-cols-2 border-b border-[#1E1E1E] p-1.5 sm:p-2 bg-white/60">
                     <span className="text-gray-600 font-medium">
-                      {t("heroSodium")}
+                      {t("heroFiber")}
                     </span>
-                    <span className="text-right font-semibold">1344.1 mg</span>
+                    <span className="text-right font-semibold">0.25g</span>
                   </div>
                   <div className="grid grid-cols-2 border-b border-[#1E1E1E] p-1.5 sm:p-2">
                     <span className="text-gray-600 font-medium">
+                      {t("heroSodium")}
+                    </span>
+                    <span className="text-right font-semibold">983.86 mg</span>
+                  </div>
+                  <div className="grid grid-cols-2 border-b border-[#1E1E1E] p-1.5 sm:p-2 bg-white/60">
+                    <span className="text-gray-600 font-medium">
                       {t("heroPotassium")}
                     </span>
-                    <span className="text-right font-semibold">340 mg</span>
+                    <span className="text-right font-semibold">193.01 mg</span>
                   </div>
                   <div className="grid grid-cols-2 p-1.5 sm:p-2 bg-[#8D9B7D]/20">
                     <span className="text-[#1E1E1E] font-bold">
                       {t("heroCalories")}
                     </span>
                     <span className="text-right font-bold text-sm text-[#1E1E1E]">
-                      1111.3 KCAL
+                      992.33 KCAL
                     </span>
                   </div>
                 </div>

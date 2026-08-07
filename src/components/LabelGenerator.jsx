@@ -13,6 +13,7 @@ const PROTEIN_TIERS = [
     label: "25g Protein Plan",
     carbs: 35,
     fat: 10,
+    fiber: 0.1,
     sodium: 400,
     potassium: 120,
     kcal: 330,
@@ -21,22 +22,24 @@ const PROTEIN_TIERS = [
     g: 60,
     price: "Rp 40.000",
     label: "60g Protein Plan",
-    carbs: 127.7,
-    fat: 28.2,
-    sodium: 1344.1,
-    potassium: 340,
-    kcal: 1111.3,
-    recommended: true,
+    carbs: 85,
+    fat: 20,
+    fiber: 0.2,
+    sodium: 780,
+    potassium: 160,
+    kcal: 760,
   },
   {
     g: 80,
     price: "Rp 50.000",
     label: "80g Protein Plan",
-    carbs: 145,
-    fat: 30,
-    sodium: 1450,
-    potassium: 380,
-    kcal: 1170,
+    carbs: 104.58,
+    fat: 25.39,
+    fiber: 0.25,
+    sodium: 983.86,
+    potassium: 193.01,
+    kcal: 992.33,
+    recommended: true,
   },
   {
     g: 100,
@@ -44,6 +47,7 @@ const PROTEIN_TIERS = [
     label: "100g Protein Plan",
     carbs: 160,
     fat: 32,
+    fiber: 0.4,
     sodium: 1650,
     potassium: 420,
     kcal: 1328,
@@ -52,12 +56,13 @@ const PROTEIN_TIERS = [
 
 export function LabelGenerator({ onOpenOrder }) {
   const { t } = useCpl();
-  const [protein, setProtein] = useState(60);
-  const [carbs, setCarbs] = useState(127.7);
-  const [fat, setFat] = useState(28.2);
-  const [sodium, setSodium] = useState(1344.1);
-  const [potassium, setPotassium] = useState(340);
-  const [customName, setCustomName] = useState("60g Protein Meal Box");
+  const [protein, setProtein] = useState(80.67);
+  const [carbs, setCarbs] = useState(104.58);
+  const [fat, setFat] = useState(25.39);
+  const [fiber, setFiber] = useState(0.25);
+  const [sodium, setSodium] = useState(983.86);
+  const [potassium, setPotassium] = useState(193.01);
+  const [customName, setCustomName] = useState("80g Protein Meal Box");
   const [copied, setCopied] = useState(false);
 
   const [labelTilt, setLabelTilt] = useState({ x: 0, y: 0 });
@@ -84,8 +89,8 @@ export function LabelGenerator({ onOpenOrder }) {
   };
 
   const calculatedKcal =
-    protein === 60 && carbs === 127.7
-      ? 1111.3
+    (protein === 80.67 || protein === 80) && carbs === 104.58
+      ? 992.33
       : Math.round(protein * 4 + carbs * 4 + fat * 9);
   const currentCode = `CPL-${Math.round(protein)}G`;
   const currentTitle = customName.toUpperCase() || "CUSTOM HIGH-PROTEIN MEAL";
@@ -94,6 +99,7 @@ export function LabelGenerator({ onOpenOrder }) {
     setProtein(tier.g);
     setCarbs(tier.carbs);
     setFat(tier.fat);
+    setFiber(tier.fiber || 0);
     setSodium(tier.sodium);
     setPotassium(tier.potassium);
     setCustomName(`${tier.g}g Protein Meal Box`);
@@ -268,12 +274,16 @@ export function LabelGenerator({ onOpenOrder }) {
                     <span className="text-right font-extrabold">{fat}g</span>
                   </div>
                   <div className="grid grid-cols-2 border-b border-[#1E1E1E] p-2 sm:p-2.5 bg-white/60">
+                    <span className="text-gray-700">{t("heroFiber")}</span>
+                    <span className="text-right font-extrabold">{fiber}g</span>
+                  </div>
+                  <div className="grid grid-cols-2 border-b border-[#1E1E1E] p-2 sm:p-2.5">
                     <span className="text-gray-700">{t("heroSodium")}</span>
                     <span className="text-right font-extrabold">
                       {sodium} mg
                     </span>
                   </div>
-                  <div className="grid grid-cols-2 border-b border-[#1E1E1E] p-2 sm:p-2.5">
+                  <div className="grid grid-cols-2 border-b border-[#1E1E1E] p-2 sm:p-2.5 bg-white/60">
                     <span className="text-gray-700">{t("heroPotassium")}</span>
                     <span className="text-right font-extrabold">
                       {potassium} mg

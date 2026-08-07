@@ -1,99 +1,123 @@
 import React from "react";
 import { Badge } from "./ui/badge";
-import { Check, Award, GraduationCap, FlaskConical } from "lucide-react";
+import { GraduationCap, FlaskConical, Quote, Sparkles, ShieldCheck, Dumbbell } from "lucide-react";
 import { useSiteCopy } from "../hooks/useSiteCopy";
 
 export function FounderSection() {
   const copy = useSiteCopy();
   const founder = copy.founder || {};
 
+  const principles = [
+    { icon: FlaskConical, label: "Food Science Precision" },
+    { icon: Dumbbell, label: "High-Protein Verified" },
+    { icon: ShieldCheck, label: "100% Macro Transparency" },
+  ];
+
   return (
     <section
       id="founder"
-      className="border-b border-[#1E1E1E] bg-[var(--cpl-white)] py-12 sm:py-24"
+      className="border-b border-[#1E1E1E] bg-[#FEFDF9] py-14 sm:py-24 relative overflow-hidden"
     >
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-3xl text-center mb-10 sm:mb-16">
+      {/* Background Accent Grid */}
+      <div className="absolute inset-0 opacity-[0.025] pointer-events-none bg-[radial-gradient(#1E1E1E_1px,transparent_1px)] [background-size:16px_16px]" />
+
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
+        {/* Section Header */}
+        <div className="mx-auto max-w-3xl text-center mb-10 sm:mb-16 space-y-3">
           <Badge variant="default">{founder.eyebrow}</Badge>
-          <h2 className="mt-3 font-display text-2xl font-extrabold uppercase tracking-tight text-[var(--cpl-dark)] sm:mt-4 sm:text-5xl">
+          <h2 className="font-display text-3xl font-black uppercase tracking-tight text-[var(--cpl-dark)] sm:text-5xl">
             {founder.title}
           </h2>
         </div>
 
         <div className="grid gap-8 lg:grid-cols-12 lg:items-center lg:gap-12">
-          {/* Founder Photo & Quick Specs Card */}
+          {/* Founder Photo & Academic Specs Card (5 cols) */}
           <div className="lg:col-span-5">
-            <div className="relative border-2 border-[#1E1E1E] bg-white p-3 shadow-[8px_8px_0_#1E1E1E] sm:p-4">
-              <div className="relative aspect-[4/5] overflow-hidden border border-[#1E1E1E]">
+            <div className="relative border-2 border-[#1E1E1E] bg-white p-3.5 sm:p-4 shadow-[8px_8px_0_#1E1E1E] transition-all duration-300 hover:shadow-[12px_12px_0_#8D9B7D]">
+              <div className="relative aspect-square overflow-hidden border-2 border-[#1E1E1E] bg-[#E1ECD3]/30 group">
                 <img
                   src="/images/founder.webp"
                   alt={founder.name}
                   loading="lazy"
                   decoding="async"
-                  className="h-full w-full object-cover object-center"
+                  className="h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
                 />
-                <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-[#1E1E1E]/90 via-[#1E1E1E]/50 to-transparent p-4 pt-12 text-white">
-                  <p className="font-display text-xl font-extrabold uppercase tracking-tight">
+
+                {/* Bottom Overlay Nameplate */}
+                <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-[#1E1E1E] via-[#1E1E1E]/80 to-transparent p-5 pt-12 text-white">
+                  <p className="font-display text-xl sm:text-2xl font-black uppercase tracking-tight leading-tight">
                     {founder.name}
                   </p>
-                  <p className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#C8D8B8]">
+                  <p className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#C8D8B8] mt-0.5">
                     {founder.role}
                   </p>
                 </div>
               </div>
 
-              {/* Academic Badge */}
-              <div className="mt-4 flex items-center gap-2 border-t border-[#1E1E1E]/20 pt-3">
-                <GraduationCap className="size-4 shrink-0 text-[#8D9B7D]" />
-                <span className="font-mono text-[11px] font-bold text-[#1E1E1E]">
-                  {founder.degree}
-                </span>
+              {/* Academic Degree Bar */}
+              <div className="mt-3.5 flex items-center gap-3 border-2 border-[#1E1E1E] bg-[#F4F7F1] p-3">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[#1E1E1E] bg-white text-[#8D9B7D]">
+                  <GraduationCap className="size-4 text-[#6B7860]" />
+                </div>
+                <div className="min-w-0">
+                  <p className="font-mono text-[9px] font-black uppercase tracking-widest text-[#6B7860]">
+                    ACADEMIC BACKGROUND
+                  </p>
+                  <p className="font-sans text-xs font-extrabold text-[#1E1E1E] truncate">
+                    {founder.degree}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Founder Story & Highlights */}
-          <div className="space-y-6 lg:col-span-7">
-            <div className="space-y-3">
-              <div className="flex items-center gap-2 text-[#8D9B7D]">
-                <FlaskConical className="size-5" />
-                <span className="font-mono text-xs font-bold uppercase tracking-widest text-[#6B7860]">
-                  Food Scientist & Innovator
+          {/* Founder Story & Quote (7 cols) */}
+          <div className="space-y-5 lg:col-span-7">
+            {/* Tag & Founder Title */}
+            <div className="space-y-1">
+              <div className="inline-flex items-center gap-2 border border-[#1E1E1E]/20 bg-white px-3 py-1 shadow-xs">
+                <FlaskConical className="size-3.5 text-[#8D9B7D]" />
+                <span className="font-mono text-[11px] font-extrabold uppercase tracking-widest text-[#6B7860]">
+                  Food Scientist & Founder
                 </span>
               </div>
-              <h3 className="font-display text-2xl font-extrabold uppercase text-[#1E1E1E] sm:text-3xl">
+              <h3 className="font-display text-2xl sm:text-4xl font-black uppercase tracking-tight text-[#1E1E1E]">
                 {founder.name}
               </h3>
-              <p className="text-xs leading-6 text-[var(--cpl-dark-muted)] sm:text-sm sm:leading-7">
+            </div>
+
+            {/* Featured Quote Card */}
+            <div className="relative border-2 border-[#1E1E1E] bg-[#E1ECD3]/50 p-6 sm:p-7 shadow-[6px_6px_0_#1E1E1E]">
+              <Quote className="absolute top-4 right-4 size-10 text-[#8D9B7D]/30 shrink-0 pointer-events-none" />
+              <p className="relative z-10 font-display text-base sm:text-xl font-black italic tracking-tight text-[#1E1E1E] leading-snug">
+                {founder.quote}
+              </p>
+            </div>
+
+            {/* Bio Card */}
+            <div className="border-2 border-[#1E1E1E] bg-white p-5 sm:p-6 shadow-[4px_4px_0_#1E1E1E]">
+              <p className="text-xs sm:text-sm leading-relaxed text-[#2B2B2B] font-medium">
                 {founder.bio}
               </p>
             </div>
 
-            {/* Highlights List */}
-            {founder.highlights && (
-              <div className="border-2 border-[#1E1E1E] bg-[#FEFDF9] p-4 sm:p-5 shadow-[4px_4px_0_#8D9B7D]">
-                <p className="font-mono text-[10px] font-bold uppercase tracking-widest text-[#6B7860] mb-3 flex items-center gap-1.5">
-                  <Award className="size-3.5 text-[#8D9B7D]" />
-                  Key Qualifications & Innovation Credentials
-                </p>
-                <ul className="grid gap-2 sm:grid-cols-2">
-                  {founder.highlights.map((item) => (
-                    <li
-                      key={item}
-                      className="flex items-start gap-2 text-[11px] font-bold text-[#1E1E1E] sm:text-xs"
-                    >
-                      <Check className="mt-0.5 size-3.5 shrink-0 text-[#8D9B7D]" />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {/* Founder Quote */}
-            <blockquote className="border-l-4 border-[#8D9B7D] bg-white p-4 text-xs font-semibold italic text-[#1E1E1E] sm:p-5 sm:text-sm leading-relaxed shadow-[2px_2px_0_#1E1E1E]">
-              {founder.quote}
-            </blockquote>
+            {/* Principles Footer Bar */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
+              {principles.map((item) => {
+                const IconComp = item.icon;
+                return (
+                  <div
+                    key={item.label}
+                    className="flex items-center gap-2 border-2 border-[#1E1E1E] bg-white p-2.5 shadow-[2px_2px_0_#1E1E1E]"
+                  >
+                    <IconComp className="size-3.5 shrink-0 text-[#8D9B7D]" />
+                    <span className="font-mono text-[10px] font-extrabold uppercase tracking-wider text-[#1E1E1E]">
+                      {item.label}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
       </div>
