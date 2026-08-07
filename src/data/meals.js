@@ -85,7 +85,7 @@ const mealCatalog = [
       },
     },
     price: 25000,
-    addons: ["vegetables", "potato-corn"],
+    addons: ["potato-corn"],
     featured: true,
   },
   {
@@ -149,7 +149,7 @@ const mealCatalog = [
       },
     },
     price: 25000,
-    addons: ["vegetables", "potato-corn"],
+    addons: ["potato-corn"],
     featured: true,
   },
   {
@@ -213,7 +213,7 @@ const mealCatalog = [
       },
     },
     price: 25000,
-    addons: ["vegetables", "potato-corn"],
+    addons: ["potato-corn"],
     featured: false,
   },
   {
@@ -277,7 +277,7 @@ const mealCatalog = [
       },
     },
     price: 25000,
-    addons: ["vegetables", "potato-corn"],
+    addons: ["potato-corn"],
     featured: false,
   },
   {
@@ -341,7 +341,7 @@ const mealCatalog = [
       },
     },
     price: 25000,
-    addons: ["vegetables", "potato-corn"],
+    addons: ["potato-corn"],
     featured: true,
   },
   {
@@ -405,7 +405,7 @@ const mealCatalog = [
       },
     },
     price: 25000,
-    addons: ["vegetables", "potato-corn"],
+    addons: ["potato-corn"],
     featured: false,
   },
 
@@ -471,7 +471,7 @@ const mealCatalog = [
       },
     },
     price: 25000,
-    addons: ["vegetables", "potato-corn"],
+    addons: ["potato-corn"],
     featured: true,
   },
   {
@@ -535,7 +535,7 @@ const mealCatalog = [
       },
     },
     price: 25000,
-    addons: ["vegetables", "potato-corn"],
+    addons: ["potato-corn"],
     featured: false,
   },
   {
@@ -599,7 +599,7 @@ const mealCatalog = [
       },
     },
     price: 25000,
-    addons: ["vegetables", "potato-corn"],
+    addons: ["potato-corn"],
     featured: false,
   },
 
@@ -665,7 +665,7 @@ const mealCatalog = [
       },
     },
     price: 25000,
-    addons: ["vegetables", "potato-corn"],
+    addons: ["potato-corn"],
     featured: true,
   },
   {
@@ -729,7 +729,7 @@ const mealCatalog = [
       },
     },
     price: 25000,
-    addons: ["vegetables", "potato-corn"],
+    addons: ["potato-corn"],
     featured: false,
   },
   {
@@ -793,7 +793,7 @@ const mealCatalog = [
       },
     },
     price: 25000,
-    addons: ["vegetables", "potato-corn"],
+    addons: ["potato-corn"],
     featured: false,
   },
   {
@@ -857,7 +857,7 @@ const mealCatalog = [
       },
     },
     price: 25000,
-    addons: ["vegetables", "potato-corn"],
+    addons: ["potato-corn"],
     featured: false,
   },
   {
@@ -921,7 +921,7 @@ const mealCatalog = [
       },
     },
     price: 25000,
-    addons: ["vegetables", "potato-corn"],
+    addons: ["potato-corn"],
     featured: true,
   },
   {
@@ -985,7 +985,7 @@ const mealCatalog = [
       },
     },
     price: 25000,
-    addons: ["vegetables", "potato-corn"],
+    addons: ["potato-corn"],
     featured: false,
   },
 ];

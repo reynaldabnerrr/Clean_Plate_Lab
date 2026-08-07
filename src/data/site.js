@@ -38,13 +38,6 @@ export const proteinTiers = [
 
 export const addons = [
   {
-    id: "vegetables",
-    type: "addon",
-    name: "Extra Vegetables",
-    nameID: "Sayuran Ekstra",
-    price: 5000,
-  },
-  {
     id: "potato-corn",
     type: "carb-swap",
     name: "Carb Swap: Baby Potato + Corn",

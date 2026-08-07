@@ -684,7 +684,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     0 20px 60px rgba(0, 0, 0, 0.18),
     0 4px 16px rgba(0, 0, 0, 0.08);
   overflow: hidden;
-  touch-action: none;
+  touch-action: auto;
   pointer-events: auto;
   user-select: none;
   -webkit-user-select: none;

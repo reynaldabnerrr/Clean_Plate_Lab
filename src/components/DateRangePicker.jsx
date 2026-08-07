@@ -306,6 +306,31 @@ export function DateRangePicker({
   }, [open, updatePos]);
 
   useEffect(() => {
+    if (!open || isMobile) return undefined;
+
+    const popupEl = popupRef.current;
+    if (!popupEl) return undefined;
+
+    const handleWheel = (event) => {
+      const scrollable =
+        rootRef.current?.closest(".overflow-y-auto") ||
+        rootRef.current?.closest("[role='dialog']") ||
+        document.querySelector(".overflow-y-auto");
+
+      if (scrollable) {
+        scrollable.scrollTop += event.deltaY;
+      } else {
+        window.scrollBy(0, event.deltaY);
+      }
+    };
+
+    popupEl.addEventListener("wheel", handleWheel, { passive: true });
+    return () => {
+      popupEl.removeEventListener("wheel", handleWheel);
+    };
+  }, [open, isMobile]);
+
+  useEffect(() => {
     if (!open) return undefined;
 
     const handler = (event) => {
@@ -429,29 +454,25 @@ export function DateRangePicker({
   );
 
   const handlePopupPointer = useCallback((event) => {
-    event.preventDefault();
     event.stopPropagation();
-    event.stopImmediatePropagation?.();
   }, []);
 
   const calendar = open
     ? createPortal(
         <>
-          <div
-            className={
-              isMobile
-                ? "cpl-cal-backdrop"
-                : "cpl-cal-backdrop cpl-cal-backdrop-desktop"
-            }
-            data-cpl-datepicker=""
-            onPointerDownCapture={(event) => handleBackdropPointer(event, true)}
-            onPointerUpCapture={(event) => handleBackdropPointer(event)}
-            onTouchStartCapture={(event) => handleBackdropPointer(event, true)}
-            onTouchEndCapture={(event) => handleBackdropPointer(event)}
-            onMouseDownCapture={(event) => handleBackdropPointer(event, true)}
-            onClickCapture={(event) => handleBackdropPointer(event)}
-            aria-hidden="true"
-          />
+          {isMobile && (
+            <div
+              className="cpl-cal-backdrop"
+              data-cpl-datepicker=""
+              onPointerDownCapture={(event) => handleBackdropPointer(event, true)}
+              onPointerUpCapture={(event) => handleBackdropPointer(event)}
+              onTouchStartCapture={(event) => handleBackdropPointer(event, true)}
+              onTouchEndCapture={(event) => handleBackdropPointer(event)}
+              onMouseDownCapture={(event) => handleBackdropPointer(event, true)}
+              onClickCapture={(event) => handleBackdropPointer(event)}
+              aria-hidden="true"
+            />
+          )}
           {isMobile ? (
             <div
               className="cpl-cal-sheet"
@@ -473,9 +494,6 @@ export function DateRangePicker({
               style={popupStyle}
               ref={popupRef}
               onPointerDown={handlePopupPointer}
-              onPointerUp={handlePopupPointer}
-              onTouchStart={handlePopupPointer}
-              onTouchEnd={handlePopupPointer}
               onClick={handlePopupPointer}
             >
               {renderCalendar()}
