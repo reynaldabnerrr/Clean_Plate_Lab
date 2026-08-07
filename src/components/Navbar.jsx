@@ -11,6 +11,7 @@ const NAV_SECTION_HREFS = [
   "#menu",
   "#calculator",
   "#why-cpl",
+  "#founder",
   "#faq",
 ];
 
@@ -88,6 +89,7 @@ export function Navbar({ onOpenOrder }) {
     { label: copy.nav.menu, href: "#menu" },
     { label: copy.nav.calculator, href: "#calculator" },
     { label: copy.nav.standard, href: "#why-cpl" },
+    { label: copy.nav.founder, href: "#founder" },
     { label: copy.nav.faq, href: "#faq" },
   ];
 

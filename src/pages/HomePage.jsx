@@ -4,6 +4,7 @@ import { Seo } from "../components/Seo";
 import { Hero } from "../components/Hero";
 import { MenuArchiveSection } from "../components/MenuArchiveSection";
 import { FaqSection } from "../components/FaqSection";
+import { FounderSection } from "../components/FounderSection";
 import { MacroCalculator } from "../components/MacroCalculator";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
@@ -329,6 +330,8 @@ export default function HomePage({ onBuild }) {
           </blockquote>
         </div>
       </section>
+
+      <FounderSection />
 
       <FaqSection />
       <section className="border-b border-[#1E1E1E] bg-[var(--cpl-cream)] px-4 py-12 sm:px-6 sm:py-24">
