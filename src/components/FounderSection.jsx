@@ -1,17 +1,11 @@
 import React from "react";
 import { Badge } from "./ui/badge";
-import { GraduationCap, FlaskConical, Quote, Sparkles, ShieldCheck, Dumbbell } from "lucide-react";
+import { GraduationCap, FlaskConical, Quote } from "lucide-react";
 import { useSiteCopy } from "../hooks/useSiteCopy";
 
 export function FounderSection() {
   const copy = useSiteCopy();
   const founder = copy.founder || {};
-
-  const principles = [
-    { icon: FlaskConical, label: "Food Science Precision" },
-    { icon: Dumbbell, label: "High-Protein Verified" },
-    { icon: ShieldCheck, label: "100% Macro Transparency" },
-  ];
 
   return (
     <section
@@ -40,7 +34,7 @@ export function FounderSection() {
                   alt={founder.name}
                   loading="lazy"
                   decoding="async"
-                  className="h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                  className="h-full w-full object-cover object-bottom transition-transform duration-500 group-hover:scale-105"
                 />
 
                 {/* Bottom Overlay Nameplate */}
@@ -61,7 +55,7 @@ export function FounderSection() {
                 </div>
                 <div className="min-w-0">
                   <p className="font-mono text-[9px] font-black uppercase tracking-widest text-[#6B7860]">
-                    ACADEMIC BACKGROUND
+                    {founder.academicTag || "ACADEMIC BACKGROUND"}
                   </p>
                   <p className="font-sans text-xs font-extrabold text-[#1E1E1E] truncate">
                     {founder.degree}
@@ -78,7 +72,7 @@ export function FounderSection() {
               <div className="inline-flex items-center gap-2 border border-[#1E1E1E]/20 bg-white px-3 py-1 shadow-xs">
                 <FlaskConical className="size-3.5 text-[#8D9B7D]" />
                 <span className="font-mono text-[11px] font-extrabold uppercase tracking-widest text-[#6B7860]">
-                  Food Scientist & Founder
+                  {founder.tag || founder.role}
                 </span>
               </div>
               <h3 className="font-display text-2xl sm:text-4xl font-black uppercase tracking-tight text-[#1E1E1E]">
@@ -87,10 +81,10 @@ export function FounderSection() {
             </div>
 
             {/* Featured Quote Card */}
-            <div className="relative border-2 border-[#1E1E1E] bg-[#E1ECD3]/50 p-6 sm:p-7 shadow-[6px_6px_0_#1E1E1E]">
-              <Quote className="absolute top-4 right-4 size-10 text-[#8D9B7D]/30 shrink-0 pointer-events-none" />
-              <p className="relative z-10 font-display text-base sm:text-xl font-black italic tracking-tight text-[#1E1E1E] leading-snug">
-                {founder.quote}
+            <div className="border-2 border-[#1E1E1E] bg-[#E1ECD3]/50 p-5 sm:p-7 shadow-[6px_6px_0_#1E1E1E] flex items-start gap-3">
+              <Quote className="size-6 text-[#8D9B7D] shrink-0 mt-0.5" />
+              <p className="font-display text-base sm:text-xl font-black italic tracking-tight text-[#1E1E1E] leading-snug">
+                “{founder.quote?.replace(/^["“]|["”]$/g, "")}”
               </p>
             </div>
 
@@ -99,24 +93,6 @@ export function FounderSection() {
               <p className="text-xs sm:text-sm leading-relaxed text-[#2B2B2B] font-medium">
                 {founder.bio}
               </p>
-            </div>
-
-            {/* Principles Footer Bar */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
-              {principles.map((item) => {
-                const IconComp = item.icon;
-                return (
-                  <div
-                    key={item.label}
-                    className="flex items-center gap-2 border-2 border-[#1E1E1E] bg-white p-2.5 shadow-[2px_2px_0_#1E1E1E]"
-                  >
-                    <IconComp className="size-3.5 shrink-0 text-[#8D9B7D]" />
-                    <span className="font-mono text-[10px] font-extrabold uppercase tracking-wider text-[#1E1E1E]">
-                      {item.label}
-                    </span>
-                  </div>
-                );
-              })}
             </div>
           </div>
         </div>
