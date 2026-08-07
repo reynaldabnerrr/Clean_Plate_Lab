@@ -1038,7 +1038,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   overscroll-behavior: contain;
   box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.22);
   animation: cpl-sheet-up 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  touch-action: none;
+  touch-action: pan-y;
   pointer-events: auto;
   user-select: none;
   -webkit-user-select: none;

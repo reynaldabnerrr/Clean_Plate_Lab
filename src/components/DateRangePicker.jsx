@@ -368,11 +368,45 @@ export function DateRangePicker({
     [startDate, endDate, baseY, baseM, notifyOpen],
   );
 
+  const [sheetTranslateY, setSheetTranslateY] = useState(0);
+  const touchStartYRef = useRef(0);
+  const isSwipingSheetRef = useRef(false);
+
+  const handleSheetTouchStart = useCallback((e) => {
+    touchStartYRef.current = e.touches[0].clientY;
+    isSwipingSheetRef.current = true;
+  }, []);
+
+  const handleSheetTouchMove = useCallback((e) => {
+    if (!isSwipingSheetRef.current) return;
+    const currentY = e.touches[0].clientY;
+    const diffY = currentY - touchStartYRef.current;
+    if (diffY > 0) {
+      setSheetTranslateY(diffY);
+    }
+  }, []);
+
   const closePicker = useCallback(() => {
     setOpen(false);
     setHoverDate(null);
+    setSheetTranslateY(0);
     notifyOpen(false);
   }, [notifyOpen]);
+
+  const handleSheetTouchEnd = useCallback(
+    (e) => {
+      if (!isSwipingSheetRef.current) return;
+      const currentY = e.changedTouches[0]?.clientY || touchStartYRef.current;
+      const diffY = currentY - touchStartYRef.current;
+
+      if (diffY > 60 || sheetTranslateY > 60) {
+        closePicker();
+      }
+      setSheetTranslateY(0);
+      isSwipingSheetRef.current = false;
+    },
+    [closePicker, sheetTranslateY],
+  );
 
   const handleDayClick = useCallback(
     (ds) => {
@@ -440,15 +474,11 @@ export function DateRangePicker({
   const endLabel = isIndonesian ? "Selesai" : "End";
   const monthNames = isIndonesian ? MONTH_ID : MONTH_EN;
 
-  const handleBackdropPointer = useCallback(
-    (event, shouldClose = false) => {
+  const handleBackdropClick = useCallback(
+    (event) => {
       event.preventDefault();
       event.stopPropagation();
-      event.stopImmediatePropagation?.();
-
-      if (shouldClose) {
-        closePicker();
-      }
+      closePicker();
     },
     [closePicker],
   );
@@ -464,12 +494,7 @@ export function DateRangePicker({
             <div
               className="cpl-cal-backdrop"
               data-cpl-datepicker=""
-              onPointerDownCapture={(event) => handleBackdropPointer(event, true)}
-              onPointerUpCapture={(event) => handleBackdropPointer(event)}
-              onTouchStartCapture={(event) => handleBackdropPointer(event, true)}
-              onTouchEndCapture={(event) => handleBackdropPointer(event)}
-              onMouseDownCapture={(event) => handleBackdropPointer(event, true)}
-              onClickCapture={(event) => handleBackdropPointer(event)}
+              onClick={handleBackdropClick}
               aria-hidden="true"
             />
           )}
