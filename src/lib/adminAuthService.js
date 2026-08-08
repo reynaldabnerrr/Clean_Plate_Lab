@@ -39,6 +39,13 @@ export async function fetchAdminUsers() {
 export async function loginAdminUser(email, password) {
   const cleanEmail = email.trim().toLowerCase();
 
+  if (!supabase) {
+    return {
+      success: false,
+      error: "Supabase client not initialized. Environment variables not set on Vercel.",
+    };
+  }
+
   try {
     // 1. Try standard Supabase Auth Login
     let { data, error } = await supabase.auth.signInWithPassword({
@@ -160,6 +167,9 @@ export async function loginAdminUser(email, password) {
  * Change Password for logged in user
  */
 export async function changeUserPassword(newPassword) {
+  if (!supabase) {
+    return { success: false, error: "Supabase client not initialized." };
+  }
   try {
     const { data, error } = await supabase.auth.updateUser({
       password: newPassword,
@@ -177,6 +187,10 @@ export async function changeUserPassword(newPassword) {
  */
 export async function createAdminAccount({ email, password, fullName, role }) {
   const cleanEmail = email.trim().toLowerCase();
+
+  if (!supabase) {
+    return { success: false, error: "Supabase client not initialized." };
+  }
 
   try {
     let newUserId = null;

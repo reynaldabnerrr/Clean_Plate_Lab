@@ -72,6 +72,18 @@ export function Navbar({ onOpenOrder, onOpenAdmin }) {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
+  // Close mobile menu when OrderModal opens (dispatched from App.jsx)
+  useEffect(() => {
+    const handler = () => {
+      if (mobileMenuOpen) {
+        document.body.style.overflow = "";
+        setMobileMenuOpen(false);
+      }
+    };
+    window.addEventListener("cpl:closeMobileMenu", handler);
+    return () => window.removeEventListener("cpl:closeMobileMenu", handler);
+  }, [mobileMenuOpen]);
+
   // Lock body scroll when mobile menu is open
   useEffect(() => {
     if (mobileMenuOpen) {

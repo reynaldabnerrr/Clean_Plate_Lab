@@ -87,6 +87,7 @@ export default function App() {
     if (proteinTier) setInitialProteinTier(proteinTier);
     setInitialMealsPerDay(mealsPerDay);
     setHasExplicitOrderDefaults(Boolean(proteinTier));
+    window.dispatchEvent(new Event("cpl:closeMobileMenu"));
     setOrderModalOpen(true);
   };
 
