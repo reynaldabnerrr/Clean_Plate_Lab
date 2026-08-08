@@ -116,7 +116,7 @@ export function Footer() {
                   href={CENTRAL_KITCHEN_MAPS_LINK}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="leading-relaxed hover:text-[#8D9B7D] hover:underline"
+                  className="leading-relaxed hover:text-[#8D9B7D] transition-colors"
                 >
                   {t("footerCentralKitchen")}
                 </a>
