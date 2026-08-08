@@ -273,8 +273,15 @@ export async function createAdminAccount({ email, password, fullName, role }) {
       )
       .select();
 
-    if (dbError && !authUser && !insertedRows) {
-      throw new Error(dbError.message || "Gagal membuat akun admin.");
+    if (dbError) {
+      console.error("admin_users upsert failed:", dbError.message);
+      return {
+        success: false,
+        error:
+          dbError.message ||
+          "Gagal menyimpan profil admin. Pastikan migrasi sudah di-apply dan Anda login dengan password yang benar (bukan bypass).",
+        authCreated: !!authUser,
+      };
     }
 
     return {
