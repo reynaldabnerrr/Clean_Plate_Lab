@@ -1,41 +1,55 @@
 import { supabase } from "./supabase";
 
 export const SUPERADMIN_EMAIL = "cleanplatelab.id@gmail.com";
-export const SUPERADMIN_DEFAULT_PASS = "CPL123";
 
-export const DEFAULT_ADMIN_USERS = [
-  {
-    id: "sa-001",
-    email: "cleanplatelab.id@gmail.com",
-    full_name: "Clean Plate Lab Owner",
-    role: "superadmin",
-    created_at: new Date().toISOString(),
-  },
-];
+const ADMIN_PROFILE_COLUMNS = "id,user_id,email,full_name,role,created_at,updated_at";
 
-/**
- * Fetch all admin users from Supabase admin_users table (with fallback)
- */
-export async function fetchAdminUsers() {
+async function getFunctionErrorMessage(error, fallback) {
   try {
-    const { data, error } = await supabase
-      .from("admin_users")
-      .select("*")
-      .order("created_at", { ascending: true });
-
-    if (error || !data || data.length === 0) {
-      return { data: DEFAULT_ADMIN_USERS, error: null };
-    }
-
-    return { data, error: null };
-  } catch (err) {
-    return { data: DEFAULT_ADMIN_USERS, error: err };
+    const payload = await error?.context?.json();
+    return payload?.error || payload?.message || error?.message || fallback;
+  } catch {
+    return error?.message || fallback;
   }
 }
 
-/**
- * Login with standard Supabase Auth — no bypass
- */
+export async function getAdminProfile(userId) {
+  if (!supabase || !userId) {
+    return { data: null, error: new Error("Sesi admin tidak valid.") };
+  }
+
+  const { data, error } = await supabase
+    .from("admin_users")
+    .select(ADMIN_PROFILE_COLUMNS)
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  return { data, error };
+}
+
+/** Fetch the complete admin list through the superadmin-only Edge Function. */
+export async function fetchAdminUsers() {
+  if (!supabase) {
+    return { data: [], error: new Error("Supabase client not initialized.") };
+  }
+
+  const { data, error } = await supabase.functions.invoke("admin-users", {
+    method: "GET",
+  });
+
+  if (error) {
+    return {
+      data: [],
+      error: new Error(
+        await getFunctionErrorMessage(error, "Gagal mengambil daftar admin."),
+      ),
+    };
+  }
+
+  return { data: data?.users || [], error: null };
+}
+
+/** Authenticate, then authorize the user against public.admin_users. */
 export async function loginAdminUser(email, password) {
   const cleanEmail = email.trim().toLowerCase();
 
@@ -53,25 +67,38 @@ export async function loginAdminUser(email, password) {
     });
 
     if (error) {
-      return { success: false, error: error.message || "Email atau password tidak valid." };
+      const isServerAccountError =
+        error.status === 500 || error.code === "unexpected_failure";
+
+      return {
+        success: false,
+        error: isServerAccountError
+          ? "Data akun Auth bermasalah. Hubungi superadmin untuk memperbaiki akun ini."
+          : error.message || "Email atau password tidak valid.",
+      };
     }
 
     const user = data.user;
-    const role =
-      cleanEmail === SUPERADMIN_EMAIL ? "superadmin" : "admin";
+    const { data: profile, error: profileError } = await getAdminProfile(user.id);
 
-    return { success: true, user, role };
-  } catch (err) {
+    if (profileError || !profile) {
+      await supabase.auth.signOut();
+      return {
+        success: false,
+        error: "Akun ini tidak terdaftar sebagai Admin Clean Plate Lab.",
+      };
+    }
+
+    return { success: true, user, role: profile.role, profile };
+  } catch (error) {
     return {
       success: false,
-      error: err.message || "Email atau password tidak valid.",
+      error: error.message || "Email atau password tidak valid.",
     };
   }
 }
 
-/**
- * Change Password — requires real authenticated session
- */
+/** Change the password for the currently authenticated admin. */
 export async function changeUserPassword(newPassword) {
   if (!supabase) {
     return { success: false, error: "Supabase client not initialized." };
@@ -92,108 +119,58 @@ export async function changeUserPassword(newPassword) {
 
     if (error) throw error;
     return { success: true, user: data.user };
-  } catch (err) {
-    return { success: false, error: err.message || "Gagal mengubah password." };
+  } catch (error) {
+    return { success: false, error: error.message || "Gagal mengubah password." };
   }
 }
 
-/**
- * Superadmin creates a new Admin/Superadmin account
- * Requires real authenticated session (superadmin must login with correct password)
- */
+/** Create Auth and profile records atomically through a privileged Edge Function. */
 export async function createAdminAccount({ email, password, fullName, role }) {
-  const cleanEmail = email.trim().toLowerCase();
-
   if (!supabase) {
     return { success: false, error: "Supabase client not initialized." };
   }
 
-  try {
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-
-    if (!session) {
-      return {
-        success: false,
-        error:
-          "Sesi tidak ditemukan. Login sebagai superadmin dengan password yang benar untuk mengelola akun admin.",
-      };
-    }
-
-    const { data: authData, error: authError } = await supabase.auth.signUp({
-      email: cleanEmail,
+  const { data, error } = await supabase.functions.invoke("admin-users", {
+    method: "POST",
+    body: {
+      email: email.trim().toLowerCase(),
       password,
-      options: {
-        data: {
-          full_name: fullName || "Admin User",
-          role: role || "admin",
-        },
-      },
-    });
+      fullName: fullName?.trim() || "Admin User",
+      role: role || "admin",
+    },
+  });
 
-    if (authError && authError.message?.includes("rate limit")) {
-      console.warn("SignUp rate limit — using existing auth user.");
-    }
-
-    const { data: insertedRows, error: dbError } = await supabase
-      .from("admin_users")
-      .upsert(
-        [
-          {
-            user_id: authData?.user?.id ?? null,
-            email: cleanEmail,
-            full_name: fullName || "Admin User",
-            role: role || "admin",
-          },
-        ],
-        { onConflict: "email" }
-      )
-      .select();
-
-    if (dbError) {
-      console.error("admin_users upsert failed:", dbError.message);
-      return {
-        success: false,
-        error:
-          dbError.message ||
-          "Gagal menyimpan profil admin. Pastikan migrasi sudah di-apply (npx supabase db push).",
-      };
-    }
-
-    return {
-      success: true,
-      user: authData?.user || insertedRows?.[0] || { email: cleanEmail, role: role || "admin" },
-    };
-  } catch (err) {
+  if (error) {
     return {
       success: false,
-      error: err.message || "Gagal membuat akun admin.",
+      error: await getFunctionErrorMessage(error, "Gagal membuat akun admin."),
     };
   }
+
+  return { success: true, user: data?.user };
 }
 
-/**
- * Delete admin account profile
- */
+/** Delete both the Auth user and profile through the superadmin-only Edge Function. */
 export async function deleteAdminUser(id, email) {
-  try {
-    if (!supabase) {
-      return { success: false, error: "Supabase client not initialized." };
-    }
-
-    if (email === SUPERADMIN_EMAIL) {
-      return { success: false, error: "Akun Superadmin Utama tidak dapat dihapus." };
-    }
-
-    const { error } = await supabase
-      .from("admin_users")
-      .delete()
-      .eq("id", id);
-
-    if (error) throw error;
-    return { success: true };
-  } catch (err) {
-    return { success: false, error: err.message };
+  if (!supabase) {
+    return { success: false, error: "Supabase client not initialized." };
   }
+
+  if (email?.trim().toLowerCase() === SUPERADMIN_EMAIL) {
+    return { success: false, error: "Akun Superadmin Utama tidak dapat dihapus." };
+  }
+
+  const { error } = await supabase.functions.invoke("admin-users", {
+    method: "DELETE",
+    body: { id, email: email?.trim().toLowerCase() },
+  });
+
+  if (error) {
+    return {
+      success: false,
+      error: await getFunctionErrorMessage(error, "Gagal menghapus akun admin."),
+    };
+  }
+
+  return { success: true };
 }

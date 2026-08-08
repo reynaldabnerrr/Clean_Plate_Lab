@@ -17,7 +17,7 @@ import {
   createAdminAccount,
   fetchAdminUsers,
   deleteAdminUser,
-  SUPERADMIN_EMAIL,
+  getAdminProfile,
 } from "../lib/adminAuthService";
 
 const INITIAL_MENU_ITEMS = [
@@ -196,7 +196,7 @@ export function CplProvider({ children }) {
   const [orders, setOrders] = useState(INITIAL_ORDERS);
   const [supabaseUser, setSupabaseUser] = useState(null);
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
-  const [userRole, setUserRole] = useState("superadmin");
+  const [userRole, setUserRole] = useState("admin");
   const [isFromDb, setIsFromDb] = useState(false);
   const [loadingMenu, setLoadingMenu] = useState(false);
   const [announcementText, setAnnouncementText] = useState(
@@ -208,57 +208,54 @@ export function CplProvider({ children }) {
     Boolean(storedLanguage),
   );
 
-  // Sync Supabase Auth state & Local Admin Session Persistence
+  // Restore only real Supabase sessions that have an admin_users profile.
   useEffect(() => {
-    // 1. Check local persistent session storage first
-    try {
-      const storedSession = localStorage.getItem("cpl_admin_session");
-      if (storedSession) {
-        const parsed = JSON.parse(storedSession);
-        if (parsed?.user) {
-          setSupabaseUser(parsed.user);
-          setIsAdminLoggedIn(true);
-          setUserRole(parsed.role || "admin");
-        }
+    if (!supabase) return undefined;
+
+    let isActive = true;
+    localStorage.removeItem("cpl_admin_session");
+
+    const clearAdminState = () => {
+      setSupabaseUser(null);
+      setIsAdminLoggedIn(false);
+      setUserRole("admin");
+    };
+
+    const syncAdminSession = async (session) => {
+      const user = session?.user ?? null;
+      if (!user) {
+        if (isActive) clearAdminState();
+        return;
       }
-    } catch {
-      // Ignore JSON parse error
-    }
 
-    // 2. Sync Supabase Auth Session
-    if (supabase) {
-      supabase.auth.getSession().then(({ data: { session } }) => {
-        const user = session?.user ?? null;
-        if (user) {
-          setSupabaseUser(user);
-          setIsAdminLoggedIn(true);
-          const role = user.email === SUPERADMIN_EMAIL ? "superadmin" : "admin";
-          setUserRole(role);
-          localStorage.setItem(
-            "cpl_admin_session",
-            JSON.stringify({ user, role })
-          );
-        }
-      });
+      const { data: profile } = await getAdminProfile(user.id);
+      if (!isActive) return;
 
-      const {
-        data: { subscription },
-      } = supabase.auth.onAuthStateChange((_event, session) => {
-        const user = session?.user ?? null;
-        if (user) {
-          setSupabaseUser(user);
-          setIsAdminLoggedIn(true);
-          const role = user.email === SUPERADMIN_EMAIL ? "superadmin" : "admin";
-          setUserRole(role);
-          localStorage.setItem(
-            "cpl_admin_session",
-            JSON.stringify({ user, role })
-          );
-        }
-      });
+      if (!profile) {
+        clearAdminState();
+        return;
+      }
 
-      return () => subscription.unsubscribe();
-    }
+      setSupabaseUser(user);
+      setIsAdminLoggedIn(true);
+      setUserRole(profile.role);
+    };
+
+    void supabase.auth
+      .getSession()
+      .then(({ data: { session } }) => syncAdminSession(session));
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      // Run outside the auth callback to avoid blocking other auth operations.
+      setTimeout(() => void syncAdminSession(session), 0);
+    });
+
+    return () => {
+      isActive = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   // Fetch menu items from Supabase (with fallback)
@@ -905,12 +902,7 @@ export function CplProvider({ children }) {
     if (res.success) {
       setSupabaseUser(res.user);
       setIsAdminLoggedIn(true);
-      const role = res.role || (res.user?.email === SUPERADMIN_EMAIL ? "superadmin" : "admin");
-      setUserRole(role);
-      localStorage.setItem(
-        "cpl_admin_session",
-        JSON.stringify({ user: res.user, role })
-      );
+      setUserRole(res.role);
     }
     return res;
   };
@@ -921,7 +913,6 @@ export function CplProvider({ children }) {
     } catch {
       // Ignore
     }
-    localStorage.removeItem("cpl_admin_session");
     setSupabaseUser(null);
     setIsAdminLoggedIn(false);
     setUserRole("admin");
@@ -1067,4 +1058,3 @@ export function CplProvider({ children }) {
     </CplContext.Provider>
   );
 }
-

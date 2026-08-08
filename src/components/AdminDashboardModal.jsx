@@ -317,7 +317,7 @@ export function AdminDashboardModal({ isOpen, onClose }) {
   };
 
   const loggedInEmail = supabaseUser?.email || "cleanplatelab.id@gmail.com";
-  const isSuperAdmin = userRole === "superadmin" || loggedInEmail === "cleanplatelab.id@gmail.com";
+  const isSuperAdmin = userRole === "superadmin";
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-3 sm:p-6 backdrop-blur-sm overflow-y-auto">
