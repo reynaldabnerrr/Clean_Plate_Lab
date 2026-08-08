@@ -5,6 +5,58 @@ export const MENU_IMAGE_MAX_BYTES = 5 * 1024 * 1024;
 export const MENU_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
 export const PROTEIN_TIERS = [25, 40, 60, 80, 100];
 
+const padDatePart = (value) => String(value).padStart(2, "0");
+
+/** Return the local calendar date for a Monday-Saturday slot in the current week. */
+export function getWeeklyMenuDate(menuSlot, referenceDate = new Date()) {
+  const slot = Number(menuSlot);
+  if (!Number.isInteger(slot) || slot < 1 || slot > 6) return "";
+
+  const date = new Date(
+    referenceDate.getFullYear(),
+    referenceDate.getMonth(),
+    referenceDate.getDate(),
+  );
+  const isoDay = date.getDay() === 0 ? 7 : date.getDay();
+  date.setDate(date.getDate() + slot - isoDay);
+
+  return `${date.getFullYear()}-${padDatePart(date.getMonth() + 1)}-${padDatePart(date.getDate())}`;
+}
+
+/** Check that a YYYY-MM-DD value belongs to the selected Monday-Saturday slot. */
+export function getMenuSlotFromDate(value) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(value || ""));
+  if (!match) return null;
+
+  const date = new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+  if (
+    date.getFullYear() !== Number(match[1])
+    || date.getMonth() !== Number(match[2]) - 1
+    || date.getDate() !== Number(match[3])
+  ) {
+    return null;
+  }
+
+  return date.getDay() === 0 ? 7 : date.getDay();
+}
+
+export function isMenuDateForSlot(value, menuSlot) {
+  return getMenuSlotFromDate(value) === Number(menuSlot);
+}
+
+/** Format a database DATE without allowing UTC conversion to shift the day. */
+export function formatMenuDate(value, locale = "id-ID") {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(value || ""));
+  if (!match) return "";
+
+  const date = new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+  return new Intl.DateTimeFormat(locale, {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  }).format(date);
+}
+
 const NUTRITION_FIELDS = [
   "protein",
   "carbs",
@@ -219,6 +271,10 @@ export function normalizeMenuItem(row) {
     name: row.name || "Menu",
     day: row.day || "",
     menuSlot: Number(row.menu_slot ?? getMenuSlot(row)),
+    menuDate:
+      row.menu_date
+      || row.menuDate
+      || getWeeklyMenuDate(Number(row.menu_slot ?? getMenuSlot(row))),
     category: "High Protein",
     protein: defaultNutrition.protein,
     carbs: defaultNutrition.carbs,
@@ -260,6 +316,10 @@ export function toDatabaseFormat(item) {
     name: item.name,
     day: item.day,
     menu_slot: getMenuSlot(item),
+    menu_date:
+      item.menuDate
+      || item.menu_date
+      || getWeeklyMenuDate(getMenuSlot(item)),
     protein: defaultNutrition.protein,
     carbs: defaultNutrition.carbs,
     fat: defaultNutrition.fat,

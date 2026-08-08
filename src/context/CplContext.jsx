@@ -199,6 +199,7 @@ export function CplProvider({ children }) {
   const [userRole, setUserRole] = useState("admin");
   const [isFromDb, setIsFromDb] = useState(false);
   const [loadingMenu, setLoadingMenu] = useState(false);
+  const [loadingAdminSession, setLoadingAdminSession] = useState(Boolean(supabase));
   const [announcementText, setAnnouncementText] = useState(
     "100% Lab Verified High Protein Meal Prep • Free Delivery Jabodetabek",
   );
@@ -210,7 +211,10 @@ export function CplProvider({ children }) {
 
   // Restore only real Supabase sessions that have an admin_users profile.
   useEffect(() => {
-    if (!supabase) return undefined;
+    if (!supabase) {
+      setLoadingAdminSession(false);
+      return undefined;
+    }
 
     let isActive = true;
     localStorage.removeItem("cpl_admin_session");
@@ -241,9 +245,21 @@ export function CplProvider({ children }) {
       setUserRole(profile.role);
     };
 
-    void supabase.auth
-      .getSession()
-      .then(({ data: { session } }) => syncAdminSession(session));
+    const restoreAdminSession = async () => {
+      try {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+        await syncAdminSession(session);
+      } catch (error) {
+        console.warn("Gagal memulihkan sesi admin:", error);
+        if (isActive) clearAdminState();
+      } finally {
+        if (isActive) setLoadingAdminSession(false);
+      }
+    };
+
+    void restoreAdminSession();
 
     const {
       data: { subscription },
@@ -261,12 +277,16 @@ export function CplProvider({ children }) {
   // Fetch menu items from Supabase (with fallback)
   const fetchLatestMenus = useCallback(async () => {
     setLoadingMenu(true);
-    const res = await fetchWeeklyMenusFromSupabase();
-    if (res.data && res.data.length > 0) {
-      setMenuItems(res.data);
-      setIsFromDb(res.isFromDb);
+    try {
+      const res = await fetchWeeklyMenusFromSupabase();
+      if (res.data && res.data.length > 0) {
+        setMenuItems(res.data);
+        setIsFromDb(res.isFromDb);
+      }
+      return res;
+    } finally {
+      setLoadingMenu(false);
     }
-    setLoadingMenu(false);
   }, []);
 
   useEffect(() => {
@@ -1025,6 +1045,7 @@ export function CplProvider({ children }) {
         deleteAdminUserAccount,
         isFromDb,
         loadingMenu,
+        loadingAdminSession,
         fetchLatestMenus,
         createMenuItem,
         updateMenuItem,

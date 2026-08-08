@@ -27,18 +27,27 @@ import {
   LayoutGrid,
   List,
   Search,
-  Check,
-  Ban,
   ExternalLink,
   ChevronRight,
+  CalendarDays,
 } from "lucide-react";
 import { Button } from "../components/ui/button";
-import { CplPrimaryLogo } from "../components/CplLogo";
 import { MenuImageUpload } from "../components/MenuImageUpload";
 import { NutritionTierEditor } from "../components/NutritionTierEditor";
 import {
+  FullScreenLoader,
+  LoadingSpinner,
+  MenuGridSkeleton,
+  Skeleton,
+} from "../components/ui/loading";
+import {
   buildNutritionByTier,
+  formatMenuDate,
   getManagedMenuImagePath,
+  getMenuSlot,
+  getMenuSlotFromDate,
+  getWeeklyMenuDate,
+  isMenuDateForSlot,
   normalizeNutritionByTier,
   removeMenuImage,
   uploadMenuImage,
@@ -54,11 +63,21 @@ const INITIAL_NUTRITION_BY_TIER = buildNutritionByTier({
   kcal: 1050,
 });
 
+const MENU_DAY_BY_SLOT = {
+  1: { day: "Monday / Senin", code: "CPL-MON", label: "Senin / Monday" },
+  2: { day: "Tuesday / Selasa", code: "CPL-TUE", label: "Selasa / Tuesday" },
+  3: { day: "Wednesday / Rabu", code: "CPL-WED", label: "Rabu / Wednesday" },
+  4: { day: "Thursday / Kamis", code: "CPL-THU", label: "Kamis / Thursday" },
+  5: { day: "Friday / Jumat", code: "CPL-FRI", label: "Jumat / Friday" },
+  6: { day: "Saturday / Sabtu", code: "CPL-SAT", label: "Sabtu / Saturday" },
+};
+
 const INITIAL_FORM_STATE = {
   id: null,
   code: "CPL-MON",
   name: "",
   day: "Monday / Senin",
+  menuDate: getWeeklyMenuDate(1),
   protein: 80,
   carbs: 120,
   fat: 25,
@@ -89,11 +108,11 @@ export default function AdminPage() {
     menuItems,
     isFromDb,
     loadingMenu,
+    loadingAdminSession,
     fetchLatestMenus,
     createMenuItem,
     updateMenuItem,
     deleteMenuItem,
-    toggleAvailability,
     seedDefaultMenus,
   } = useCpl();
 
@@ -174,11 +193,18 @@ export default function AdminPage() {
   const loadAdminUsersList = useCallback(async () => {
     if (!isSuperAdmin) return;
     setLoadingUsers(true);
-    const res = await getAdminUsers();
-    if (res.data) {
-      setAdminUsers(res.data);
+    setUserMgmtError("");
+    try {
+      const res = await getAdminUsers();
+      if (res.data) {
+        setAdminUsers(res.data);
+      }
+      if (res.error) {
+        setUserMgmtError(res.error.message || "Gagal memuat daftar akun admin.");
+      }
+    } finally {
+      setLoadingUsers(false);
     }
-    setLoadingUsers(false);
   }, [isSuperAdmin, getAdminUsers]);
 
   useEffect(() => {
@@ -204,7 +230,7 @@ export default function AdminPage() {
   // Open Form to Create Meal
   const handleOpenCreate = () => {
     setIsEditing(false);
-    setFormState(INITIAL_FORM_STATE);
+    setFormState({ ...INITIAL_FORM_STATE, menuDate: getWeeklyMenuDate(1) });
     setImageFile(null);
     setEditModalOpen(true);
   };
@@ -218,6 +244,10 @@ export default function AdminPage() {
       code: item.code || "CPL-MENU",
       name: item.name || "",
       day: item.day || "Monday / Senin",
+      menuDate:
+        item.menuDate
+        || item.menu_date
+        || getWeeklyMenuDate(getMenuSlot(item)),
       protein: item.protein ?? 80,
       carbs: item.carbs ?? 120,
       fat: item.fat ?? 25,
@@ -236,10 +266,47 @@ export default function AdminPage() {
     setEditModalOpen(true);
   };
 
+  const handleMenuDateChange = (event) => {
+    const menuDate = event.currentTarget.value;
+    const menuSlot = getMenuSlotFromDate(menuDate);
+
+    if (!menuDate) {
+      event.currentTarget.setCustomValidity("");
+      setFormState((current) => ({ ...current, menuDate: "" }));
+      return;
+    }
+
+    if (menuSlot === 7) {
+      event.currentTarget.setCustomValidity(
+        "Hari Minggu tidak tersedia. Pilih tanggal Senin sampai Sabtu.",
+      );
+      setFormState((current) => ({ ...current, menuDate }));
+      event.currentTarget.reportValidity();
+      return;
+    }
+
+    const selectedDay = MENU_DAY_BY_SLOT[menuSlot];
+    if (!selectedDay) return;
+
+    event.currentTarget.setCustomValidity("");
+    setFormState((current) => ({
+      ...current,
+      menuDate,
+      day: selectedDay.day,
+      code: selectedDay.code,
+    }));
+  };
+
   // Save Meal Form
   const handleFormSave = async (e) => {
     e.preventDefault();
     setStatusMessage("");
+
+    const menuSlot = getMenuSlot(formState);
+    if (!isMenuDateForSlot(formState.menuDate, menuSlot)) {
+      alert(`Tanggal menu harus sesuai dengan hari ${formState.day}.`);
+      return;
+    }
 
     // Validation: prevent duplicate days when creating new meal
     if (!isEditing) {
@@ -320,17 +387,6 @@ export default function AdminPage() {
       setTimeout(() => setStatusMessage(""), 4000);
     } else {
       alert(`Gagal menghapus menu: ${res.error}`);
-    }
-  };
-
-  // Toggle Availability
-  const handleToggleMeal = async (id, currentStatus, name) => {
-    const res = await toggleAvailability(id, !currentStatus);
-    if (res.success) {
-      setStatusMessage(
-        `Status "${name}" diubah menjadi ${!currentStatus ? "Tersedia" : "Stok Habis"}.`
-      );
-      setTimeout(() => setStatusMessage(""), 3000);
     }
   };
 
@@ -438,11 +494,21 @@ export default function AdminPage() {
       item.name.toLowerCase().includes(query) ||
       (item.code && item.code.toLowerCase().includes(query)) ||
       (item.category && item.category.toLowerCase().includes(query)) ||
-      (item.day && item.day.toLowerCase().includes(query))
+      (item.day && item.day.toLowerCase().includes(query)) ||
+      (item.menuDate && item.menuDate.includes(query))
     );
   });
 
   const loggedInEmail = supabaseUser?.email || "cleanplatelab.id@gmail.com";
+
+  if (loadingAdminSession) {
+    return (
+      <FullScreenLoader
+        title="Menyiapkan portal admin"
+        description="Memeriksa sesi admin dan hak akses Supabase..."
+      />
+    );
+  }
 
   // LOGIN PAGE LAYOUT (UNAUTHENTICATED)
   if (!isAdminLoggedIn) {
@@ -461,9 +527,6 @@ export default function AdminPage() {
             <ArrowLeft size={15} />
             <span>Ke Website Utama</span>
           </a>
-          <span className="font-mono text-xs font-bold text-[#6B7860] uppercase tracking-wider">
-            Clean Plate Lab CMS v2.0
-          </span>
         </div>
 
         {/* Center Login Box */}
@@ -557,7 +620,7 @@ export default function AdminPage() {
 
   // DASHBOARD LAYOUT WITH LEFT SIDEBAR (AUTHENTICATED)
   return (
-    <div className="h-screen w-screen overflow-hidden bg-[#F6F5EE] flex text-[#1E1E1E] font-sans">
+    <div className="flex min-h-[100dvh] w-full overflow-x-hidden bg-[#F6F5EE] font-sans text-[#1E1E1E] lg:h-screen lg:overflow-hidden">
       {/* Mobile Backdrop Overlay */}
       {mobileSidebarOpen && (
         <div
@@ -568,7 +631,7 @@ export default function AdminPage() {
 
       {/* LEFT SIDEBAR NAVIGATION (RESPONSIVE DRAWER) */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-72 bg-[#1E1E1E] text-white flex flex-col justify-between shrink-0 h-full border-r-2 border-[#1E1E1E] overflow-y-auto transition-transform duration-300 lg:static lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 flex h-full w-[min(18rem,calc(100vw-2rem))] shrink-0 flex-col justify-between overflow-y-auto border-r-2 border-[#1E1E1E] bg-[#1E1E1E] text-white transition-transform duration-300 lg:static lg:w-72 lg:translate-x-0 ${
           mobileSidebarOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full"
         }`}
       >
@@ -713,9 +776,9 @@ export default function AdminPage() {
       </aside>
 
       {/* MAIN DASHBOARD CONTENT AREA */}
-      <div className="flex-1 h-full flex flex-col min-w-0 overflow-y-auto">
+      <div className="flex min-h-[100dvh] min-w-0 flex-1 flex-col lg:h-full lg:min-h-0 lg:overflow-y-auto">
         {/* Top Header Bar */}
-        <header className="bg-white border-b-2 border-[#1E1E1E] p-4 sm:p-6 sticky top-0 z-20 shadow-2xs flex flex-col xl:flex-row xl:items-center justify-between gap-4">
+        <header className="sticky top-0 z-20 flex flex-col justify-between gap-3 border-b-2 border-[#1E1E1E] bg-white p-3 shadow-2xs sm:p-5 xl:flex-row xl:items-center xl:gap-4">
           <div className="flex items-center justify-between gap-3 min-w-0">
             <div className="flex items-center gap-3 min-w-0">
               <button
@@ -728,7 +791,7 @@ export default function AdminPage() {
               </button>
 
               <div className="min-w-0">
-                <div className="flex items-center gap-2 font-mono text-[11px] text-[#6B7860] uppercase font-bold mb-1 truncate">
+                <div className="mb-1 hidden items-center gap-2 truncate font-mono text-[11px] font-bold uppercase text-[#6B7860] sm:flex">
                   <span>Admin Dashboard</span>
                   <ChevronRight size={13} className="shrink-0" />
                   <span className="text-[#1E1E1E] truncate">
@@ -739,7 +802,7 @@ export default function AdminPage() {
                       : "Pengaturan Keamanan Password"}
                   </span>
                 </div>
-                <h2 className="font-display text-lg sm:text-2xl lg:text-3xl font-black uppercase tracking-tight text-[#1E1E1E] truncate">
+                <h2 className="line-clamp-2 font-display text-base font-black uppercase leading-tight tracking-tight text-[#1E1E1E] sm:text-2xl lg:text-3xl">
                   {activeTab === "menu"
                     ? "KATALOG THIS WEEK MENU"
                     : activeTab === "users"
@@ -750,15 +813,49 @@ export default function AdminPage() {
             </div>
 
             {/* Mobile / Tablet Database Status Badge */}
-            <span className="inline-flex xl:hidden items-center gap-1.5 rounded-full bg-emerald-100 px-2.5 py-1 text-[10px] sm:text-xs font-bold text-emerald-900 border border-emerald-300 shrink-0">
-              <CheckCircle size={12} className="text-emerald-600" /> Live DB
+            <span
+              className={`hidden shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-bold sm:inline-flex sm:text-xs xl:hidden ${
+                loadingMenu
+                  ? "border-amber-300 bg-amber-100 text-amber-900"
+                  : isFromDb
+                    ? "border-emerald-300 bg-emerald-100 text-emerald-900"
+                    : "border-slate-300 bg-slate-100 text-slate-700"
+              }`}
+            >
+              {loadingMenu ? (
+                <RefreshCw size={12} className="animate-spin" />
+              ) : isFromDb ? (
+                <CheckCircle size={12} className="text-emerald-600" />
+              ) : (
+                <Database size={12} />
+              )}
+              {loadingMenu ? "Syncing" : isFromDb ? "Live DB" : "Fallback"}
             </span>
           </div>
 
           {/* Quick Header Badges & Actions */}
-          <div className="flex flex-wrap items-center justify-start xl:justify-end gap-2.5 w-full xl:w-auto shrink-0 pt-2 xl:pt-0 border-t xl:border-t-0 border-[#1E1E1E]/10">
-            <span className="hidden xl:inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-900 border border-emerald-300">
-              <CheckCircle size={13} className="text-emerald-600" /> Live Database Active
+          <div className="flex w-full shrink-0 flex-wrap items-center justify-start gap-2.5 border-t border-[#1E1E1E]/10 pt-2 xl:w-auto xl:justify-end xl:border-t-0 xl:pt-0">
+            <span
+              className={`hidden items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-bold xl:inline-flex ${
+                loadingMenu
+                  ? "border-amber-300 bg-amber-100 text-amber-900"
+                  : isFromDb
+                    ? "border-emerald-300 bg-emerald-100 text-emerald-900"
+                    : "border-slate-300 bg-slate-100 text-slate-700"
+              }`}
+            >
+              {loadingMenu ? (
+                <RefreshCw size={13} className="animate-spin" />
+              ) : isFromDb ? (
+                <CheckCircle size={13} className="text-emerald-600" />
+              ) : (
+                <Database size={13} />
+              )}
+              {loadingMenu
+                ? "Syncing Database..."
+                : isFromDb
+                  ? "Live Database Active"
+                  : "Menggunakan Data Fallback"}
             </span>
 
             {activeTab === "menu" && (
@@ -813,13 +910,13 @@ export default function AdminPage() {
         )}
 
         {/* MAIN BODY AREA */}
-        <main className="p-4 sm:p-6 flex-1">
+        <main className="min-w-0 flex-1 p-3 pb-8 sm:p-5 lg:p-6">
           {/* TAB 1: KATALOG MENU THIS WEEK */}
           {activeTab === "menu" && (
             <div className="space-y-6">
               {/* Top Search & Filter Bar */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-2 border-[#1E1E1E] bg-white p-4 shadow-[4px_4px_0_#1E1E1E]">
-                <div className="relative flex-1 max-w-md">
+              <div className="flex flex-col justify-between gap-3 border-2 border-[#1E1E1E] bg-white p-3 shadow-[4px_4px_0_#1E1E1E] sm:flex-row sm:items-center sm:p-4">
+                <div className="relative w-full flex-1 sm:max-w-md">
                   <Search size={16} className="absolute left-3.5 top-3 text-gray-400" />
                   <input
                     type="text"
@@ -830,8 +927,8 @@ export default function AdminPage() {
                   />
                 </div>
 
-                <div className="flex items-center gap-2 self-end sm:self-auto">
-                  <span className="font-mono text-xs font-bold text-gray-500 mr-2">
+                <div className="flex w-full flex-wrap items-center justify-between gap-2 sm:w-auto sm:flex-nowrap sm:justify-end">
+                  <span className="mr-auto font-mono text-[10px] font-bold text-gray-500 sm:mr-2 sm:text-xs">
                     Menampilkan {filteredMenuItems.length} dari {menuItems.length} menu
                   </span>
 
@@ -863,8 +960,10 @@ export default function AdminPage() {
               </div>
 
               {/* VIEW MODE 1: GRID VIEW */}
-              {viewMode === "grid" ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+              {loadingMenu ? (
+                <MenuGridSkeleton />
+              ) : viewMode === "grid" ? (
+                <div className="grid grid-cols-1 gap-6 sm:gap-8 md:grid-cols-2 xl:grid-cols-3">
                   {filteredMenuItems.map((item) => {
                     return (
                       <div
@@ -889,6 +988,12 @@ export default function AdminPage() {
                           <div className="absolute left-3 top-3 bg-[#1E1E1E] text-white px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-wider shadow-[2px_2px_0_#8D9B7D] border border-white/20">
                             {item.day ? item.day.toUpperCase() : item.code}
                           </div>
+                          {item.menuDate && (
+                            <div className="absolute right-3 top-3 inline-flex items-center gap-1.5 border border-[#1E1E1E] bg-[#FEFDF9] px-2.5 py-1 font-mono text-[9px] font-black uppercase text-[#1E1E1E] shadow-[2px_2px_0_#8D9B7D]">
+                              <CalendarDays size={11} aria-hidden="true" />
+                              {formatMenuDate(item.menuDate)}
+                            </div>
+                          )}
                         </div>
 
                         {/* Card Content */}
@@ -989,12 +1094,13 @@ export default function AdminPage() {
                 </div>
               ) : (
                 /* VIEW MODE 2: TABLE VIEW */
-                <div className="overflow-x-auto border-2 border-[#1E1E1E] bg-white shadow-[6px_6px_0_#1E1E1E]">
-                  <table className="w-full text-left text-xs font-sans">
+                <div className="max-w-full overflow-x-auto border-2 border-[#1E1E1E] bg-white shadow-[6px_6px_0_#1E1E1E]">
+                  <table className="min-w-[860px] w-full text-left text-xs font-sans">
                     <thead className="border-b-2 border-[#1E1E1E] bg-[#1E1E1E] font-mono uppercase text-white text-[10px]">
                       <tr>
                         <th className="p-3">Hidangan</th>
                         <th className="p-3">Hari / Kode</th>
+                        <th className="p-3">Kategori</th>
                         <th className="p-3 text-center">Protein</th>
                         <th className="p-3 text-center">Carbs</th>
                         <th className="p-3 text-center">Fat</th>
@@ -1023,7 +1129,12 @@ export default function AdminPage() {
                             </td>
                             <td className="p-3 font-mono text-xs">
                               <div>{item.day || item.code}</div>
-                              {item.menu_date && <div className="text-[10px] text-[#6B7860] font-bold">{item.menu_date}</div>}
+                              {item.menuDate && (
+                                <div className="mt-1 inline-flex items-center gap-1 text-[10px] font-bold text-[#6B7860]">
+                                  <CalendarDays size={11} aria-hidden="true" />
+                                  {formatMenuDate(item.menuDate)}
+                                </div>
+                              )}
                             </td>
                             <td className="p-3">{item.category}</td>
                             <td className="p-3 text-center text-[#6B7860] font-black">{item.protein}g</td>
@@ -1060,8 +1171,8 @@ export default function AdminPage() {
 
           {/* TAB 2: USER MANAGEMENT (SUPERADMIN ONLY) */}
           {activeTab === "users" && isSuperAdmin && (
-            <div className="space-y-6 max-w-4xl">
-              <div className="flex items-center justify-between border-2 border-[#1E1E1E] bg-white p-5 shadow-[4px_4px_0_#1E1E1E]">
+            <div className="max-w-4xl space-y-6">
+              <div className="flex flex-col gap-4 border-2 border-[#1E1E1E] bg-white p-4 shadow-[4px_4px_0_#1E1E1E] sm:flex-row sm:items-center sm:justify-between sm:p-5">
                 <div>
                   <div className="flex items-center gap-2">
                     <Crown size={18} className="text-amber-500" />
@@ -1073,7 +1184,7 @@ export default function AdminPage() {
                 </div>
                 <Button
                   onClick={() => setCreateUserModalOpen(true)}
-                  className="gap-2 border-2 border-[#1E1E1E] bg-[#8D9B7D] text-white text-xs font-bold uppercase shadow-[2px_2px_0_#1E1E1E] hover:bg-[#6B7860]"
+                  className="w-full gap-2 border-2 border-[#1E1E1E] bg-[#8D9B7D] text-xs font-bold uppercase text-white shadow-[2px_2px_0_#1E1E1E] hover:bg-[#6B7860] sm:w-auto"
                 >
                   <UserPlus size={16} />
                   <span>Tambah Akun Baru</span>
@@ -1081,8 +1192,98 @@ export default function AdminPage() {
               </div>
 
               {/* Admin Users Table */}
-              <div className="border-2 border-[#1E1E1E] bg-white shadow-[6px_6px_0_#1E1E1E] overflow-hidden">
-                <table className="w-full text-left text-xs">
+              {userMgmtError && (
+                <div className="flex items-center gap-2 rounded-xl border border-red-300 bg-red-50 p-3 text-xs font-bold text-red-800" role="alert">
+                  <AlertTriangle size={15} className="shrink-0" />
+                  <span>{userMgmtError}</span>
+                </div>
+              )}
+              {userMgmtSuccess && (
+                <div className="flex items-center gap-2 rounded-xl border border-emerald-300 bg-emerald-50 p-3 text-xs font-bold text-emerald-900" role="status">
+                  <CheckCircle size={15} className="shrink-0 text-emerald-600" />
+                  <span>{userMgmtSuccess}</span>
+                </div>
+              )}
+
+              {loadingUsers ? (
+                <div className="space-y-3 border-2 border-[#1E1E1E] bg-white p-4 shadow-[6px_6px_0_#1E1E1E]" role="status" aria-label="Memuat daftar akun admin">
+                  <LoadingSpinner
+                    label="Memuat daftar akun admin..."
+                    className="w-full py-2 font-mono text-xs font-bold uppercase text-[#6B7860]"
+                  />
+                  {Array.from({ length: 3 }).map((_, index) => (
+                    <div key={index} className="grid gap-2 border-t border-[#1E1E1E]/15 pt-3 sm:grid-cols-[1fr_7rem_8rem]">
+                      <div className="space-y-2">
+                        <Skeleton className="h-4 w-40" />
+                        <Skeleton className="h-3 w-56 max-w-full" />
+                      </div>
+                      <Skeleton className="h-6 w-20" />
+                      <Skeleton className="h-4 w-24" />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <>
+                  <div className="grid gap-3 md:hidden">
+                    {adminUsers.length === 0 ? (
+                      <div className="border-2 border-dashed border-[#1E1E1E]/30 bg-white p-6 text-center font-mono text-xs uppercase text-gray-500">
+                        Belum ada akun admin yang dapat ditampilkan.
+                      </div>
+                    ) : (
+                      adminUsers.map((user) => (
+                        <article
+                          key={user.id}
+                          className="border-2 border-[#1E1E1E] bg-white p-4 shadow-[4px_4px_0_#1E1E1E]"
+                        >
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="min-w-0">
+                              <h4 className="truncate font-display text-base font-black text-[#1E1E1E]">
+                                {user.full_name || "Admin CPL"}
+                              </h4>
+                              <p className="mt-0.5 break-all font-mono text-[10px] text-gray-500">
+                                {user.email}
+                              </p>
+                            </div>
+                            <span
+                              className={`inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 font-mono text-[9px] font-black uppercase ${
+                                user.role === "superadmin"
+                                  ? "border border-amber-300 bg-amber-100 text-amber-900"
+                                  : "border border-blue-300 bg-blue-100 text-blue-900"
+                              }`}
+                            >
+                              {user.role === "superadmin" ? (
+                                <Crown size={10} />
+                              ) : (
+                                <UserCheck size={10} />
+                              )}
+                              {user.role?.toUpperCase()}
+                            </span>
+                          </div>
+                          <div className="mt-4 flex items-center justify-between gap-3 border-t border-[#1E1E1E]/15 pt-3">
+                            <span className="font-mono text-[10px] text-gray-500">
+                              Dibuat {user.created_at ? new Date(user.created_at).toLocaleDateString("id-ID") : "-"}
+                            </span>
+                            {user.email !== "cleanplatelab.id@gmail.com" ? (
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteUser(user.id, user.email)}
+                                className="min-h-10 rounded-lg px-2 font-mono text-[10px] font-bold text-red-600 hover:bg-red-50 hover:text-red-800"
+                              >
+                                Hapus Akun
+                              </button>
+                            ) : (
+                              <span className="font-mono text-[9px] italic text-gray-400">
+                                Primary Owner
+                              </span>
+                            )}
+                          </div>
+                        </article>
+                      ))
+                    )}
+                  </div>
+
+              <div className="hidden max-w-full overflow-x-auto border-2 border-[#1E1E1E] bg-white shadow-[6px_6px_0_#1E1E1E] md:block">
+                <table className="min-w-[680px] w-full text-left text-xs">
                   <thead className="border-b-2 border-[#1E1E1E] bg-[#1E1E1E] font-mono text-white text-[10px] uppercase">
                     <tr>
                       <th className="p-3.5">Nama & Email</th>
@@ -1092,6 +1293,13 @@ export default function AdminPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y border-[#1E1E1E]/20 font-bold">
+                    {adminUsers.length === 0 && (
+                      <tr>
+                        <td colSpan={4} className="p-8 text-center font-mono text-xs uppercase text-gray-500">
+                          Belum ada akun admin yang dapat ditampilkan.
+                        </td>
+                      </tr>
+                    )}
                     {adminUsers.map((u) => (
                       <tr key={u.id} className="hover:bg-gray-50">
                         <td className="p-3.5">
@@ -1133,12 +1341,14 @@ export default function AdminPage() {
                   </tbody>
                 </table>
               </div>
+                </>
+              )}
             </div>
           )}
 
           {/* TAB 3: GANTI PASSWORD */}
           {activeTab === "password" && (
-            <div className="max-w-md mx-auto my-6 border-2 border-[#1E1E1E] bg-white p-6 sm:p-8 shadow-[6px_6px_0_#1E1E1E]">
+            <div className="mx-auto my-3 max-w-md border-2 border-[#1E1E1E] bg-white p-4 shadow-[6px_6px_0_#1E1E1E] sm:my-6 sm:p-8">
               <div className="flex items-center gap-3 mb-6 border-b border-[#1E1E1E]/15 pb-4">
                 <div className="p-2.5 bg-[#1E1E1E] text-[#8D9B7D] rounded-xl">
                   <Key size={20} />
@@ -1205,7 +1415,11 @@ export default function AdminPage() {
                   disabled={passLoading}
                   className="w-full min-h-11 mt-4 border-2 border-[#1E1E1E] bg-[#1E1E1E] text-white font-display font-black uppercase text-xs shadow-[3px_3px_0_#8D9B7D]"
                 >
-                  {passLoading ? "Mengubah Password..." : "Simpan Password Baru"}
+                  {passLoading ? (
+                    <LoadingSpinner label="Mengubah Password..." />
+                  ) : (
+                    "Simpan Password Baru"
+                  )}
                 </Button>
               </form>
             </div>
@@ -1216,7 +1430,7 @@ export default function AdminPage() {
       {/* CREATE / EDIT MEAL MODAL */}
       {editModalOpen && (
         <div className="fixed inset-0 z-50 bg-[#1E1E1E]/80 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
-          <div className="w-full max-w-2xl my-auto border-2 border-[#1E1E1E] bg-white p-5 sm:p-7 shadow-[8px_8px_0_#1E1E1E] max-h-[92vh] overflow-y-auto rounded-2xl">
+          <div className="my-auto max-h-[calc(100dvh-1.5rem)] w-full max-w-2xl overflow-y-auto rounded-2xl border-2 border-[#1E1E1E] bg-white p-4 shadow-[6px_6px_0_#1E1E1E] sm:max-h-[92vh] sm:p-7 sm:shadow-[8px_8px_0_#1E1E1E]">
             <div className="flex items-center justify-between border-b-2 border-[#1E1E1E] pb-3.5 mb-5 sticky top-0 bg-white z-10">
               <div>
                 <span className="font-mono text-[10px] font-bold text-[#8D9B7D] uppercase tracking-wider">
@@ -1237,8 +1451,8 @@ export default function AdminPage() {
 
             <form onSubmit={handleFormSave} className="space-y-4 text-xs font-sans font-bold">
               {/* Basic info grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div className="md:col-span-2">
                   <label className="font-mono text-[10px] uppercase text-[#6B7860] mb-1 block">
                     Nama Hidangan <span className="text-red-500">*</span>
                   </label>
@@ -1253,31 +1467,42 @@ export default function AdminPage() {
                 </div>
 
                 <div>
-                  <label className="font-mono text-[10px] uppercase text-[#6B7860] mb-1 block">
-                    Hari Katering (Slot 1 - 6)
+                  <label htmlFor="menu-date" className="mb-1 block font-mono text-[10px] uppercase text-[#6B7860]">
+                    Tanggal Menu <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    id="menu-date"
+                    type="date"
+                    required
+                    value={formState.menuDate}
+                    onChange={handleMenuDateChange}
+                    aria-describedby="menu-date-help"
+                    className="w-full min-h-10 rounded-xl border-2 border-[#1E1E1E] p-2.5 text-xs font-bold focus:border-[#8D9B7D] focus:outline-none"
+                  />
+                  <p id="menu-date-help" className="mt-1.5 text-[10px] font-medium leading-relaxed text-[#1E1E1E]/60">
+                    Pilih tanggal Senin–Sabtu. Hari, kode, dan slot akan terisi otomatis.
+                  </p>
+                </div>
+
+                <div>
+                  <label className="mb-1 block font-mono text-[10px] uppercase text-[#6B7860]">
+                    Hari Katering (Otomatis)
                   </label>
                   <select
                     value={formState.day}
-                    onChange={(e) => {
-                      const selectedDay = e.target.value;
-                      let code = "CPL-MON";
-                      if (selectedDay.includes("Tuesday") || selectedDay.includes("Selasa")) code = "CPL-TUE";
-                      if (selectedDay.includes("Wednesday") || selectedDay.includes("Rabu")) code = "CPL-WED";
-                      if (selectedDay.includes("Thursday") || selectedDay.includes("Kamis")) code = "CPL-THU";
-                      if (selectedDay.includes("Friday") || selectedDay.includes("Jumat")) code = "CPL-FRI";
-                      if (selectedDay.includes("Saturday") || selectedDay.includes("Sabtu")) code = "CPL-SAT";
-
-                      setFormState({ ...formState, day: selectedDay, code });
-                    }}
-                    className="w-full rounded-xl border-2 border-[#1E1E1E] p-2.5 text-xs font-bold focus:border-[#8D9B7D] focus:outline-none"
+                    disabled
+                    aria-describedby="menu-day-help"
+                    className="w-full cursor-not-allowed rounded-xl border-2 border-[#1E1E1E] bg-[#E1ECD3]/50 p-2.5 text-xs font-bold text-[#1E1E1E] opacity-100"
                   >
-                    <option value="Monday / Senin">Senin / Monday (CPL-MON)</option>
-                    <option value="Tuesday / Selasa">Selasa / Tuesday (CPL-TUE)</option>
-                    <option value="Wednesday / Rabu">Rabu / Wednesday (CPL-WED)</option>
-                    <option value="Thursday / Kamis">Kamis / Thursday (CPL-THU)</option>
-                    <option value="Friday / Jumat">Jumat / Friday (CPL-FRI)</option>
-                    <option value="Saturday / Sabtu">Sabtu / Saturday (CPL-SAT)</option>
+                    {Object.entries(MENU_DAY_BY_SLOT).map(([slot, option]) => (
+                      <option key={slot} value={option.day}>
+                        {option.label} ({option.code})
+                      </option>
+                    ))}
                   </select>
+                  <p id="menu-day-help" className="mt-1.5 text-[10px] font-medium leading-relaxed text-[#1E1E1E]/60">
+                    Slot {getMenuSlot(formState)} mengikuti tanggal yang dipilih.
+                  </p>
                 </div>
               </div>
 
@@ -1348,7 +1573,11 @@ export default function AdminPage() {
                   disabled={actionLoading}
                   className="w-full sm:w-auto min-h-11 px-6 rounded-xl border-2 border-[#1E1E1E] bg-[#8D9B7D] text-white font-display font-black uppercase shadow-[3px_3px_0_#1E1E1E] hover:bg-[#6B7860] transition-all"
                 >
-                  {actionLoading ? "Menyimpan..." : "Simpan Menu"}
+                  {actionLoading ? (
+                    <LoadingSpinner label="Menyimpan..." />
+                  ) : (
+                    "Simpan Menu"
+                  )}
                 </Button>
               </div>
             </form>
@@ -1358,8 +1587,8 @@ export default function AdminPage() {
 
       {/* CREATE ADMIN USER MODAL (SUPERADMIN ONLY) */}
       {createUserModalOpen && (
-        <div className="fixed inset-0 z-50 bg-[#1E1E1E]/80 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="w-full max-w-md border-2 border-[#1E1E1E] bg-white p-6 sm:p-8 shadow-[8px_8px_0_#1E1E1E]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-[#1E1E1E]/80 p-3 backdrop-blur-xs sm:p-4">
+          <div className="my-auto max-h-[calc(100dvh-1.5rem)] w-full max-w-md overflow-y-auto border-2 border-[#1E1E1E] bg-white p-4 shadow-[6px_6px_0_#1E1E1E] sm:p-8 sm:shadow-[8px_8px_0_#1E1E1E]">
             <div className="flex items-center justify-between border-b-2 border-[#1E1E1E] pb-3 mb-5">
               <h3 className="font-display text-lg font-black uppercase">Tambah Akun Admin Baru</h3>
               <button type="button" onClick={() => setCreateUserModalOpen(false)}>
@@ -1436,7 +1665,11 @@ export default function AdminPage() {
                   disabled={createUserLoading}
                   className="min-h-10 px-5 rounded-xl border-2 border-[#1E1E1E] bg-[#8D9B7D] text-white font-display font-black uppercase shadow-[3px_3px_0_#1E1E1E]"
                 >
-                  {createUserLoading ? "Membuat Akun..." : "Buat Akun Admin"}
+                  {createUserLoading ? (
+                    <LoadingSpinner label="Membuat Akun..." />
+                  ) : (
+                    "Buat Akun Admin"
+                  )}
                 </Button>
               </div>
             </form>

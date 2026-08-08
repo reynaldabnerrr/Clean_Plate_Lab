@@ -3,8 +3,13 @@ import { useCpl } from "../hooks/useCpl";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { Card } from "./ui/card";
-import { ArrowRight, RefreshCw } from "lucide-react";
-import { getMenuNutritionForTier, PROTEIN_TIERS } from "../lib/menuService";
+import { ArrowRight, CalendarDays, RefreshCw } from "lucide-react";
+import {
+  formatMenuDate,
+  getMenuNutritionForTier,
+  PROTEIN_TIERS,
+} from "../lib/menuService";
+import { MenuGridSkeleton } from "./ui/loading";
 
 export function ThisWeekMenuSection({ onSelectMeal, onOpenAdmin }) {
   const { menuItems, language, isAdminLoggedIn, fetchLatestMenus, loadingMenu } = useCpl();
@@ -47,7 +52,9 @@ export function ThisWeekMenuSection({ onSelectMeal, onOpenAdmin }) {
         </div>
 
         {/* Menu Cards Grid */}
-        {menuItems.length === 0 ? (
+        {loadingMenu ? (
+          <MenuGridSkeleton className="lg:grid-cols-3" />
+        ) : menuItems.length === 0 ? (
           <div className="text-center py-16 border-2 border-dashed border-[#1E1E1E]/30 bg-white p-8">
             <p className="font-mono text-xs font-bold uppercase text-[#6B7860]">No Menus Found</p>
             <p className="text-sm text-gray-500 mt-2">Belum ada menu yang ditambahkan.</p>
@@ -108,6 +115,15 @@ export function ThisWeekMenuSection({ onSelectMeal, onOpenAdmin }) {
                     <div className="absolute left-3 top-3 bg-[#1E1E1E] text-white px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-wider shadow-[2px_2px_0_#8D9B7D] border border-white/20">
                       {meal.day ? meal.day.toUpperCase() : meal.code}
                     </div>
+                    {meal.menuDate && (
+                      <div className="absolute right-3 top-3 inline-flex items-center gap-1.5 border border-[#1E1E1E] bg-[#FEFDF9] px-2.5 py-1 font-mono text-[9px] font-black uppercase text-[#1E1E1E] shadow-[2px_2px_0_#8D9B7D]">
+                        <CalendarDays size={11} aria-hidden="true" />
+                        {formatMenuDate(
+                          meal.menuDate,
+                          language === "ID" ? "id-ID" : "en-GB",
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   {/* Body Content */}
