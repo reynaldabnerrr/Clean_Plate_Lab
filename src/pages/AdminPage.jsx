@@ -34,6 +34,12 @@ import {
 } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { CplPrimaryLogo } from "../components/CplLogo";
+import { MenuImageUpload } from "../components/MenuImageUpload";
+import {
+  getManagedMenuImagePath,
+  removeMenuImage,
+  uploadMenuImage,
+} from "../lib/menuService";
 
 const INITIAL_FORM_STATE = {
   id: null,
@@ -47,7 +53,7 @@ const INITIAL_FORM_STATE = {
   sodium: 1300,
   potassium: 350,
   kcal: 1050,
-  image: "/images/chicken_teriyaki.webp",
+  image: "",
   tags_ID: ["Monday / Senin", "80g Protein"],
   tags_EN: ["Monday", "80g Protein"],
   desc_ID: "",
@@ -123,6 +129,7 @@ export default function AdminPage() {
   // Menu CRUD modal state
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [formState, setFormState] = useState(INITIAL_FORM_STATE);
+  const [imageFile, setImageFile] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
@@ -184,12 +191,14 @@ export default function AdminPage() {
   const handleOpenCreate = () => {
     setIsEditing(false);
     setFormState(INITIAL_FORM_STATE);
+    setImageFile(null);
     setEditModalOpen(true);
   };
 
   // Open Form to Edit Meal
   const handleOpenEdit = (item) => {
     setIsEditing(true);
+    setImageFile(null);
     setFormState({
       id: item.id,
       code: item.code || "CPL-MENU",
@@ -215,7 +224,6 @@ export default function AdminPage() {
   // Save Meal Form
   const handleFormSave = async (e) => {
     e.preventDefault();
-    setActionLoading(true);
     setStatusMessage("");
 
     // Validation: prevent duplicate days when creating new meal
@@ -228,32 +236,62 @@ export default function AdminPage() {
         alert(
           `Hari "${formState.day}" sudah memiliki menu (${existingMeal.name}). Katalog katering ini khusus 6 hari (Senin - Sabtu). Silakan gunakan tombol Edit pada menu "${existingMeal.name}" untuk memperbaruinya.`
         );
-        setActionLoading(false);
         return;
       }
     }
 
-    let res;
-    if (isEditing) {
-      res = await updateMenuItem(formState.id, formState);
-    } else {
-      res = await createMenuItem(formState);
+    if (!isEditing && menuItems.length >= 6) {
+      alert("Katalog sudah memiliki 6 menu. Edit salah satu slot atau hapus slot terlebih dahulu.");
+      return;
     }
 
-    setActionLoading(false);
-    if (res.success) {
+    setActionLoading(true);
+    let uploadedPath = null;
+    try {
+      const payload = { ...formState };
+      if (imageFile) {
+        const uploadResult = await uploadMenuImage(imageFile, formState.code);
+        if (!uploadResult.success) {
+          alert(`Gagal upload gambar: ${uploadResult.error}`);
+          return;
+        }
+        payload.image = uploadResult.publicUrl;
+        uploadedPath = uploadResult.path;
+      }
+
+      if (!payload.image) {
+        alert("Pilih gambar menu sebelum menyimpan.");
+        return;
+      }
+
+      const res = isEditing
+        ? await updateMenuItem(formState.id, payload)
+        : await createMenuItem(payload);
+
+      if (!res.success) {
+        if (uploadedPath) await removeMenuImage(uploadedPath);
+        alert(`Gagal menyimpan menu: ${res.error}`);
+        return;
+      }
+
+      const oldManagedPath = getManagedMenuImagePath(formState.image);
+      if (isEditing && oldManagedPath && formState.image !== payload.image) {
+        await removeMenuImage(oldManagedPath);
+      }
+
+      setImageFile(null);
       setEditModalOpen(false);
       setStatusMessage(
-        isEditing ? "Menu berhasil diperbarui!" : "Menu baru berhasil ditambahkan!"
+        isEditing ? "Menu dan gambarnya berhasil diperbarui!" : "Menu baru berhasil ditambahkan!"
       );
       setTimeout(() => setStatusMessage(""), 4000);
-    } else {
-      alert(`Gagal menyimpan menu: ${res.error}`);
+    } finally {
+      setActionLoading(false);
     }
   };
 
   // Delete Meal
-  const handleDeleteMeal = async (id, name) => {
+  const handleDeleteMeal = async (id, name, imageUrl) => {
     if (!window.confirm(`Apakah Anda yakin ingin menghapus menu "${name}"?`)) {
       return;
     }
@@ -262,6 +300,7 @@ export default function AdminPage() {
     setActionLoading(false);
 
     if (res.success) {
+      await removeMenuImage(imageUrl);
       setStatusMessage(`Menu "${name}" berhasil dihapus.`);
       setTimeout(() => setStatusMessage(""), 4000);
     } else {
@@ -284,7 +323,7 @@ export default function AdminPage() {
   const handleSeedPresets = async () => {
     if (
       !window.confirm(
-        "Apakah Anda yakin ingin menambahkan 6 menu preset Clean Plate Lab ke database?"
+        "Perbarui 6 slot menu dengan preset Clean Plate Lab? Data pada slot Senin-Sabtu akan diganti, tanpa menambah baris baru."
       )
     )
       return;
@@ -294,7 +333,7 @@ export default function AdminPage() {
     setActionLoading(false);
 
     if (res.success) {
-      setStatusMessage("6 Menu preset berhasil di-seed!");
+      setStatusMessage("6 slot menu berhasil diperbarui dari preset!");
       setTimeout(() => setStatusMessage(""), 4000);
     } else {
       alert(`Gagal seed preset: ${res.error}`);
@@ -733,6 +772,8 @@ export default function AdminPage() {
 
                 <Button
                   onClick={handleOpenCreate}
+                  disabled={actionLoading || menuItems.length >= 6}
+                  title={menuItems.length >= 6 ? "Enam slot sudah terisi. Gunakan Edit untuk memperbarui menu." : "Tambah menu ke slot yang kosong"}
                   className="col-span-2 sm:flex-none w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2 border-2 border-[#1E1E1E] bg-[#8D9B7D] text-white text-xs font-display font-black uppercase shadow-[3px_3px_0_#1E1E1E] hover:bg-[#6B7860] transition-all active:translate-x-0.5 active:translate-y-0.5"
                 >
                   <Plus size={16} />
@@ -908,7 +949,7 @@ export default function AdminPage() {
                               </Button>
                               <Button
                                 size="sm"
-                                onClick={() => handleDeleteMeal(item.id, item.name)}
+                                onClick={() => handleDeleteMeal(item.id, item.name, item.image)}
                                 className="h-10 px-3.5 border-2 border-[#1E1E1E] bg-red-50 text-red-700 shadow-[3px_3px_0_#1E1E1E] hover:bg-red-600 hover:text-white transition-all"
                                 title="Hapus Menu Ini"
                               >
@@ -975,7 +1016,7 @@ export default function AdminPage() {
                                 </button>
                                 <button
                                   type="button"
-                                  onClick={() => handleDeleteMeal(item.id, item.name)}
+                                  onClick={() => handleDeleteMeal(item.id, item.name, item.image)}
                                   className="p-1.5 text-red-600 hover:bg-red-50 rounded"
                                 >
                                   <Trash2 size={15} />
@@ -1215,61 +1256,13 @@ export default function AdminPage() {
                 </div>
               </div>
 
-              {/* Image URL & Quick Presets & Preview */}
-              <div className="border-2 border-[#1E1E1E] bg-[#FEFDF9] p-3.5 rounded-xl space-y-3">
-                <div>
-                  <label className="font-mono text-[10px] uppercase text-[#6B7860] mb-1 block">URL Gambar Hidangan</label>
-                  <input
-                    type="text"
-                    required
-                    value={formState.image}
-                    onChange={(e) => setFormState({ ...formState, image: e.target.value })}
-                    placeholder="/images/chicken_teriyaki.webp atau URL gambar"
-                    className="w-full rounded-xl border-2 border-[#1E1E1E] bg-white p-2.5 text-xs font-bold focus:border-[#8D9B7D] focus:outline-none"
-                  />
-                </div>
-
-                {/* Preset image selector & Live Preview */}
-                <div className="flex flex-col sm:flex-row items-center gap-3 pt-1">
-                  <div className="h-20 w-28 shrink-0 rounded-xl border-2 border-[#1E1E1E] overflow-hidden bg-gray-100 relative">
-                    <img
-                      src={formState.image}
-                      alt="Preview"
-                      className="h-full w-full object-cover"
-                      onError={(e) => {
-                        e.currentTarget.src =
-                          "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80";
-                      }}
-                    />
-                    <span className="absolute bottom-1 right-1 bg-[#1E1E1E] text-white text-[8px] font-mono px-1 py-0.5 rounded">
-                      PREVIEW
-                    </span>
-                  </div>
-
-                  <div className="flex-1 w-full">
-                    <span className="font-mono text-[9px] text-gray-500 uppercase block mb-1.5">
-                      Preset Gambar Contoh (Klik untuk pilih):
-                    </span>
-                    <div className="flex flex-wrap gap-1.5">
-                      {[
-                        { name: "Chicken Teriyaki", url: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80" },
-                        { name: "Beef Steak", url: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80" },
-                        { name: "Salmon Bowl", url: "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=800&q=80" },
-                        { name: "Grilled Chicken", url: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=800&q=80" },
-                      ].map((preset) => (
-                        <button
-                          key={preset.name}
-                          type="button"
-                          onClick={() => setFormState({ ...formState, image: preset.url })}
-                          className="px-2 py-1 text-[10px] font-mono font-bold bg-white border border-[#1E1E1E] rounded hover:bg-[#E1ECD3] transition-colors"
-                        >
-                          {preset.name}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <MenuImageUpload
+                currentImage={formState.image}
+                file={imageFile}
+                onFileChange={setImageFile}
+                disabled={actionLoading}
+                required={!isEditing}
+              />
 
               {/* Macros Grid */}
               <div>

@@ -1,5 +1,9 @@
 import { supabase } from "./supabase";
 
+export const MENU_IMAGE_BUCKET = "menu-images";
+export const MENU_IMAGE_MAX_BYTES = 5 * 1024 * 1024;
+export const MENU_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
+
 export const DEFAULT_WEEKLY_MENUS = [
   {
     id: "m1",
@@ -142,6 +146,7 @@ export function normalizeMenuItem(row) {
     code: row.code || "CPL-MENU",
     name: row.name || "Menu",
     day: row.day || "",
+    menuSlot: Number(row.menu_slot ?? getMenuSlot(row)),
     category: "High Protein",
     protein: Number(row.protein ?? 40),
     carbs: Number(row.carbs ?? 50),
@@ -174,6 +179,7 @@ export function toDatabaseFormat(item) {
     code: item.code,
     name: item.name,
     day: item.day,
+    menu_slot: getMenuSlot(item),
     protein: Number(item.protein),
     carbs: Number(item.carbs),
     fat: Number(item.fat),
@@ -199,6 +205,21 @@ const DAY_ORDER_MAP = {
   sat: 6, sabtu: 6, saturday: 6,
   sun: 7, minggu: 7, sunday: 7,
 };
+
+/** Resolve a menu to its fixed Monday-Saturday database slot. */
+export function getMenuSlot(item = {}) {
+  const explicitSlot = Number(item.menuSlot ?? item.menu_slot);
+  if (Number.isInteger(explicitSlot) && explicitSlot >= 1 && explicitSlot <= 6) {
+    return explicitSlot;
+  }
+
+  const text = `${item.day || ""} ${item.code || ""}`.toLowerCase();
+  for (const [keyword, slot] of Object.entries(DAY_ORDER_MAP)) {
+    if (slot <= 6 && text.includes(keyword)) return slot;
+  }
+
+  throw new Error("Hari menu harus berada pada slot Senin sampai Sabtu.");
+}
 
 /** Sort and deduplicate meals strictly from Monday (1) to Saturday (6) */
 export function sortMealsByDay(meals = []) {
@@ -278,13 +299,13 @@ export async function fetchWeeklyMenusFromSupabase() {
   }
 }
 
-/** Seed default menus into Supabase */
+/** Update or create the six fixed default slots without adding duplicates. */
 export async function seedDefaultWeeklyMenus() {
   try {
     const dbPayloads = DEFAULT_WEEKLY_MENUS.map((item) => toDatabaseFormat(item));
     const { data, error } = await supabase
       .from("this_week_menu")
-      .insert(dbPayloads)
+      .upsert(dbPayloads, { onConflict: "menu_slot" })
       .select();
 
     if (error) throw error;
@@ -293,6 +314,84 @@ export async function seedDefaultWeeklyMenus() {
     console.error("Failed to seed default weekly menus:", error);
     return { success: false, error: error.message };
   }
+}
+
+/** Validate an image before sending it to Supabase Storage. */
+export function validateMenuImage(file) {
+  if (typeof File === "undefined" || !(file instanceof File)) {
+    return "Pilih file gambar terlebih dahulu.";
+  }
+  if (!MENU_IMAGE_TYPES.includes(file.type)) {
+    return "Format gambar harus JPG, PNG, atau WebP.";
+  }
+  if (file.size > MENU_IMAGE_MAX_BYTES) {
+    return "Ukuran gambar maksimal 5 MB.";
+  }
+  return null;
+}
+
+/** Upload a menu image using a unique path to avoid stale CDN cache entries. */
+export async function uploadMenuImage(file, menuCode = "menu") {
+  const validationError = validateMenuImage(file);
+  if (validationError) return { success: false, error: validationError };
+
+  const extensionByType = {
+    "image/jpeg": "jpg",
+    "image/png": "png",
+    "image/webp": "webp",
+  };
+  const safeCode = String(menuCode || "menu")
+    .toLowerCase()
+    .replace(/[^a-z0-9-]+/g, "-")
+    .replace(/^-+|-+$/g, "") || "menu";
+  const uniqueId = globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  const objectPath = `weekly/${safeCode}-${uniqueId}.${extensionByType[file.type]}`;
+
+  try {
+    const { error } = await supabase.storage
+      .from(MENU_IMAGE_BUCKET)
+      .upload(objectPath, file, {
+        cacheControl: "31536000",
+        contentType: file.type,
+        upsert: false,
+      });
+
+    if (error) throw error;
+    const { data } = supabase.storage.from(MENU_IMAGE_BUCKET).getPublicUrl(objectPath);
+    return { success: true, publicUrl: data.publicUrl, path: objectPath };
+  } catch (error) {
+    console.error("Failed to upload menu image:", error);
+    return { success: false, error: error.message || "Upload gambar gagal." };
+  }
+}
+
+/** Return the object path only for URLs managed by this app's menu bucket. */
+export function getManagedMenuImagePath(imageUrl) {
+  if (!imageUrl) return null;
+  const marker = `/storage/v1/object/public/${MENU_IMAGE_BUCKET}/`;
+  try {
+    const url = new URL(imageUrl);
+    const markerIndex = url.pathname.indexOf(marker);
+    if (markerIndex === -1) return null;
+    return decodeURIComponent(url.pathname.slice(markerIndex + marker.length));
+  } catch {
+    return null;
+  }
+}
+
+/** Best-effort cleanup for replaced or failed uploads. */
+export async function removeMenuImage(imageOrPath) {
+  const path = imageOrPath?.includes?.("/storage/v1/object/")
+    ? getManagedMenuImagePath(imageOrPath)
+    : imageOrPath;
+  if (!path) return { success: true };
+
+  const { error } = await supabase.storage.from(MENU_IMAGE_BUCKET).remove([path]);
+  if (error) {
+    console.warn("Failed to remove old menu image:", error.message);
+    return { success: false, error: error.message };
+  }
+  return { success: true };
 }
 
 /** Create a new menu item in Supabase */

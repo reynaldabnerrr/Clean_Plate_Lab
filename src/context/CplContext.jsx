@@ -941,16 +941,8 @@ export function CplProvider({ children }) {
       setMenuItems((prev) => [...prev, res.data]);
       setIsFromDb(true);
       return { success: true, data: res.data };
-    } else {
-      // Local fallback if DB is not created yet
-      const fallbackItem = {
-        ...itemData,
-        id: `m-${Date.now()}`,
-        available: itemData.available ?? true,
-      };
-      setMenuItems((prev) => [...prev, fallbackItem]);
-      return { success: true, data: fallbackItem, error: res.error };
     }
+    return { success: false, error: res.error };
   };
 
   const updateMenuItem = async (id, updatedFields) => {
@@ -960,20 +952,16 @@ export function CplProvider({ children }) {
         prev.map((item) => (item.id === id ? res.data : item)),
       );
       return { success: true, data: res.data };
-    } else {
-      setMenuItems((prev) =>
-        prev.map((item) =>
-          item.id === id ? { ...item, ...updatedFields } : item,
-        ),
-      );
-      return { success: true, error: res.error };
     }
+    return { success: false, error: res.error };
   };
 
   const deleteMenuItem = async (id) => {
     const res = await deleteWeeklyMenuItem(id);
-    setMenuItems((prev) => prev.filter((item) => item.id !== id));
-    return { success: true, error: res.error };
+    if (res.success) {
+      setMenuItems((prev) => prev.filter((item) => item.id !== id));
+    }
+    return res;
   };
 
   const toggleAvailability = async (id, currentStatus) => {
