@@ -240,7 +240,7 @@ export default function HomePage({ onBuild, onOpenAdmin }) {
       </section>
 
       <ThisWeekMenuSection
-        onSelectMeal={() => onBuild("this_week_menu")}
+        onSelectMeal={(proteinTier) => onBuild("this_week_menu", proteinTier)}
       />
 
       <MenuArchiveSection />

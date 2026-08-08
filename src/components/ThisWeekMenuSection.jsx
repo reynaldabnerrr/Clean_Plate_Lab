@@ -1,12 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import { useCpl } from "../hooks/useCpl";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { Card } from "./ui/card";
-import { ArrowRight, Sparkles, CheckCircle2, AlertCircle, RefreshCw, ShieldCheck } from "lucide-react";
+import { ArrowRight, RefreshCw } from "lucide-react";
+import { getMenuNutritionForTier, PROTEIN_TIERS } from "../lib/menuService";
 
 export function ThisWeekMenuSection({ onSelectMeal, onOpenAdmin }) {
-  const { menuItems, language, isFromDb, isAdminLoggedIn, fetchLatestMenus, loadingMenu } = useCpl();
+  const { menuItems, language, isAdminLoggedIn, fetchLatestMenus, loadingMenu } = useCpl();
+  const [selectedTiers, setSelectedTiers] = useState({});
 
   return (
     <section
@@ -58,15 +60,25 @@ export function ThisWeekMenuSection({ onSelectMeal, onOpenAdmin }) {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {menuItems.map((meal) => {
+              const availableTiers = meal.availableProteinTiers || PROTEIN_TIERS;
+              const selectedTier = availableTiers.includes(selectedTiers[meal.id])
+                ? selectedTiers[meal.id]
+                : 40;
+              const nutrition = getMenuNutritionForTier(meal, selectedTier);
               const rawTags =
                 language === "ID"
                   ? meal.tags_ID || meal.tags
                   : meal.tags_EN || meal.tags;
-              const tags = Array.isArray(rawTags)
+              const staticTags = Array.isArray(rawTags)
                 ? rawTags
                 : rawTags
                   ? [rawTags]
                   : [];
+              const tags = [
+                ...staticTags.filter((tag) => !/(protein|kcal|kkal)/i.test(String(tag))),
+                `${selectedTier}g Protein`,
+                `${nutrition.kcal} ${language === "ID" ? "Kkal" : "Kcal"}`,
+              ];
               const description =
                 language === "ID"
                   ? meal.desc_ID || meal.desc_EN || meal.desc || ""
@@ -110,13 +122,45 @@ export function ThisWeekMenuSection({ onSelectMeal, onOpenAdmin }) {
                         </h3>
                       </div>
                       <span className="shrink-0 bg-[#E1ECD3] border border-[#1E1E1E] px-2.5 py-1 font-mono text-[10px] font-extrabold text-[#1E1E1E] mt-4">
-                        {meal.kcal} KCAL
+                        {nutrition.kcal} KCAL
                       </span>
                     </div>
 
                     <p className="mt-3 text-xs leading-relaxed text-[#1E1E1E]/80">
                       {description || "Dibuat dengan spesifikasi nutrisi lengkap tinggi protein."}
                     </p>
+
+                    <fieldset className="mt-4">
+                      <legend className="font-mono text-[9px] font-black uppercase tracking-wider text-[#6B7860]">
+                        {language === "ID" ? "Pilih kategori protein" : "Choose protein tier"}
+                      </legend>
+                      <div
+                        className="mt-2 grid grid-cols-5 border-2 border-[#1E1E1E]"
+                        role="radiogroup"
+                        aria-label={`${language === "ID" ? "Kategori protein" : "Protein tier"}: ${meal.name}`}
+                      >
+                        {availableTiers.map((tier) => {
+                          const isSelected = selectedTier === tier;
+                          return (
+                            <button
+                              key={tier}
+                              type="button"
+                              role="radio"
+                              aria-checked={isSelected}
+                              onClick={() =>
+                                setSelectedTiers((current) => ({
+                                  ...current,
+                                  [meal.id]: tier,
+                                }))
+                              }
+                              className={`min-h-11 border-r border-[#1E1E1E] px-1 font-mono text-[9px] font-black last:border-r-0 focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8D9B7D] focus-visible:ring-inset sm:text-[10px] ${isSelected ? "bg-[#1E1E1E] text-white" : "bg-white hover:bg-[#E1ECD3]"}`}
+                            >
+                              {tier}g
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </fieldset>
 
                     {/* Tags */}
                     {tags.length > 0 && (
@@ -143,19 +187,19 @@ export function ThisWeekMenuSection({ onSelectMeal, onOpenAdmin }) {
                         <div className="grid grid-cols-4 gap-1 text-center font-display">
                           <div className="border border-[#1E1E1E] bg-white p-1">
                             <div className="text-[7.5px] font-mono font-bold uppercase text-gray-500">PROTEIN</div>
-                            <div className="text-xs font-black text-[#6B7860] mt-0.5">{meal.protein}g</div>
+                            <div className="text-xs font-black text-[#6B7860] mt-0.5">{nutrition.protein}g</div>
                           </div>
                           <div className="border border-[#1E1E1E] bg-white p-1">
                             <div className="text-[7.5px] font-mono font-bold uppercase text-gray-500">CARBS</div>
-                            <div className="text-xs font-black text-[#1E1E1E] mt-0.5">{meal.carbs}g</div>
+                            <div className="text-xs font-black text-[#1E1E1E] mt-0.5">{nutrition.carbs}g</div>
                           </div>
                           <div className="border border-[#1E1E1E] bg-white p-1">
                             <div className="text-[7.5px] font-mono font-bold uppercase text-gray-500">FAT</div>
-                            <div className="text-xs font-black text-[#1E1E1E] mt-0.5">{meal.fat}g</div>
+                            <div className="text-xs font-black text-[#1E1E1E] mt-0.5">{nutrition.fat}g</div>
                           </div>
                           <div className="border border-[#1E1E1E] bg-white p-1">
                             <div className="text-[7.5px] font-mono font-bold uppercase text-gray-500">FIBER</div>
-                            <div className="text-xs font-black text-[#1E1E1E] mt-0.5">{meal.fiber ?? 0.14}g</div>
+                            <div className="text-xs font-black text-[#1E1E1E] mt-0.5">{nutrition.fiber}g</div>
                           </div>
                         </div>
 
@@ -163,18 +207,18 @@ export function ThisWeekMenuSection({ onSelectMeal, onOpenAdmin }) {
                         <div className="grid grid-cols-2 gap-1.5 font-mono text-[9px]">
                           <div className="border border-[#1E1E1E]/40 bg-white px-2 py-1 flex items-center justify-between">
                             <span className="text-gray-500 font-bold">SODIUM</span>
-                            <span className="font-extrabold text-[#1E1E1E]">{meal.sodium}mg</span>
+                            <span className="font-extrabold text-[#1E1E1E]">{nutrition.sodium}mg</span>
                           </div>
                           <div className="border border-[#1E1E1E]/40 bg-white px-2 py-1 flex items-center justify-between">
                             <span className="text-gray-500 font-bold">POTASSIUM</span>
-                            <span className="font-extrabold text-[#1E1E1E]">{meal.potassium}mg</span>
+                            <span className="font-extrabold text-[#1E1E1E]">{nutrition.potassium}mg</span>
                           </div>
                         </div>
                       </div>
 
                       {/* Action Button */}
                       <Button
-                        onClick={onSelectMeal}
+                        onClick={() => onSelectMeal?.(selectedTier, meal)}
                         className="mt-4 min-h-11 w-full justify-between rounded-none border-2 border-[#1E1E1E] px-4 text-xs font-display font-extrabold uppercase shadow-[3px_3px_0_#1E1E1E] bg-[#8D9B7D] text-white hover:bg-[#6B7860]"
                       >
                         <span>

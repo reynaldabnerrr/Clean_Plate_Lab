@@ -35,11 +35,24 @@ import {
 import { Button } from "../components/ui/button";
 import { CplPrimaryLogo } from "../components/CplLogo";
 import { MenuImageUpload } from "../components/MenuImageUpload";
+import { NutritionTierEditor } from "../components/NutritionTierEditor";
 import {
+  buildNutritionByTier,
   getManagedMenuImagePath,
+  normalizeNutritionByTier,
   removeMenuImage,
   uploadMenuImage,
 } from "../lib/menuService";
+
+const INITIAL_NUTRITION_BY_TIER = buildNutritionByTier({
+  protein: 80,
+  carbs: 120,
+  fat: 25,
+  fiber: 0.14,
+  sodium: 1300,
+  potassium: 350,
+  kcal: 1050,
+});
 
 const INITIAL_FORM_STATE = {
   id: null,
@@ -53,6 +66,7 @@ const INITIAL_FORM_STATE = {
   sodium: 1300,
   potassium: 350,
   kcal: 1050,
+  nutritionByTier: INITIAL_NUTRITION_BY_TIER,
   image: "",
   tags_ID: ["Monday / Senin", "80g Protein"],
   tags_EN: ["Monday", "80g Protein"],
@@ -211,6 +225,7 @@ export default function AdminPage() {
       sodium: item.sodium ?? 1300,
       potassium: item.potassium ?? 350,
       kcal: item.kcal ?? 1050,
+      nutritionByTier: normalizeNutritionByTier(item.nutritionByTier, item),
       image: item.image || "/images/chicken_teriyaki.webp",
       tags_ID: Array.isArray(item.tags_ID) ? item.tags_ID : [item.day || "Today"],
       tags_EN: Array.isArray(item.tags_EN) ? item.tags_EN : [item.day || "Today"],
@@ -896,13 +911,23 @@ export default function AdminPage() {
                             <p className="mt-3 text-xs leading-relaxed text-[#1E1E1E]/80">
                               {item.desc_ID || item.desc_EN || "Spesifikasi nutrisi lengkap tinggi protein."}
                             </p>
+                            <div className="mt-3 flex flex-wrap gap-1.5" aria-label="Varian protein tersedia">
+                              {(item.availableProteinTiers || [25, 40, 60, 80, 100]).map((tier) => (
+                                <span
+                                  key={tier}
+                                  className="border border-[#1E1E1E] bg-[#E1ECD3] px-2 py-1 font-mono text-[9px] font-black text-[#1E1E1E]"
+                                >
+                                  {tier}g
+                                </span>
+                              ))}
+                            </div>
                           </div>
 
                           {/* COMPLETE NUTRITION FACTS SPECS BOX */}
                           <div className="mt-auto pt-4 border-t border-[#1E1E1E]/15 space-y-3">
                             <div className="border-2 border-[#1E1E1E] bg-[#FEFDF9] p-3 space-y-2 rounded-none">
                               <div className="border-b border-[#1E1E1E]/20 pb-1.5 font-mono text-[9px] font-black uppercase tracking-wider text-[#6B7860]">
-                                <span>LAB NUTRITION SPECS</span>
+                                <span>LAB NUTRITION SPECS · DEFAULT 40G TIER</span>
                               </div>
 
                               {/* 4-Column Macros Grid */}
@@ -1264,73 +1289,13 @@ export default function AdminPage() {
                 required={!isEditing}
               />
 
-              {/* Macros Grid */}
-              <div>
-                <label className="font-mono text-[10px] uppercase text-[#6B7860] mb-1.5 block">
-                  Kandungan Nutrisi / Makro (Per Porsi)
-                </label>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  <div className="border-2 border-[#1E1E1E] bg-white p-2.5 rounded-xl">
-                    <label className="font-mono text-[9px] uppercase text-[#6B7860] block mb-1">Protein (g)</label>
-                    <input
-                      type="number"
-                      step="0.1"
-                      required
-                      value={formState.protein}
-                      onChange={(e) => setFormState({ ...formState, protein: parseFloat(e.target.value) || 0 })}
-                      className="w-full rounded-lg border border-[#1E1E1E] p-2 text-xs font-bold text-[#6B7860] focus:outline-none focus:border-[#8D9B7D]"
-                    />
-                  </div>
-
-                  <div className="border-2 border-[#1E1E1E] bg-white p-2.5 rounded-xl">
-                    <label className="font-mono text-[9px] uppercase text-[#6B7860] block mb-1">Carbs (g)</label>
-                    <input
-                      type="number"
-                      step="0.1"
-                      required
-                      value={formState.carbs}
-                      onChange={(e) => setFormState({ ...formState, carbs: parseFloat(e.target.value) || 0 })}
-                      className="w-full rounded-lg border border-[#1E1E1E] p-2 text-xs font-bold focus:outline-none focus:border-[#8D9B7D]"
-                    />
-                  </div>
-
-                  <div className="border-2 border-[#1E1E1E] bg-white p-2.5 rounded-xl">
-                    <label className="font-mono text-[9px] uppercase text-[#6B7860] block mb-1">Fat (g)</label>
-                    <input
-                      type="number"
-                      step="0.1"
-                      required
-                      value={formState.fat}
-                      onChange={(e) => setFormState({ ...formState, fat: parseFloat(e.target.value) || 0 })}
-                      className="w-full rounded-lg border border-[#1E1E1E] p-2 text-xs font-bold focus:outline-none focus:border-[#8D9B7D]"
-                    />
-                  </div>
-
-                  <div className="border-2 border-[#1E1E1E] bg-white p-2.5 rounded-xl">
-                    <label className="font-mono text-[9px] uppercase text-[#6B7860] block mb-1">Fiber / Serat (g)</label>
-                    <input
-                      type="number"
-                      step="0.01"
-                      required
-                      value={formState.fiber}
-                      onChange={(e) => setFormState({ ...formState, fiber: parseFloat(e.target.value) || 0 })}
-                      className="w-full rounded-lg border border-[#1E1E1E] p-2 text-xs font-bold text-[#1E1E1E] focus:outline-none focus:border-[#8D9B7D]"
-                    />
-                  </div>
-
-                  <div className="border-2 border-[#1E1E1E] bg-white p-2.5 rounded-xl">
-                    <label className="font-mono text-[9px] uppercase text-[#6B7860] block mb-1">Kalori (Kcal)</label>
-                    <input
-                      type="number"
-                      step="0.1"
-                      required
-                      value={formState.kcal}
-                      onChange={(e) => setFormState({ ...formState, kcal: parseFloat(e.target.value) || 0 })}
-                      className="w-full rounded-lg border border-[#1E1E1E] p-2 text-xs font-bold focus:outline-none focus:border-[#8D9B7D]"
-                    />
-                  </div>
-                </div>
-              </div>
+              <NutritionTierEditor
+                value={formState.nutritionByTier}
+                onChange={(nutritionByTier) =>
+                  setFormState((current) => ({ ...current, nutritionByTier }))
+                }
+                disabled={actionLoading}
+              />
 
               {/* Descriptions Dual-Language */}
               <div className="space-y-3 pt-2">

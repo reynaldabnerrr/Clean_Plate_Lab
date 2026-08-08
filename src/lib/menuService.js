@@ -3,6 +3,72 @@ import { supabase } from "./supabase";
 export const MENU_IMAGE_BUCKET = "menu-images";
 export const MENU_IMAGE_MAX_BYTES = 5 * 1024 * 1024;
 export const MENU_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
+export const PROTEIN_TIERS = [25, 40, 60, 80, 100];
+
+const NUTRITION_FIELDS = [
+  "protein",
+  "carbs",
+  "fat",
+  "fiber",
+  "sodium",
+  "potassium",
+  "kcal",
+];
+
+const roundNutrition = (value) => Math.round(Number(value || 0) * 100) / 100;
+
+/** Build editable estimates for all tiers from one existing nutrition snapshot. */
+export function buildNutritionByTier(snapshot = {}) {
+  const baseProtein = Math.max(Number(snapshot.protein) || 40, 1);
+
+  return Object.fromEntries(
+    PROTEIN_TIERS.map((tier) => {
+      const ratio = tier / baseProtein;
+      return [
+        tier,
+        {
+          protein: tier,
+          carbs: roundNutrition(Number(snapshot.carbs ?? 50) * ratio),
+          fat: roundNutrition(Number(snapshot.fat ?? 15) * ratio),
+          fiber: roundNutrition(Number(snapshot.fiber ?? 0.14) * ratio),
+          sodium: roundNutrition(Number(snapshot.sodium ?? 500) * ratio),
+          potassium: roundNutrition(Number(snapshot.potassium ?? 350) * ratio),
+          kcal: roundNutrition(Number(snapshot.kcal ?? 500) * ratio),
+        },
+      ];
+    }),
+  );
+}
+
+/** Ensure every tier and nutrient is present and numeric before persisting. */
+export function normalizeNutritionByTier(rawNutrition, fallbackSnapshot = {}) {
+  const fallback = buildNutritionByTier(fallbackSnapshot);
+
+  return Object.fromEntries(
+    PROTEIN_TIERS.map((tier) => {
+      const rawTier = rawNutrition?.[tier] || rawNutrition?.[String(tier)] || {};
+      const normalizedTier = Object.fromEntries(
+        NUTRITION_FIELDS.map((field) => {
+          const rawValue = Number(rawTier[field]);
+          return [
+            field,
+            Number.isFinite(rawValue) && rawValue >= 0
+              ? roundNutrition(rawValue)
+              : fallback[tier][field],
+          ];
+        }),
+      );
+      return [tier, normalizedTier];
+    }),
+  );
+}
+
+export function getMenuNutritionForTier(menu, tier = 40) {
+  const normalizedTier = PROTEIN_TIERS.includes(Number(tier)) ? Number(tier) : 40;
+  const nutrition = menu?.nutritionByTier?.[normalizedTier]
+    || menu?.nutrition_by_tier?.[normalizedTier];
+  return nutrition || buildNutritionByTier(menu)[normalizedTier];
+}
 
 export const DEFAULT_WEEKLY_MENUS = [
   {
@@ -21,9 +87,9 @@ export const DEFAULT_WEEKLY_MENUS = [
     tags_ID: ["Monday / Senin", "82.4g Protein", "1100.8 Kkal"],
     tags_EN: ["Monday", "82.4g Protein", "1100.8 Kcal"],
     desc_ID:
-      "Dada ayam empuk berbalut saus teriyaki manis gurih, disajikan dengan spesifikasi nutrisi lengkap 82.4g protein, 132.5g karbo, 26.8g lemak, 1380.5mg natrium, dan 355mg kalium.",
+      "Dada ayam empuk berbalut saus teriyaki manis gurih.",
     desc_EN:
-      "Tender chicken glazed in a sweet & savory teriyaki sauce, served with full lab specs: 82.4g protein, 132.5g carbs, 26.8g fat, 1380.5mg sodium, and 355mg potassium.",
+      "Tender chicken glazed in a sweet and savory teriyaki sauce.",
     available: true,
     batch: "MON-01",
   },
@@ -43,9 +109,9 @@ export const DEFAULT_WEEKLY_MENUS = [
     tags_ID: ["Tuesday / Selasa", "79.8g Protein", "1080.7 Kkal"],
     tags_EN: ["Tuesday", "79.8g Protein", "1080.7 Kcal"],
     desc_ID:
-      "Ayam empuk beraroma sambal cabai hijau segar, disajikan dengan spesifikasi nutrisi lengkap 79.8g protein, 124g karbo, 29.5g lemak, 1290mg natrium, dan 365mg kalium.",
+      "Ayam empuk beraroma sambal cabai hijau segar.",
     desc_EN:
-      "Tender chicken tossed in aromatic green chili sauce, served with full lab specs: 79.8g protein, 124g carbs, 29.5g fat, 1290mg sodium, and 365mg potassium.",
+      "Tender chicken tossed in an aromatic green chili sauce.",
     available: true,
     batch: "TUE-02",
   },
@@ -65,9 +131,9 @@ export const DEFAULT_WEEKLY_MENUS = [
     tags_ID: ["Wednesday / Rabu", "83.2g Protein", "1127.6 Kkal"],
     tags_EN: ["Wednesday", "83.2g Protein", "1127.6 Kcal"],
     desc_ID:
-      "Dada ayam juicy dengan lapisan saus mentai gurih creamy, disajikan dengan spesifikasi nutrisi lengkap 83.2g protein, 128.5g karbo, 31.2g lemak, 1420mg natrium, dan 330mg kalium.",
+      "Dada ayam juicy dengan lapisan saus mentai gurih creamy.",
     desc_EN:
-      "Juicy chicken topped with creamy, savory mentai sauce, served with full lab specs: 83.2g protein, 128.5g carbs, 31.2g fat, 1420mg sodium, and 330mg potassium.",
+      "Juicy chicken topped with a creamy, savory mentai sauce.",
     available: true,
     batch: "WED-03",
   },
@@ -87,9 +153,9 @@ export const DEFAULT_WEEKLY_MENUS = [
     tags_ID: ["Thursday / Kamis", "81.0g Protein", "1059.5 Kkal"],
     tags_EN: ["Thursday", "81.0g Protein", "1059.5 Kcal"],
     desc_ID:
-      "Dada ayam empuk dengan kuah sate Padang kaya rempah khas, disajikan dengan spesifikasi nutrisi lengkap 81.0g protein, 122g karbo, 27.5g lemak, 1360mg natrium, dan 370mg kalium.",
+      "Dada ayam empuk dengan kuah sate Padang kaya rempah khas.",
     desc_EN:
-      "Tender chicken coated in rich and aromatic Padang-style sauce, served with full lab specs: 81.0g protein, 122g carbs, 27.5g fat, 1360mg sodium, and 370mg potassium.",
+      "Tender chicken coated in a rich and aromatic Padang-style sauce.",
     available: true,
     batch: "THU-04",
   },
@@ -109,9 +175,9 @@ export const DEFAULT_WEEKLY_MENUS = [
     tags_ID: ["Friday / Jumat", "78.5g Protein", "1039 Kkal"],
     tags_EN: ["Friday", "78.5g Protein", "1039 Kcal"],
     desc_ID:
-      "Oseng ayam gurih bertabur irisan kecombrang harum, disajikan dengan spesifikasi nutrisi lengkap 78.5g protein, 125g karbo, 25g lemak, 1240mg natrium, dan 385mg kalium.",
+      "Oseng ayam gurih bertabur irisan kecombrang harum.",
     desc_EN:
-      "Savory stir-fried chicken infused with fragrant kecombrang, served with full lab specs: 78.5g protein, 125g carbs, 25g fat, 1240mg sodium, and 385mg potassium.",
+      "Savory stir-fried chicken infused with fragrant kecombrang.",
     available: true,
     batch: "FRI-05",
   },
@@ -131,9 +197,9 @@ export const DEFAULT_WEEKLY_MENUS = [
     tags_ID: ["Saturday / Sabtu", "80.5g Protein", "1114 Kkal"],
     tags_EN: ["Saturday", "80.5g Protein", "1114 Kcal"],
     desc_ID:
-      "Ayam renyah berbalut saus asam manis buatan sendiri yang segar, disajikan dengan spesifikasi nutrisi lengkap 80.5g protein, 135g karbo, 28g lemak, 1310mg natrium, dan 345mg kalium.",
+      "Ayam renyah berbalut saus asam manis buatan sendiri yang segar.",
     desc_EN:
-      "Crispy chicken tossed in a sweet and tangy homemade sauce, served with full lab specs: 80.5g protein, 135g carbs, 28g fat, 1310mg sodium, and 345mg potassium.",
+      "Crispy chicken tossed in a sweet and tangy homemade sauce.",
     available: true,
     batch: "SAT-06",
   },
@@ -141,6 +207,12 @@ export const DEFAULT_WEEKLY_MENUS = [
 
 /** Normalize DB row to frontend camelCase item */
 export function normalizeMenuItem(row) {
+  const nutritionByTier = normalizeNutritionByTier(
+    row.nutrition_by_tier || row.nutritionByTier,
+    row,
+  );
+  const defaultNutrition = nutritionByTier[40];
+
   return {
     id: row.id,
     code: row.code || "CPL-MENU",
@@ -148,13 +220,15 @@ export function normalizeMenuItem(row) {
     day: row.day || "",
     menuSlot: Number(row.menu_slot ?? getMenuSlot(row)),
     category: "High Protein",
-    protein: Number(row.protein ?? 40),
-    carbs: Number(row.carbs ?? 50),
-    fat: Number(row.fat ?? 15),
-    fiber: Number(row.fiber ?? 0.14),
-    sodium: Number(row.sodium ?? 500),
-    potassium: Number(row.potassium ?? 350),
-    kcal: Number(row.kcal ?? 500),
+    protein: defaultNutrition.protein,
+    carbs: defaultNutrition.carbs,
+    fat: defaultNutrition.fat,
+    fiber: defaultNutrition.fiber,
+    sodium: defaultNutrition.sodium,
+    potassium: defaultNutrition.potassium,
+    kcal: defaultNutrition.kcal,
+    availableProteinTiers: PROTEIN_TIERS,
+    nutritionByTier,
     image: row.image || "/images/chicken_teriyaki.webp",
     tags_ID: Array.isArray(row.tags_id)
       ? row.tags_id
@@ -175,18 +249,25 @@ export function normalizeMenuItem(row) {
 
 /** Convert frontend item to DB format */
 export function toDatabaseFormat(item) {
+  const nutritionByTier = normalizeNutritionByTier(
+    item.nutritionByTier || item.nutrition_by_tier,
+    item,
+  );
+  const defaultNutrition = nutritionByTier[40];
+
   return {
     code: item.code,
     name: item.name,
     day: item.day,
     menu_slot: getMenuSlot(item),
-    protein: Number(item.protein),
-    carbs: Number(item.carbs),
-    fat: Number(item.fat),
-    fiber: Number(item.fiber ?? 0.14),
-    sodium: Number(item.sodium),
-    potassium: Number(item.potassium),
-    kcal: Number(item.kcal),
+    protein: defaultNutrition.protein,
+    carbs: defaultNutrition.carbs,
+    fat: defaultNutrition.fat,
+    fiber: defaultNutrition.fiber,
+    sodium: defaultNutrition.sodium,
+    potassium: defaultNutrition.potassium,
+    kcal: defaultNutrition.kcal,
+    nutrition_by_tier: nutritionByTier,
     image: item.image,
     tags_id: Array.isArray(item.tags_ID) ? item.tags_ID : [],
     tags_en: Array.isArray(item.tags_EN) ? item.tags_EN : [],
@@ -272,6 +353,14 @@ export function sortMealsByDay(meals = []) {
   return result;
 }
 
+const getDefaultWeeklyMenus = () =>
+  DEFAULT_WEEKLY_MENUS.map((item) =>
+    normalizeMenuItem({
+      ...item,
+      nutrition_by_tier: buildNutritionByTier(item),
+    }),
+  );
+
 /** Fetch all weekly menus from Supabase */
 export async function fetchWeeklyMenusFromSupabase() {
   try {
@@ -281,11 +370,11 @@ export async function fetchWeeklyMenusFromSupabase() {
 
     if (error) {
       console.warn("Supabase fetch error (using fallback):", error.message);
-      return { data: sortMealsByDay(DEFAULT_WEEKLY_MENUS), isFromDb: false, error };
+      return { data: sortMealsByDay(getDefaultWeeklyMenus()), isFromDb: false, error };
     }
 
     if (!data || data.length === 0) {
-      return { data: sortMealsByDay(DEFAULT_WEEKLY_MENUS), isFromDb: false, error: null };
+      return { data: sortMealsByDay(getDefaultWeeklyMenus()), isFromDb: false, error: null };
     }
 
     return {
@@ -295,7 +384,7 @@ export async function fetchWeeklyMenusFromSupabase() {
     };
   } catch (err) {
     console.warn("Error calling Supabase API (using fallback):", err);
-    return { data: sortMealsByDay(DEFAULT_WEEKLY_MENUS), isFromDb: false, error: err };
+    return { data: sortMealsByDay(getDefaultWeeklyMenus()), isFromDb: false, error: err };
   }
 }
 
