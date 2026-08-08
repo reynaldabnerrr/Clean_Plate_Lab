@@ -226,37 +226,39 @@ export function CplProvider({ children }) {
     }
 
     // 2. Sync Supabase Auth Session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      const user = session?.user ?? null;
-      if (user) {
-        setSupabaseUser(user);
-        setIsAdminLoggedIn(true);
-        const role = user.email === SUPERADMIN_EMAIL ? "superadmin" : "admin";
-        setUserRole(role);
-        localStorage.setItem(
-          "cpl_admin_session",
-          JSON.stringify({ user, role })
-        );
-      }
-    });
+    if (supabase) {
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        const user = session?.user ?? null;
+        if (user) {
+          setSupabaseUser(user);
+          setIsAdminLoggedIn(true);
+          const role = user.email === SUPERADMIN_EMAIL ? "superadmin" : "admin";
+          setUserRole(role);
+          localStorage.setItem(
+            "cpl_admin_session",
+            JSON.stringify({ user, role })
+          );
+        }
+      });
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      const user = session?.user ?? null;
-      if (user) {
-        setSupabaseUser(user);
-        setIsAdminLoggedIn(true);
-        const role = user.email === SUPERADMIN_EMAIL ? "superadmin" : "admin";
-        setUserRole(role);
-        localStorage.setItem(
-          "cpl_admin_session",
-          JSON.stringify({ user, role })
-        );
-      }
-    });
+      const {
+        data: { subscription },
+      } = supabase.auth.onAuthStateChange((_event, session) => {
+        const user = session?.user ?? null;
+        if (user) {
+          setSupabaseUser(user);
+          setIsAdminLoggedIn(true);
+          const role = user.email === SUPERADMIN_EMAIL ? "superadmin" : "admin";
+          setUserRole(role);
+          localStorage.setItem(
+            "cpl_admin_session",
+            JSON.stringify({ user, role })
+          );
+        }
+      });
 
-    return () => subscription.unsubscribe();
+      return () => subscription.unsubscribe();
+    }
   }, []);
 
   // Fetch menu items from Supabase (with fallback)
@@ -915,7 +917,7 @@ export function CplProvider({ children }) {
 
   const logoutSupabase = async () => {
     try {
-      await supabase.auth.signOut();
+      if (supabase) await supabase.auth.signOut();
     } catch {
       // Ignore
     }
