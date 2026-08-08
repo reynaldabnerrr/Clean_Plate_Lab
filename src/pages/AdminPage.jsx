@@ -321,7 +321,11 @@ export default function AdminPage() {
     setPassLoading(false);
 
     if (res.success) {
-      setPassSuccess("Password berhasil diubah!");
+      if (res.requiresEmailConfirmation) {
+        setPassSuccess(res.message || "Tautan reset password telah dikirim ke email Anda.");
+      } else {
+        setPassSuccess("Password berhasil diubah!");
+      }
       setNewPassword("");
       setConfirmPassword("");
     } else {

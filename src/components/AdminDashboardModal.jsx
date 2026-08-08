@@ -155,9 +155,15 @@ export function AdminDashboardModal({ isOpen, onClose }) {
     setPassLoading(false);
 
     if (res.success) {
-      setPassSuccess("Password berhasil diperbarui!");
-      setNewPassword("");
-      setConfirmPassword("");
+      if (res.requiresEmailConfirmation) {
+        setPassSuccess(res.message || "Tautan reset password telah dikirim ke email Anda.");
+        setNewPassword("");
+        setConfirmPassword("");
+      } else {
+        setPassSuccess("Password berhasil diperbarui!");
+        setNewPassword("");
+        setConfirmPassword("");
+      }
     } else {
       setPassError(res.error || "Gagal memperbarui password.");
     }

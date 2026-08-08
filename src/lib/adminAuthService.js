@@ -173,17 +173,41 @@ export async function loginAdminUser(email, password) {
 /**
  * Change Password for logged in user
  */
-export async function changeUserPassword(newPassword) {
+export async function changeUserPassword(newPassword, userEmail = null) {
   if (!supabase) {
     return { success: false, error: "Supabase client not initialized." };
   }
-  try {
-    const { data, error } = await supabase.auth.updateUser({
-      password: newPassword,
-    });
 
-    if (error) throw error;
-    return { success: true, user: data.user };
+  try {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (session) {
+      const { data, error } = await supabase.auth.updateUser({
+        password: newPassword,
+      });
+      if (error) throw error;
+      return { success: true, user: data.user };
+    }
+
+    if (userEmail) {
+      const { data, error } = await supabase.auth.resetPasswordForEmail(
+        userEmail,
+        {
+          redirectTo: `${window.location.origin}/?reset=true`,
+        },
+      );
+      if (error && error.message !== "User not found") throw error;
+      return {
+        success: true,
+        requiresEmailConfirmation: true,
+        message:
+          "Kami mengirimkan tautan reset password ke email Anda. Buka email untuk mengkonfirmasi perubahan password.",
+      };
+    }
+
+    throw new Error("No active session. Please log in again to change password.");
   } catch (err) {
     return { success: false, error: err.message || "Gagal mengubah password." };
   }
