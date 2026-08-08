@@ -928,7 +928,7 @@ export function CplProvider({ children }) {
   };
 
   const changePassword = async (newPassword) => {
-    return await changeUserPassword(newPassword, supabaseUser?.email);
+    return await changeUserPassword(newPassword);
   };
 
   const createAdminUserAccount = async (accountData) => {

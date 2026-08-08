@@ -34,7 +34,7 @@ export async function fetchAdminUsers() {
 }
 
 /**
- * Login function with direct authentication & "Email not confirmed" bypass
+ * Login with standard Supabase Auth — no bypass
  */
 export async function loginAdminUser(email, password) {
   const cleanEmail = email.trim().toLowerCase();
@@ -42,135 +42,25 @@ export async function loginAdminUser(email, password) {
   if (!supabase) {
     return {
       success: false,
-      error: "Supabase client not initialized. Environment variables not set on Vercel.",
+      error: "Supabase client not initialized. Environment variables not set.",
     };
   }
 
   try {
-    // 1. Try standard Supabase Auth Login
-    let { data, error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email: cleanEmail,
       password,
     });
 
-    // 2. Auto-provision Superadmin if first time (user may not exist yet)
-    if (error && cleanEmail === SUPERADMIN_EMAIL) {
-      console.log("Auto-provisioning Superadmin account in Supabase Auth...");
-      try {
-        const signUpRes = await supabase.auth.signUp({
-          email: cleanEmail,
-          password: password || SUPERADMIN_DEFAULT_PASS,
-          options: {
-            data: {
-              full_name: "Superadmin CPL",
-              role: "superadmin",
-            },
-          },
-        });
-
-        if (!signUpRes.error && signUpRes.data.user) {
-          data = signUpRes.data;
-          error = null;
-        }
-      } catch {
-        // Continue
-      }
-    }
-
-    // 3. Only bypass for EMAIL NOT CONFIRMED — never for wrong password
     if (error) {
-      const isEmailNotConfirmed =
-        error.message?.toLowerCase().includes("not confirmed") ||
-        error.message?.toLowerCase().includes("email_confirm") ||
-        error.code === "email_not_confirmed";
-
-      // Superadmin bypass — ONLY for unconfirmed email
-      if (cleanEmail === SUPERADMIN_EMAIL && isEmailNotConfirmed) {
-        return {
-          success: true,
-          user: {
-            id: "sa-001",
-            email: SUPERADMIN_EMAIL,
-            user_metadata: { full_name: "Superadmin CPL", role: "superadmin" },
-          },
-          role: "superadmin",
-        };
-      }
-
-      // Registered admin bypass — ONLY for unconfirmed email
-      if (isEmailNotConfirmed) {
-        try {
-          const { data: adminRecord } = await supabase
-            .from("admin_users")
-            .select("*")
-            .eq("email", cleanEmail)
-            .single();
-
-          if (adminRecord) {
-            return {
-              success: true,
-              user: {
-                id: adminRecord.user_id || adminRecord.id,
-                email: adminRecord.email,
-                user_metadata: {
-                  full_name: adminRecord.full_name,
-                  role: adminRecord.role,
-                },
-              },
-              role: adminRecord.role || "admin",
-            };
-          }
-        } catch {
-          // Continue to error
-        }
-      }
-
-      // Wrong password, user not found, etc. — reject
-      throw error;
+      return { success: false, error: error.message || "Email atau password tidak valid." };
     }
 
     const user = data.user;
-    let role = cleanEmail === SUPERADMIN_EMAIL ? "superadmin" : "admin";
+    const role =
+      cleanEmail === SUPERADMIN_EMAIL ? "superadmin" : "admin";
 
-    // Fetch profile from admin_users table
-    try {
-      const { data: profile, error: profileError } = await supabase
-        .from("admin_users")
-        .select("role")
-        .eq("email", cleanEmail)
-        .single();
-
-      if (profileError) {
-        if (
-          profileError.message?.includes("not found") ||
-          profileError.message?.includes("querying schema")
-        ) {
-          console.warn("admin_users table not available — skipping profile fetch.");
-        } else {
-          console.warn("admin_users profile query error:", profileError.message);
-        }
-      } else if (profile?.role) {
-        role = profile.role;
-      } else {
-        // Upsert admin user profile
-        await supabase.from("admin_users").upsert([
-          {
-            user_id: user.id,
-            email: cleanEmail,
-            full_name: user.user_metadata?.full_name || (cleanEmail === SUPERADMIN_EMAIL ? "Superadmin CPL" : "Admin User"),
-            role: role,
-          },
-        ]);
-      }
-    } catch {
-      // Ignore if table error — login still succeeds
-    }
-
-    return {
-      success: true,
-      user,
-      role,
-    };
+    return { success: true, user, role };
   } catch (err) {
     return {
       success: false,
@@ -180,9 +70,9 @@ export async function loginAdminUser(email, password) {
 }
 
 /**
- * Change Password for logged in user
+ * Change Password — requires real authenticated session
  */
-export async function changeUserPassword(newPassword, userEmail = null) {
+export async function changeUserPassword(newPassword) {
   if (!supabase) {
     return { success: false, error: "Supabase client not initialized." };
   }
@@ -192,31 +82,16 @@ export async function changeUserPassword(newPassword, userEmail = null) {
       data: { session },
     } = await supabase.auth.getSession();
 
-    if (session) {
-      const { data, error } = await supabase.auth.updateUser({
-        password: newPassword,
-      });
-      if (error) throw error;
-      return { success: true, user: data.user };
+    if (!session) {
+      return { success: false, error: "Sesi tidak ditemukan. Login ulang untuk ganti password." };
     }
 
-    if (userEmail) {
-      const { data, error } = await supabase.auth.resetPasswordForEmail(
-        userEmail,
-        {
-          redirectTo: `${window.location.origin}/?reset=true`,
-        },
-      );
-      if (error && error.message !== "User not found") throw error;
-      return {
-        success: true,
-        requiresEmailConfirmation: true,
-        message:
-          "Kami mengirimkan tautan reset password ke email Anda. Buka email untuk mengkonfirmasi perubahan password.",
-      };
-    }
+    const { data, error } = await supabase.auth.updateUser({
+      password: newPassword,
+    });
 
-    throw new Error("No active session. Please log in again to change password.");
+    if (error) throw error;
+    return { success: true, user: data.user };
   } catch (err) {
     return { success: false, error: err.message || "Gagal mengubah password." };
   }
@@ -224,6 +99,7 @@ export async function changeUserPassword(newPassword, userEmail = null) {
 
 /**
  * Superadmin creates a new Admin/Superadmin account
+ * Requires real authenticated session (superadmin must login with correct password)
  */
 export async function createAdminAccount({ email, password, fullName, role }) {
   const cleanEmail = email.trim().toLowerCase();
@@ -233,37 +109,39 @@ export async function createAdminAccount({ email, password, fullName, role }) {
   }
 
   try {
-    let newUserId = null;
-    let authUser = null;
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
 
-    // Attempt Supabase Auth SignUp silently
-    try {
-      const { data, error } = await supabase.auth.signUp({
-        email: cleanEmail,
-        password,
-        options: {
-          data: {
-            full_name: fullName || "Admin User",
-            role: role || "admin",
-          },
-        },
-      });
-
-      if (!error && data?.user) {
-        authUser = data.user;
-        newUserId = data.user.id;
-      }
-    } catch (authErr) {
-      console.warn("Bypassing Auth email confirmation rate limit:", authErr.message);
+    if (!session) {
+      return {
+        success: false,
+        error:
+          "Sesi tidak ditemukan. Login sebagai superadmin dengan password yang benar untuk mengelola akun admin.",
+      };
     }
 
-    // Direct registration into admin_users table (No Email Confirmation Needed)
+    const { data: authData, error: authError } = await supabase.auth.signUp({
+      email: cleanEmail,
+      password,
+      options: {
+        data: {
+          full_name: fullName || "Admin User",
+          role: role || "admin",
+        },
+      },
+    });
+
+    if (authError && authError.message?.includes("rate limit")) {
+      console.warn("SignUp rate limit — using existing auth user.");
+    }
+
     const { data: insertedRows, error: dbError } = await supabase
       .from("admin_users")
       .upsert(
         [
           {
-            user_id: newUserId,
+            user_id: authData?.user?.id ?? null,
             email: cleanEmail,
             full_name: fullName || "Admin User",
             role: role || "admin",
@@ -279,14 +157,13 @@ export async function createAdminAccount({ email, password, fullName, role }) {
         success: false,
         error:
           dbError.message ||
-          "Gagal menyimpan profil admin. Pastikan migrasi sudah di-apply dan Anda login dengan password yang benar (bukan bypass).",
-        authCreated: !!authUser,
+          "Gagal menyimpan profil admin. Pastikan migrasi sudah di-apply (npx supabase db push).",
       };
     }
 
     return {
       success: true,
-      user: authUser || insertedRows?.[0] || { email: cleanEmail, role: role || "admin" },
+      user: authData?.user || insertedRows?.[0] || { email: cleanEmail, role: role || "admin" },
     };
   } catch (err) {
     return {
@@ -301,6 +178,10 @@ export async function createAdminAccount({ email, password, fullName, role }) {
  */
 export async function deleteAdminUser(id, email) {
   try {
+    if (!supabase) {
+      return { success: false, error: "Supabase client not initialized." };
+    }
+
     if (email === SUPERADMIN_EMAIL) {
       return { success: false, error: "Akun Superadmin Utama tidak dapat dihapus." };
     }
