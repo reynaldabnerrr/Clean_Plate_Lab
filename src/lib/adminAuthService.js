@@ -134,13 +134,22 @@ export async function loginAdminUser(email, password) {
 
     // Fetch profile from admin_users table
     try {
-      const { data: profile } = await supabase
+      const { data: profile, error: profileError } = await supabase
         .from("admin_users")
         .select("role")
         .eq("email", cleanEmail)
         .single();
 
-      if (profile?.role) {
+      if (profileError) {
+        if (
+          profileError.message?.includes("not found") ||
+          profileError.message?.includes("querying schema")
+        ) {
+          console.warn("admin_users table not available — skipping profile fetch.");
+        } else {
+          console.warn("admin_users profile query error:", profileError.message);
+        }
+      } else if (profile?.role) {
         role = profile.role;
       } else {
         // Upsert admin user profile
@@ -154,7 +163,7 @@ export async function loginAdminUser(email, password) {
         ]);
       }
     } catch {
-      // Ignore if table error
+      // Ignore if table error — login still succeeds
     }
 
     return {
