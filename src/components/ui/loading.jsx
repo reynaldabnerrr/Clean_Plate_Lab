@@ -31,9 +31,14 @@ export function Skeleton({ className }) {
   );
 }
 
-function MenuCardSkeleton() {
+function MenuCardSkeleton({ className }) {
   return (
-    <div className="overflow-hidden border-2 border-[#1E1E1E] bg-white shadow-[6px_6px_0_#1E1E1E]">
+    <div
+      className={cn(
+        "overflow-hidden border-2 border-[#1E1E1E] bg-white shadow-[6px_6px_0_#1E1E1E]",
+        className,
+      )}
+    >
       <Skeleton className="h-52 w-full border-b-2 border-[#1E1E1E] sm:h-60" />
       <div className="space-y-5 p-5 sm:p-6">
         <div className="space-y-2">
@@ -53,18 +58,27 @@ function MenuCardSkeleton() {
   );
 }
 
-export function MenuGridSkeleton({ count = 6, className }) {
+export function MenuGridSkeleton({ count = 6, className, mobileCarousel = false }) {
   return (
     <div role="status" aria-label="Memuat data menu dari database">
       <span className="sr-only">Memuat data menu dari database...</span>
       <div
         className={cn(
-          "grid grid-cols-1 gap-6 sm:gap-8 md:grid-cols-2 xl:grid-cols-3",
+          mobileCarousel
+            ? "-mx-4 flex snap-x gap-4 overflow-hidden px-4 pb-3 md:mx-0 md:grid md:grid-cols-2 md:gap-6 md:overflow-visible md:px-0 md:pb-0 xl:grid-cols-3"
+            : "grid grid-cols-1 gap-6 sm:gap-8 md:grid-cols-2 xl:grid-cols-3",
           className,
         )}
       >
         {Array.from({ length: count }).map((_, index) => (
-          <MenuCardSkeleton key={index} />
+          <MenuCardSkeleton
+            key={index}
+            className={
+              mobileCarousel
+                ? "min-w-0 flex-[0_0_calc(100%-2rem)] snap-start md:flex-auto"
+                : undefined
+            }
+          />
         ))}
       </div>
     </div>

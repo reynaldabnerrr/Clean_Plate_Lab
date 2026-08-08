@@ -1,9 +1,15 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useCpl } from "../hooks/useCpl";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { Card } from "./ui/card";
-import { ArrowRight, CalendarDays, RefreshCw } from "lucide-react";
+import {
+  ArrowRight,
+  CalendarDays,
+  ChevronLeft,
+  ChevronRight,
+  RefreshCw,
+} from "lucide-react";
 import {
   formatMenuDate,
   getMenuNutritionForTier,
@@ -14,6 +20,44 @@ import { MenuGridSkeleton } from "./ui/loading";
 export function ThisWeekMenuSection({ onSelectMeal, onOpenAdmin }) {
   const { menuItems, language, isAdminLoggedIn, fetchLatestMenus, loadingMenu } = useCpl();
   const [selectedTiers, setSelectedTiers] = useState({});
+  const [activeMenuIndex, setActiveMenuIndex] = useState(0);
+  const menuTrackRef = useRef(null);
+
+  const scrollToMenu = (index) => {
+    const track = menuTrackRef.current;
+    const target = track?.children[index];
+
+    if (!track || !target) return;
+
+    const firstCardOffset = track.firstElementChild?.offsetLeft || 0;
+
+    track.scrollTo({
+      left: target.offsetLeft - firstCardOffset,
+      behavior: "smooth",
+    });
+    setActiveMenuIndex(index);
+  };
+
+  const handleMenuScroll = (event) => {
+    const track = event.currentTarget;
+    const cards = Array.from(track.children);
+
+    if (cards.length === 0) return;
+
+    const firstCardOffset = cards[0].offsetLeft;
+
+    const closestIndex = cards.reduce((closest, card, index) => {
+      const currentDistance = Math.abs(card.offsetLeft - firstCardOffset - track.scrollLeft);
+      const closestCard = cards[closest];
+      const closestDistance = Math.abs(
+        closestCard.offsetLeft - firstCardOffset - track.scrollLeft,
+      );
+
+      return currentDistance < closestDistance ? index : closest;
+    }, 0);
+
+    setActiveMenuIndex(closestIndex);
+  };
 
   return (
     <section
@@ -22,7 +66,7 @@ export function ThisWeekMenuSection({ onSelectMeal, onOpenAdmin }) {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 border-b border-[#1E1E1E]/20 pb-8">
+        <div className="mb-8 flex flex-col justify-between gap-6 border-b border-[#1E1E1E]/20 pb-6 sm:mb-12 sm:pb-8 md:flex-row md:items-end">
           <div>
             <Badge variant="default" className="mb-3">
               {language === "ID" ? "MENU MINGGU INI" : "THIS WEEK'S MENU"}
@@ -53,7 +97,7 @@ export function ThisWeekMenuSection({ onSelectMeal, onOpenAdmin }) {
 
         {/* Menu Cards Grid */}
         {loadingMenu ? (
-          <MenuGridSkeleton className="lg:grid-cols-3" />
+          <MenuGridSkeleton className="lg:grid-cols-3" mobileCarousel />
         ) : menuItems.length === 0 ? (
           <div className="text-center py-16 border-2 border-dashed border-[#1E1E1E]/30 bg-white p-8">
             <p className="font-mono text-xs font-bold uppercase text-[#6B7860]">No Menus Found</p>
@@ -65,8 +109,46 @@ export function ThisWeekMenuSection({ onSelectMeal, onOpenAdmin }) {
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-            {menuItems.map((meal) => {
+          <>
+            <div className="mb-4 flex items-center justify-between gap-4 md:hidden">
+              <div>
+                <p className="font-mono text-[10px] font-black uppercase tracking-wider text-[#1E1E1E]">
+                  {language === "ID" ? "Geser untuk pilih menu" : "Swipe to choose a meal"}
+                </p>
+                <p className="mt-0.5 font-mono text-[9px] font-bold uppercase text-[#6B7860]">
+                  {String(activeMenuIndex + 1).padStart(2, "0")} / {String(menuItems.length).padStart(2, "0")}
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => scrollToMenu(activeMenuIndex - 1)}
+                  disabled={activeMenuIndex === 0}
+                  aria-label={language === "ID" ? "Menu sebelumnya" : "Previous meal"}
+                  className="grid size-11 place-items-center border-2 border-[#1E1E1E] bg-white shadow-[2px_2px_0_#1E1E1E] transition-colors hover:bg-[#E1ECD3] disabled:cursor-not-allowed disabled:opacity-35 disabled:shadow-none"
+                >
+                  <ChevronLeft size={18} aria-hidden="true" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => scrollToMenu(activeMenuIndex + 1)}
+                  disabled={activeMenuIndex === menuItems.length - 1}
+                  aria-label={language === "ID" ? "Menu berikutnya" : "Next meal"}
+                  className="grid size-11 place-items-center border-2 border-[#1E1E1E] bg-[#1E1E1E] text-white shadow-[2px_2px_0_#8D9B7D] transition-colors hover:bg-[#6B7860] disabled:cursor-not-allowed disabled:opacity-35 disabled:shadow-none"
+                >
+                  <ChevronRight size={18} aria-hidden="true" />
+                </button>
+              </div>
+            </div>
+
+            <div
+              ref={menuTrackRef}
+              onScroll={handleMenuScroll}
+              aria-label={language === "ID" ? "Daftar menu minggu ini" : "This week's meal list"}
+              className="relative -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:mx-0 md:grid md:grid-cols-2 md:gap-6 md:overflow-visible md:px-0 md:pb-0 lg:grid-cols-3 lg:gap-8"
+            >
+              {menuItems.map((meal) => {
               const availableTiers = meal.availableProteinTiers || PROTEIN_TIERS;
               const selectedTier = availableTiers.includes(selectedTiers[meal.id])
                 ? selectedTiers[meal.id]
@@ -94,7 +176,7 @@ export function ThisWeekMenuSection({ onSelectMeal, onOpenAdmin }) {
               return (
                 <Card
                   key={meal.id}
-                  className="group grid h-full grid-rows-[auto_1fr] overflow-hidden rounded-none border-2 border-[#1E1E1E] bg-white shadow-[6px_6px_0_#1E1E1E] transition-all duration-200 hover:-translate-y-1 hover:shadow-[9px_9px_0_#8D9B7D]"
+                  className="group grid h-full min-w-0 flex-[0_0_calc(100%-2rem)] snap-start scroll-ml-4 grid-rows-[auto_1fr] overflow-hidden rounded-none border-2 border-[#1E1E1E] bg-white shadow-[6px_6px_0_#1E1E1E] transition-all duration-200 hover:-translate-y-1 hover:shadow-[9px_9px_0_#8D9B7D] md:flex-auto md:scroll-ml-0"
                 >
                   {/* Image Container */}
                   <div className="relative h-52 overflow-hidden bg-[#1E1E1E] sm:h-60 border-b-2 border-[#1E1E1E]">
@@ -248,8 +330,27 @@ export function ThisWeekMenuSection({ onSelectMeal, onOpenAdmin }) {
                   </div>
                 </Card>
               );
-            })}
-          </div>
+              })}
+            </div>
+
+            <div className="mt-4 flex items-center justify-center gap-2 md:hidden">
+              {menuItems.map((meal, index) => (
+                <button
+                  key={meal.id}
+                  type="button"
+                  onClick={() => scrollToMenu(index)}
+                  aria-label={`${language === "ID" ? "Tampilkan menu" : "Show meal"} ${index + 1}`}
+                  aria-current={index === activeMenuIndex ? "true" : undefined}
+                  className="grid min-h-8 min-w-8 place-items-center"
+                >
+                  <span
+                    aria-hidden="true"
+                    className={`h-1.5 transition-all ${index === activeMenuIndex ? "w-8 bg-[#1E1E1E]" : "w-3 bg-[#1E1E1E]/20"}`}
+                  />
+                </button>
+              ))}
+            </div>
+          </>
         )}
       </div>
     </section>
