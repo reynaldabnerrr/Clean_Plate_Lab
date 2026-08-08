@@ -62,7 +62,7 @@ export function ThisWeekMenuSection({ onSelectMeal, onOpenAdmin }) {
   return (
     <section
       id="this-week-menu"
-      className="py-16 sm:py-24 bg-[#FEFDF9] border-b-2 border-[#1E1E1E] relative overflow-hidden"
+      className="relative scroll-mt-[74px] overflow-hidden border-b-2 border-[#1E1E1E] bg-[#FEFDF9] py-16 sm:scroll-mt-[78px] sm:py-24"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}

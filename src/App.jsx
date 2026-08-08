@@ -7,6 +7,48 @@ import { LanguageWelcomeModal } from "./components/LanguageWelcomeModal";
 import HomePage from "./pages/HomePage";
 import AdminPage from "./pages/AdminPage";
 import { analytics, trackEvent } from "./lib/analytics";
+import { useCpl } from "./hooks/useCpl";
+
+function HashScrollHandler() {
+  const { hasSelectedLanguage } = useCpl();
+
+  React.useEffect(() => {
+    if (!hasSelectedLanguage) return undefined;
+
+    let animationFrame;
+
+    const scrollToHash = () => {
+      if (animationFrame) window.cancelAnimationFrame(animationFrame);
+
+      animationFrame = window.requestAnimationFrame(() => {
+        const hash = window.location.hash.slice(1);
+        if (!hash || hash === "admin") return;
+
+        let targetId = hash;
+        try {
+          targetId = decodeURIComponent(hash);
+        } catch {
+          // Keep the original hash when it contains malformed URL encoding.
+        }
+
+        document.getElementById(targetId)?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      });
+    };
+
+    scrollToHash();
+    window.addEventListener("hashchange", scrollToHash);
+
+    return () => {
+      window.removeEventListener("hashchange", scrollToHash);
+      if (animationFrame) window.cancelAnimationFrame(animationFrame);
+    };
+  }, [hasSelectedLanguage]);
+
+  return null;
+}
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -94,6 +136,7 @@ export default function App() {
   return (
     <ErrorBoundary>
       <CplProvider>
+        <HashScrollHandler />
         {isAdminPage ? (
           <AdminPage />
         ) : (
@@ -117,4 +160,3 @@ export default function App() {
     </ErrorBoundary>
   );
 }
-
