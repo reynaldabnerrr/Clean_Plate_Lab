@@ -22,7 +22,7 @@ function HashScrollHandler() {
 
       animationFrame = window.requestAnimationFrame(() => {
         const hash = window.location.hash.slice(1);
-        if (!hash || hash === "admin") return;
+        if (!hash || hash === "admin" || hash === "order-form") return;
 
         let targetId = hash;
         try {
@@ -91,10 +91,13 @@ class ErrorBoundary extends React.Component {
 }
 
 export default function App() {
-  const [orderModalOpen, setOrderModalOpen] = React.useState(false);
+  const [orderModalOpen, setOrderModalOpen] = React.useState(
+    () => window.location.hash === "#order-form",
+  );
   const [initialProteinTier, setInitialProteinTier] = React.useState(40);
   const [initialMealsPerDay, setInitialMealsPerDay] = React.useState(1);
   const [hasExplicitOrderDefaults, setHasExplicitOrderDefaults] = React.useState(false);
+  const orderOpenedFromPage = React.useRef(false);
 
   const [isAdminPage, setIsAdminPage] = React.useState(() => {
     return (
@@ -109,6 +112,8 @@ export default function App() {
         window.location.hash === "#admin" ||
         window.location.pathname.startsWith("/admin");
       setIsAdminPage(isAdmin);
+      setOrderModalOpen(window.location.hash === "#order-form");
+      if (window.location.hash !== "#order-form") orderOpenedFromPage.current = false;
     };
 
     handleRouteChange();
@@ -130,7 +135,29 @@ export default function App() {
     setInitialMealsPerDay(mealsPerDay);
     setHasExplicitOrderDefaults(Boolean(proteinTier));
     window.dispatchEvent(new Event("cpl:closeMobileMenu"));
+    if (window.location.hash !== "#order-form") {
+      orderOpenedFromPage.current = true;
+      window.history.pushState(null, "", "#order-form");
+    }
     setOrderModalOpen(true);
+  };
+
+  const handleCloseOrder = () => {
+    setOrderModalOpen(false);
+
+    if (window.location.hash !== "#order-form") return;
+
+    if (orderOpenedFromPage.current) {
+      orderOpenedFromPage.current = false;
+      window.history.back();
+      return;
+    }
+
+    window.history.replaceState(
+      null,
+      "",
+      `${window.location.pathname}${window.location.search}`,
+    );
   };
 
   return (
@@ -149,7 +176,7 @@ export default function App() {
             <Footer />
             <OrderModal
               isOpen={orderModalOpen}
-              onClose={() => setOrderModalOpen(false)}
+              onClose={handleCloseOrder}
               initialProteinTier={initialProteinTier}
               initialMealsPerDay={initialMealsPerDay}
               hasExplicitInitialValues={hasExplicitOrderDefaults}
