@@ -53,7 +53,7 @@ export async function loginAdminUser(email, password) {
       password,
     });
 
-    // 2. Auto-provision Superadmin cleanplatelab.id@gmail.com if first time
+    // 2. Auto-provision Superadmin if first time (user may not exist yet)
     if (error && cleanEmail === SUPERADMIN_EMAIL) {
       console.log("Auto-provisioning Superadmin account in Supabase Auth...");
       try {
@@ -73,14 +73,19 @@ export async function loginAdminUser(email, password) {
           error = null;
         }
       } catch {
-        // Continue to bypass
+        // Continue
       }
     }
 
-    // 3. Bypass "Email not confirmed" or Auth Errors for Superadmin & Registered Admins
+    // 3. Only bypass for EMAIL NOT CONFIRMED — never for wrong password
     if (error) {
-      // Superadmin bypass
-      if (cleanEmail === SUPERADMIN_EMAIL) {
+      const isEmailNotConfirmed =
+        error.message?.toLowerCase().includes("not confirmed") ||
+        error.message?.toLowerCase().includes("email_confirm") ||
+        error.code === "email_not_confirmed";
+
+      // Superadmin bypass — ONLY for unconfirmed email
+      if (cleanEmail === SUPERADMIN_EMAIL && isEmailNotConfirmed) {
         return {
           success: true,
           user: {
@@ -92,33 +97,35 @@ export async function loginAdminUser(email, password) {
         };
       }
 
-      // Check if registered in admin_users table
-      try {
-        const { data: adminRecord } = await supabase
-          .from("admin_users")
-          .select("*")
-          .eq("email", cleanEmail)
-          .single();
+      // Registered admin bypass — ONLY for unconfirmed email
+      if (isEmailNotConfirmed) {
+        try {
+          const { data: adminRecord } = await supabase
+            .from("admin_users")
+            .select("*")
+            .eq("email", cleanEmail)
+            .single();
 
-        if (adminRecord) {
-          return {
-            success: true,
-            user: {
-              id: adminRecord.user_id || adminRecord.id,
-              email: adminRecord.email,
-              user_metadata: {
-                full_name: adminRecord.full_name,
-                role: adminRecord.role,
+          if (adminRecord) {
+            return {
+              success: true,
+              user: {
+                id: adminRecord.user_id || adminRecord.id,
+                email: adminRecord.email,
+                user_metadata: {
+                  full_name: adminRecord.full_name,
+                  role: adminRecord.role,
+                },
               },
-            },
-            role: adminRecord.role || "admin",
-          };
+              role: adminRecord.role || "admin",
+            };
+          }
+        } catch {
+          // Continue to error
         }
-      } catch {
-        // Continue to error
       }
 
-      // If invalid password or user not found
+      // Wrong password, user not found, etc. — reject
       throw error;
     }
 
