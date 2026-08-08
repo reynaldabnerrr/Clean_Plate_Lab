@@ -99,7 +99,7 @@ export default function App() {
         ) : (
           <div className="min-h-screen bg-[var(--cpl-cream)] text-[var(--cpl-dark)]">
             <LanguageWelcomeModal />
-            <Navbar onOpenOrder={() => handleBuild("navigation")} />
+            <Navbar onOpenOrder={() => handleBuild("navigation")} hidden={orderModalOpen} />
             <main id="main-content" tabIndex="-1" className="outline-none">
               <HomePage onBuild={handleBuild} />
             </main>

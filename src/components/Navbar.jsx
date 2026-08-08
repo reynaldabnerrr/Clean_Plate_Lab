@@ -16,7 +16,7 @@ const NAV_SECTION_HREFS = [
   "#faq",
 ];
 
-export function Navbar({ onOpenOrder, onOpenAdmin }) {
+export function Navbar({ onOpenOrder, onOpenAdmin, hidden = false }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeHref, setActiveHref] = useState("");
@@ -143,13 +143,13 @@ export function Navbar({ onOpenOrder, onOpenAdmin }) {
         />
       )}
 
-      <div aria-hidden="true" className="h-[74px] sm:h-[78px]" />
+      <div aria-hidden="true" className={`h-[74px] sm:h-[78px] transition-opacity duration-200 ${hidden ? "opacity-0" : "opacity-100"}`} />
       <header
         className={`fixed inset-x-0 top-0 z-[100] transition-all duration-200 ${
           mobileMenuOpen || scrolled
             ? "bg-[#FEFDF9] shadow-md border-b-2 border-[#1E1E1E] py-3"
             : "bg-[#FEFDF9]/95 border-b border-[#1E1E1E]/20 py-4"
-        }`}
+        } ${hidden ? "pointer-events-none opacity-0" : "opacity-100"}`}
       >
         <div className="mx-auto flex max-w-[90rem] items-center justify-between gap-2 px-4 sm:gap-4 sm:px-6 xl:gap-3 xl:px-5 2xl:gap-5 2xl:px-8 relative z-50">
           {/* Brand Logo */}
