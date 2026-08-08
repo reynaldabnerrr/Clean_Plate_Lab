@@ -2,8 +2,10 @@ import React from "react";
 import { ArrowRight, Check, MessageCircle } from "lucide-react";
 import { Seo } from "../components/Seo";
 import { Hero } from "../components/Hero";
+import { ThisWeekMenuSection } from "../components/ThisWeekMenuSection";
 import { MenuArchiveSection } from "../components/MenuArchiveSection";
 import { FaqSection } from "../components/FaqSection";
+
 import { FounderSection } from "../components/FounderSection";
 import { MacroCalculator } from "../components/MacroCalculator";
 import { Badge } from "../components/ui/badge";
@@ -49,7 +51,7 @@ function LegacySectionHeader({
   );
 }
 
-export default function HomePage({ onBuild }) {
+export default function HomePage({ onBuild, onOpenAdmin }) {
   const { language } = useCpl();
   const copy = useSiteCopy();
   const isIndonesian = language === "ID";
@@ -236,6 +238,10 @@ export default function HomePage({ onBuild }) {
           </div>
         </div>
       </section>
+
+      <ThisWeekMenuSection
+        onSelectMeal={() => onBuild("this_week_menu")}
+      />
 
       <MenuArchiveSection />
 

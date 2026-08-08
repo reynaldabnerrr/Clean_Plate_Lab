@@ -2,6 +2,23 @@ import React, { useCallback, useEffect, useState } from "react";
 import { CplContext } from "./cpl-context";
 import { getDateInputValueInTimeZone } from "../lib/order";
 import { migrateStoredLanguage, writeStoredState } from "../lib/storage";
+import { supabase } from "../lib/supabase";
+import {
+  fetchWeeklyMenusFromSupabase,
+  createWeeklyMenuItem,
+  updateWeeklyMenuItem,
+  deleteWeeklyMenuItem,
+  toggleWeeklyMenuItemAvailability,
+  seedDefaultWeeklyMenus,
+} from "../lib/menuService";
+import {
+  loginAdminUser,
+  changeUserPassword,
+  createAdminAccount,
+  fetchAdminUsers,
+  deleteAdminUser,
+  SUPERADMIN_EMAIL,
+} from "../lib/adminAuthService";
 
 const INITIAL_MENU_ITEMS = [
   {
@@ -177,7 +194,11 @@ const INITIAL_ORDERS = [
 export function CplProvider({ children }) {
   const [menuItems, setMenuItems] = useState(INITIAL_MENU_ITEMS);
   const [orders, setOrders] = useState(INITIAL_ORDERS);
+  const [supabaseUser, setSupabaseUser] = useState(null);
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
+  const [userRole, setUserRole] = useState("superadmin");
+  const [isFromDb, setIsFromDb] = useState(false);
+  const [loadingMenu, setLoadingMenu] = useState(false);
   const [announcementText, setAnnouncementText] = useState(
     "100% Lab Verified High Protein Meal Prep • Free Delivery Jabodetabek",
   );
@@ -186,6 +207,72 @@ export function CplProvider({ children }) {
   const [hasSelectedLanguage, setHasSelectedLanguage] = useState(
     Boolean(storedLanguage),
   );
+
+  // Sync Supabase Auth state & Local Admin Session Persistence
+  useEffect(() => {
+    // 1. Check local persistent session storage first
+    try {
+      const storedSession = localStorage.getItem("cpl_admin_session");
+      if (storedSession) {
+        const parsed = JSON.parse(storedSession);
+        if (parsed?.user) {
+          setSupabaseUser(parsed.user);
+          setIsAdminLoggedIn(true);
+          setUserRole(parsed.role || "admin");
+        }
+      }
+    } catch {
+      // Ignore JSON parse error
+    }
+
+    // 2. Sync Supabase Auth Session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      const user = session?.user ?? null;
+      if (user) {
+        setSupabaseUser(user);
+        setIsAdminLoggedIn(true);
+        const role = user.email === SUPERADMIN_EMAIL ? "superadmin" : "admin";
+        setUserRole(role);
+        localStorage.setItem(
+          "cpl_admin_session",
+          JSON.stringify({ user, role })
+        );
+      }
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      const user = session?.user ?? null;
+      if (user) {
+        setSupabaseUser(user);
+        setIsAdminLoggedIn(true);
+        const role = user.email === SUPERADMIN_EMAIL ? "superadmin" : "admin";
+        setUserRole(role);
+        localStorage.setItem(
+          "cpl_admin_session",
+          JSON.stringify({ user, role })
+        );
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  // Fetch menu items from Supabase (with fallback)
+  const fetchLatestMenus = useCallback(async () => {
+    setLoadingMenu(true);
+    const res = await fetchWeeklyMenusFromSupabase();
+    if (res.data && res.data.length > 0) {
+      setMenuItems(res.data);
+      setIsFromDb(res.isFromDb);
+    }
+    setLoadingMenu(false);
+  }, []);
+
+  useEffect(() => {
+    fetchLatestMenus();
+  }, [fetchLatestMenus]);
 
   const setLanguage = useCallback((nextLanguage) => {
     if (nextLanguage !== "ID" && nextLanguage !== "EN") return;
@@ -810,29 +897,116 @@ export function CplProvider({ children }) {
     return translations[language]?.[key] || translations["EN"]?.[key] || key;
   };
 
-  // Add new meal item
-  const addMenuItem = (item) => {
-    const newItem = {
-      ...item,
-      id: `m${Date.now()}`,
-      code: item.code || `CPL-0${menuItems.length + 14}`,
-      available: true,
-    };
-    setMenuItems((prev) => [newItem, ...prev]);
+  // Supabase Auth & Role Management Methods
+  const loginSupabase = async (email, password) => {
+    const res = await loginAdminUser(email, password);
+    if (res.success) {
+      setSupabaseUser(res.user);
+      setIsAdminLoggedIn(true);
+      const role = res.role || (res.user?.email === SUPERADMIN_EMAIL ? "superadmin" : "admin");
+      setUserRole(role);
+      localStorage.setItem(
+        "cpl_admin_session",
+        JSON.stringify({ user: res.user, role })
+      );
+    }
+    return res;
   };
 
-  // Update existing meal item
-  const updateMenuItem = (id, updatedFields) => {
-    setMenuItems((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, ...updatedFields } : item,
-      ),
-    );
+  const logoutSupabase = async () => {
+    try {
+      await supabase.auth.signOut();
+    } catch {
+      // Ignore
+    }
+    localStorage.removeItem("cpl_admin_session");
+    setSupabaseUser(null);
+    setIsAdminLoggedIn(false);
+    setUserRole("admin");
   };
 
-  // Delete meal item
-  const deleteMenuItem = (id) => {
+  const changePassword = async (newPassword) => {
+    return await changeUserPassword(newPassword);
+  };
+
+  const createAdminUserAccount = async (accountData) => {
+    return await createAdminAccount(accountData);
+  };
+
+  const getAdminUsers = async () => {
+    return await fetchAdminUsers();
+  };
+
+  const deleteAdminUserAccount = async (id, email) => {
+    return await deleteAdminUser(id, email);
+  };
+
+  // Supabase Menu CRUD Methods
+  const createMenuItem = async (itemData) => {
+    const res = await createWeeklyMenuItem(itemData);
+    if (res.success) {
+      setMenuItems((prev) => [...prev, res.data]);
+      setIsFromDb(true);
+      return { success: true, data: res.data };
+    } else {
+      // Local fallback if DB is not created yet
+      const fallbackItem = {
+        ...itemData,
+        id: `m-${Date.now()}`,
+        available: itemData.available ?? true,
+      };
+      setMenuItems((prev) => [...prev, fallbackItem]);
+      return { success: true, data: fallbackItem, error: res.error };
+    }
+  };
+
+  const updateMenuItem = async (id, updatedFields) => {
+    const res = await updateWeeklyMenuItem(id, updatedFields);
+    if (res.success) {
+      setMenuItems((prev) =>
+        prev.map((item) => (item.id === id ? res.data : item)),
+      );
+      return { success: true, data: res.data };
+    } else {
+      setMenuItems((prev) =>
+        prev.map((item) =>
+          item.id === id ? { ...item, ...updatedFields } : item,
+        ),
+      );
+      return { success: true, error: res.error };
+    }
+  };
+
+  const deleteMenuItem = async (id) => {
+    const res = await deleteWeeklyMenuItem(id);
     setMenuItems((prev) => prev.filter((item) => item.id !== id));
+    return { success: true, error: res.error };
+  };
+
+  const toggleAvailability = async (id, currentStatus) => {
+    const res = await toggleWeeklyMenuItemAvailability(id, currentStatus);
+    if (res.success) {
+      setMenuItems((prev) =>
+        prev.map((item) => (item.id === id ? res.data : item)),
+      );
+      return { success: true };
+    } else {
+      setMenuItems((prev) =>
+        prev.map((item) =>
+          item.id === id ? { ...item, available: !currentStatus } : item,
+        ),
+      );
+      return { success: true, error: res.error };
+    }
+  };
+
+  const seedDefaultMenus = async () => {
+    const res = await seedDefaultWeeklyMenus();
+    if (res.success) {
+      await fetchLatestMenus();
+      return { success: true };
+    }
+    return { success: false, error: res.error };
   };
 
   // Add new order
@@ -858,14 +1032,27 @@ export function CplProvider({ children }) {
     <CplContext.Provider
       value={{
         menuItems,
-        addMenuItem,
+        supabaseUser,
+        isAdminLoggedIn,
+        setIsAdminLoggedIn,
+        userRole,
+        loginSupabase,
+        logoutSupabase,
+        changePassword,
+        createAdminUserAccount,
+        getAdminUsers,
+        deleteAdminUserAccount,
+        isFromDb,
+        loadingMenu,
+        fetchLatestMenus,
+        createMenuItem,
         updateMenuItem,
         deleteMenuItem,
+        toggleAvailability,
+        seedDefaultMenus,
         orders,
         addOrder,
         updateOrderStatus,
-        isAdminLoggedIn,
-        setIsAdminLoggedIn,
         announcementText,
         setAnnouncementText,
         language,
@@ -878,3 +1065,4 @@ export function CplProvider({ children }) {
     </CplContext.Provider>
   );
 }
+

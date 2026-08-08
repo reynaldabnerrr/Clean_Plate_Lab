@@ -100,7 +100,7 @@ export const siteCopy = {
     },
     menu: {
       eyebrow: "Weekly Menu Collection",
-      title: "Three weeks of meals worth looking forward to.",
+      title: "Best-of Menu Recap.",
       description:
         "Browse the weekly catalog and compare nutrition facts across the 25g, 40g, 60g, 80g, and 100g protein variants directly on each card.",
       search: "Search this week",
@@ -272,8 +272,8 @@ export const siteCopy = {
       cta: "Pilih Paket Katering",
     },
     menu: {
-      eyebrow: "Portofolio menu mingguan",
-      title: "Tiga minggu menu yang layak dinantikan.",
+      eyebrow: "Koleksi menu mingguan",
+      title: "Katalog Kilas Balik Menu Unggulan.",
       description:
         "Jelajahi katalog mingguan dan bandingkan nutrition facts varian protein 25g, 40g, 60g, 80g, dan 100g langsung pada setiap kartu.",
       search: "Cari di minggu ini",

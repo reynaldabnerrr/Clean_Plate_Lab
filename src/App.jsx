@@ -5,6 +5,7 @@ import { Footer } from "./components/Footer";
 import { OrderModal } from "./components/OrderModal";
 import { LanguageWelcomeModal } from "./components/LanguageWelcomeModal";
 import HomePage from "./pages/HomePage";
+import AdminPage from "./pages/AdminPage";
 import { analytics, trackEvent } from "./lib/analytics";
 
 class ErrorBoundary extends React.Component {
@@ -51,12 +52,35 @@ export default function App() {
   const [orderModalOpen, setOrderModalOpen] = React.useState(false);
   const [initialProteinTier, setInitialProteinTier] = React.useState(40);
   const [initialMealsPerDay, setInitialMealsPerDay] = React.useState(1);
-  const [hasExplicitOrderDefaults, setHasExplicitOrderDefaults] =
-    React.useState(false);
+  const [hasExplicitOrderDefaults, setHasExplicitOrderDefaults] = React.useState(false);
+
+  const [isAdminPage, setIsAdminPage] = React.useState(() => {
+    return (
+      window.location.hash === "#admin" ||
+      window.location.pathname.startsWith("/admin")
+    );
+  });
 
   React.useEffect(() => {
-    trackEvent("page_view", { page_path: "/" });
+    const handleRouteChange = () => {
+      const isAdmin =
+        window.location.hash === "#admin" ||
+        window.location.pathname.startsWith("/admin");
+      setIsAdminPage(isAdmin);
+    };
+
+    handleRouteChange();
+    window.addEventListener("hashchange", handleRouteChange);
+    window.addEventListener("popstate", handleRouteChange);
+    return () => {
+      window.removeEventListener("hashchange", handleRouteChange);
+      window.removeEventListener("popstate", handleRouteChange);
+    };
   }, []);
+
+  React.useEffect(() => {
+    trackEvent("page_view", { page_path: isAdminPage ? "/admin" : "/" });
+  }, [isAdminPage]);
 
   const handleBuild = (source, proteinTier, mealsPerDay = 1) => {
     analytics.builderOpened(source);
@@ -69,22 +93,27 @@ export default function App() {
   return (
     <ErrorBoundary>
       <CplProvider>
-        <div className="min-h-screen bg-[var(--cpl-cream)] text-[var(--cpl-dark)]">
-          <LanguageWelcomeModal />
-          <Navbar onOpenOrder={() => handleBuild("navigation")} />
-          <main id="main-content" tabIndex="-1" className="outline-none">
-            <HomePage onBuild={handleBuild} />
-          </main>
-          <Footer />
-          <OrderModal
-            isOpen={orderModalOpen}
-            onClose={() => setOrderModalOpen(false)}
-            initialProteinTier={initialProteinTier}
-            initialMealsPerDay={initialMealsPerDay}
-            hasExplicitInitialValues={hasExplicitOrderDefaults}
-          />
-        </div>
+        {isAdminPage ? (
+          <AdminPage />
+        ) : (
+          <div className="min-h-screen bg-[var(--cpl-cream)] text-[var(--cpl-dark)]">
+            <LanguageWelcomeModal />
+            <Navbar onOpenOrder={() => handleBuild("navigation")} />
+            <main id="main-content" tabIndex="-1" className="outline-none">
+              <HomePage onBuild={handleBuild} />
+            </main>
+            <Footer />
+            <OrderModal
+              isOpen={orderModalOpen}
+              onClose={() => setOrderModalOpen(false)}
+              initialProteinTier={initialProteinTier}
+              initialMealsPerDay={initialMealsPerDay}
+              hasExplicitInitialValues={hasExplicitOrderDefaults}
+            />
+          </div>
+        )}
       </CplProvider>
     </ErrorBoundary>
   );
 }
+

@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { CplPrimaryLogo } from "./CplLogo";
 import { Button } from "./ui/button";
-import { Menu, X, ArrowRight } from "lucide-react";
+import { Menu, X, ArrowRight, ShieldCheck } from "lucide-react";
 import { useCpl } from "../hooks/useCpl";
 import { useSiteCopy } from "../hooks/useSiteCopy";
 
 const NAV_SECTION_HREFS = [
   "#how-it-works",
   "#protein-tiers",
+  "#this-week-menu",
   "#menu",
   "#calculator",
   "#why-cpl",
@@ -15,7 +16,7 @@ const NAV_SECTION_HREFS = [
   "#faq",
 ];
 
-export function Navbar({ onOpenOrder }) {
+export function Navbar({ onOpenOrder, onOpenAdmin }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeHref, setActiveHref] = useState("");
@@ -86,6 +87,10 @@ export function Navbar({ onOpenOrder }) {
   const navItems = [
     { label: copy.nav.how, href: "#how-it-works" },
     { label: copy.nav.protein, href: "#protein-tiers" },
+    {
+      label: language === "ID" ? "Menu Minggu Ini" : "This Week's Menu",
+      href: "#this-week-menu",
+    },
     { label: copy.nav.menu, href: "#menu" },
     { label: copy.nav.calculator, href: "#calculator" },
     { label: copy.nav.standard, href: "#why-cpl" },
@@ -128,12 +133,10 @@ export function Navbar({ onOpenOrder }) {
 
       <div aria-hidden="true" className="h-[74px] sm:h-[78px]" />
       <header
-        className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
-          mobileMenuOpen
-            ? "bg-[#FEFDF9] shadow-md border-b border-[#1E1E1E]/15 py-3"
-            : scrolled
-              ? "bg-[#FEFDF9]/95 shadow-md border-b border-[#1E1E1E]/12 backdrop-blur-md py-3"
-              : "bg-[#FEFDF9]/90 border-b border-[#1E1E1E]/10 backdrop-blur-sm py-4"
+        className={`fixed inset-x-0 top-0 z-[100] transition-all duration-200 ${
+          mobileMenuOpen || scrolled
+            ? "bg-[#FEFDF9] shadow-md border-b-2 border-[#1E1E1E] py-3"
+            : "bg-[#FEFDF9]/95 border-b border-[#1E1E1E]/20 py-4"
         }`}
       >
         <div className="mx-auto flex max-w-[90rem] items-center justify-between gap-2 px-4 sm:gap-4 sm:px-6 xl:gap-3 xl:px-5 2xl:gap-5 2xl:px-8 relative z-50">
