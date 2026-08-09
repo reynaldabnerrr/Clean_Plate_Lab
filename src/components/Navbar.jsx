@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { CplPrimaryLogo } from "./CplLogo";
 import { Button } from "./ui/button";
-import { Menu, X, ArrowRight, ShieldCheck } from "lucide-react";
+import { ArrowRight, Menu, X } from "lucide-react";
 import { useCpl } from "../hooks/useCpl";
 import { useSiteCopy } from "../hooks/useSiteCopy";
 
@@ -16,7 +16,7 @@ const NAV_SECTION_HREFS = [
   "#faq",
 ];
 
-export function Navbar({ onOpenOrder, onOpenAdmin, hidden = false }) {
+export function Navbar({ onOpenOrder, hidden = false }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeHref, setActiveHref] = useState("");
@@ -102,6 +102,7 @@ export function Navbar({ onOpenOrder, onOpenAdmin, hidden = false }) {
     {
       label: language === "ID" ? "Menu Minggu Ini" : "This Week's Menu",
       href: "#this-week-menu",
+      featured: true,
     },
     { label: copy.nav.menu, href: "#menu" },
     { label: copy.nav.calculator, href: "#calculator" },
@@ -126,145 +127,186 @@ export function Navbar({ onOpenOrder, onOpenAdmin, hidden = false }) {
 
   return (
     <>
-      {/* Accessibility Skip Link */}
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 z-[100] px-4 py-2 bg-[#8D9B7D] text-white font-bold text-xs rounded-md shadow-lg outline-none ring-2 ring-white"
+        className="sr-only z-[200] bg-[#1E1E1E] px-4 py-3 font-mono text-xs font-bold uppercase text-white outline-none ring-2 ring-[#EABB85] focus:not-sr-only focus:fixed focus:left-4 focus:top-4"
       >
         {t("skipContent")}
       </a>
 
-      {/* Mobile Backdrop Overlay (Layered behind z-50 header & drawer) */}
       {mobileMenuOpen && (
         <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 xl:hidden animate-cpl-fade-in"
+          className="fixed inset-0 z-[90] bg-[#1E1E1E]/70 backdrop-blur-[2px] xl:hidden animate-cpl-fade-in"
           onClick={() => setMobileMenuOpen(false)}
           aria-hidden="true"
         />
       )}
 
-      <div aria-hidden="true" className={`h-[74px] sm:h-[78px] transition-opacity duration-200 ${hidden ? "opacity-0" : "opacity-100"}`} />
+      <div
+        aria-hidden="true"
+        className={`h-[72px] transition-opacity duration-200 sm:h-[78px] xl:h-[112px] ${hidden ? "opacity-0" : "opacity-100"}`}
+      />
       <header
-        className={`fixed inset-x-0 top-0 z-[100] transition-all duration-200 ${
+        className={`fixed inset-x-0 top-0 z-[100] border-b-2 border-[#1E1E1E] bg-[#FEFDF9] transition-[opacity,box-shadow] duration-200 ${
           mobileMenuOpen || scrolled
-            ? "bg-[#FEFDF9] shadow-md border-b-2 border-[#1E1E1E] py-3"
-            : "bg-[#FEFDF9]/95 border-b border-[#1E1E1E]/20 py-4"
+            ? "shadow-[0_10px_30px_rgba(30,30,30,0.12)]"
+            : "shadow-none"
         } ${hidden ? "pointer-events-none opacity-0" : "opacity-100"}`}
       >
-        <div className="mx-auto flex max-w-[90rem] items-center justify-between gap-2 px-4 sm:gap-4 sm:px-6 xl:gap-3 xl:px-5 2xl:gap-5 2xl:px-8 relative z-50">
-          {/* Brand Logo */}
-          <a
-            href="#main-content"
-            className="flex items-center shrink-0 hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8D9B7D] rounded-lg"
-            aria-label="Clean Plate Lab Home"
-          >
-            <div className="origin-left scale-95 transform sm:scale-100 xl:scale-[0.88] 2xl:scale-100">
-              <CplPrimaryLogo />
+        <div className="relative z-50 border-b border-[#1E1E1E] xl:border-b-0">
+          <div className="mx-auto flex h-[70px] max-w-[90rem] items-center justify-between gap-3 px-4 sm:h-[76px] sm:px-6 xl:px-8">
+            <a
+              href="#main-content"
+              className="group flex min-w-0 shrink-0 items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8D9B7D] focus-visible:ring-offset-4"
+              aria-label="Clean Plate Lab Home"
+            >
+              <div className="origin-left scale-[0.88] transition-opacity group-hover:opacity-80 min-[380px]:scale-95 sm:scale-100 xl:scale-[0.92] 2xl:scale-100">
+                <CplPrimaryLogo />
+              </div>
+            </a>
+
+            <div className="hidden min-w-0 flex-1 items-stretch justify-end xl:flex">
+              <div className="mr-6 flex min-w-[300px] items-center border-r border-[#1E1E1E] px-4 2xl:mr-10 2xl:min-w-[340px]">
+                <div className="flex flex-col justify-center">
+                  <span className="font-display text-[11px] font-black uppercase tracking-[0.08em] text-[#1E1E1E]">
+                    {language === "ID" ? "Dimasak segar Senin–Sabtu" : "Fresh cooked Monday–Saturday"}
+                  </span>
+                  <span className="mt-0.5 font-mono text-[8px] font-bold uppercase tracking-[0.18em] text-[#6B7860]">
+                    Makassar · High-protein meal system
+                  </span>
+                </div>
+              </div>
             </div>
-          </a>
 
-          {/* Desktop Navigation Links */}
-          <nav
-            aria-label="Main Navigation"
-            className="hidden items-center justify-center gap-3 font-display text-[11px] font-extrabold uppercase tracking-[0.04em] text-[#1E1E1E] xl:flex 2xl:gap-6 2xl:text-xs 2xl:tracking-wider"
-          >
-            {navItems.map((item) => {
-              const isActive = activeHref === item.href;
-
-              return (
-                <a
-                  key={item.href}
-                  href={item.href}
-                  aria-current={isActive ? "location" : undefined}
-                  onClick={() => setActiveHref(item.href)}
-                  className={`group relative whitespace-nowrap rounded py-1.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8D9B7D] ${
-                    isActive ? "text-[#6B7860]" : "hover:text-[#6B7860]"
-                  }`}
-                >
-                  <span>{item.label}</span>
-                  <span
-                    aria-hidden="true"
-                    className={`absolute bottom-0 left-0 h-[2px] bg-[#6B7860] transition-all duration-200 ${
-                      isActive ? "w-full" : "w-0 group-hover:w-full"
-                    }`}
-                  />
-                </a>
-              );
-            })}
-          </nav>
-
-          {/* Right Action Bar */}
-          <div className="flex items-center justify-end gap-2 sm:gap-3 shrink-0">
-            {/* Desktop Language Switcher */}
-            <div className="hidden items-center rounded-full border border-[#1E1E1E]/15 bg-[#1E1E1E]/8 p-1 shadow-inner sm:flex">
+            <div className="flex shrink-0 items-center justify-end gap-2 sm:gap-3">
+              <div className="hidden h-10 items-stretch border border-[#1E1E1E] bg-white sm:flex">
               <button
                 type="button"
                 onClick={() => setLanguage("ID")}
-                className={`rounded-full px-2.5 py-1 text-[11px] font-black transition-all duration-200 ${
+                  className={`min-w-10 px-2 font-mono text-[10px] font-black transition-colors focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#8D9B7D] ${
                   language === "ID"
-                    ? "bg-[#8D9B7D] text-white shadow-sm scale-[1.02]"
-                    : "text-[#1E1E1E]/70 hover:text-[#1E1E1E]"
+                      ? "bg-[#1E1E1E] text-white"
+                      : "bg-white text-[#6B7860] hover:bg-[#E1ECD3] hover:text-[#1E1E1E]"
                 }`}
                 aria-label="Bahasa Indonesia"
               >
-                <span>ID</span>
+                  ID
               </button>
               <button
                 type="button"
                 onClick={() => setLanguage("EN")}
-                className={`rounded-full px-2.5 py-1 text-[11px] font-black transition-all duration-200 ${
+                  className={`min-w-10 border-l border-[#1E1E1E] px-2 font-mono text-[10px] font-black transition-colors focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#8D9B7D] ${
                   language === "EN"
-                    ? "bg-[#8D9B7D] text-white shadow-sm scale-[1.02]"
-                    : "text-[#1E1E1E]/70 hover:text-[#1E1E1E]"
+                      ? "bg-[#1E1E1E] text-white"
+                      : "bg-white text-[#6B7860] hover:bg-[#E1ECD3] hover:text-[#1E1E1E]"
                 }`}
                 aria-label="English Language"
               >
-                <span>EN</span>
+                  EN
               </button>
             </div>
 
-            {/* Desktop / Tablet CTA Button */}
             <Button
               variant="default"
               size="default"
               onClick={onOpenOrder}
-              className="hidden md:flex items-center gap-2 rounded-full bg-[#8A9C7A] hover:bg-[#647554] active:scale-[0.98] text-white font-extrabold text-xs shadow-md hover:shadow-lg transition-all transform hover:scale-[1.02] min-h-[40px] px-4.5 shrink-0 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-[#8A9C7A]"
+                className="hidden min-h-10 items-center gap-3 rounded-none border border-[#1E1E1E] bg-[#8D9B7D] px-4 font-display text-[11px] font-black uppercase tracking-[0.06em] text-white shadow-[3px_3px_0_#1E1E1E] transition-[background-color,box-shadow] hover:bg-[#6B7860] hover:shadow-[1px_1px_0_#1E1E1E] focus-visible:ring-2 focus-visible:ring-[#6B7860] md:flex xl:min-h-11 xl:px-5"
             >
               <span>{copy.nav.build}</span>
-              <ArrowRight size={14} />
+                <ArrowRight size={15} strokeWidth={2.4} aria-hidden="true" />
             </Button>
 
-            {/* Mobile / Tablet Menu Toggle Button (Touch Area 44x44px) */}
             <button
               type="button"
               onClick={() => setMobileMenuOpen((current) => !current)}
               aria-expanded={mobileMenuOpen}
               aria-controls="mobile-menu-drawer"
               aria-label={
-                mobileMenuOpen ? "Close Menu" : "Open Navigation Menu"
+                  mobileMenuOpen
+                    ? language === "ID" ? "Tutup menu" : "Close menu"
+                    : language === "ID" ? "Buka menu navigasi" : "Open navigation menu"
               }
-              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[#1E1E1E]/15 bg-[#1E1E1E]/5 text-[#1E1E1E] transition-colors hover:bg-[#1E1E1E]/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8D9B7D] xl:hidden"
+                className={`flex h-11 shrink-0 items-center justify-center gap-2 border-2 border-[#1E1E1E] px-3 font-mono text-[9px] font-black uppercase tracking-[0.14em] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8D9B7D] focus-visible:ring-offset-2 xl:hidden ${
+                  mobileMenuOpen
+                    ? "bg-[#1E1E1E] text-white"
+                    : "bg-[#E1ECD3] text-[#1E1E1E] hover:bg-[#D1954E]"
+                }`}
             >
-              {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+                <span className="hidden min-[420px]:inline">
+                  {mobileMenuOpen ? (language === "ID" ? "Tutup" : "Close") : "Menu"}
+                </span>
+                {mobileMenuOpen
+                  ? <X size={19} strokeWidth={2.4} aria-hidden="true" />
+                  : <Menu size={19} strokeWidth={2.4} aria-hidden="true" />}
             </button>
+            </div>
           </div>
         </div>
 
-        {/* Mobile / Tablet Full-Featured Drawer */}
+        <div className="hidden border-t border-[#1E1E1E] bg-white xl:block">
+          <div className="mx-auto flex h-[34px] max-w-[90rem] items-stretch px-8">
+            <a
+              href="#main-content"
+              aria-current={activeHref ? undefined : "location"}
+              onClick={() => setActiveHref("")}
+              className="flex w-36 shrink-0 items-center justify-center border-x border-[#1E1E1E] bg-white px-3 font-display text-[9px] font-black uppercase tracking-[0.035em] text-[#1E1E1E] transition-colors hover:bg-[#E1ECD3] focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#8D9B7D] 2xl:w-40 2xl:text-[10px]"
+            >
+              <span>Home</span>
+            </a>
+            <nav aria-label="Main Navigation" className="flex min-w-0 flex-1 border-r border-[#1E1E1E]">
+              {navItems.map((item) => {
+                const isActive = activeHref === item.href;
+
+                return (
+                  <a
+                    key={item.href}
+                    href={item.href}
+                    aria-current={isActive ? "location" : undefined}
+                    onClick={() => setActiveHref(item.href)}
+                    className={`group relative flex min-w-0 flex-1 items-center justify-center border-l border-[#1E1E1E] px-2 font-display text-[9px] font-black uppercase tracking-[0.035em] transition-colors focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#8D9B7D] 2xl:text-[10px] ${
+                      isActive
+                        ? "bg-[#1E1E1E] text-white"
+                        : item.featured
+                          ? "bg-[#E1ECD3] text-[#1E1E1E] hover:bg-[#8D9B7D]"
+                          : "bg-white text-[#1E1E1E] hover:bg-[#E1ECD3]"
+                    }`}
+                  >
+                    {item.featured && (
+                      <span
+                        aria-hidden="true"
+                        className={`mr-1.5 h-1.5 w-1.5 shrink-0 rounded-full border border-[#1E1E1E] ${isActive ? "bg-[#D1954E]" : "bg-[#8D9B7D]"}`}
+                      />
+                    )}
+                    <span className="truncate">{item.label}</span>
+                    <span
+                      aria-hidden="true"
+                      className={`absolute inset-x-2 bottom-0 h-0.5 origin-left bg-[#D1954E] transition-transform duration-200 motion-reduce:transition-none ${
+                        isActive ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
+                      }`}
+                    />
+                  </a>
+                );
+              })}
+            </nav>
+          </div>
+        </div>
+
         {mobileMenuOpen && (
           <div
             id="mobile-menu-drawer"
-            className="absolute left-0 right-0 top-full z-50 max-h-[calc(100vh-80px)] origin-top space-y-4 overflow-y-auto border-b-2 border-[#1E1E1E] bg-[#FEFDF9] px-4 py-4 font-display text-xs font-bold uppercase tracking-wider text-[#1E1E1E] shadow-[0_18px_35px_rgba(30,30,30,0.16)] animate-cpl-slide-down sm:px-6 sm:py-5 xl:hidden"
+            className="absolute left-0 right-0 top-full z-50 max-h-[calc(100dvh-72px)] origin-top overflow-y-auto border-b-2 border-[#1E1E1E] bg-[#FEFDF9] shadow-[0_24px_45px_rgba(30,30,30,0.24)] animate-cpl-slide-down sm:max-h-[calc(100dvh-78px)] xl:hidden"
           >
-            <div className="flex items-center justify-between gap-4 border-b border-[#1E1E1E]/20 pb-4 sm:hidden">
-              <span className="font-display text-[10px] font-extrabold uppercase tracking-wider text-[#1E1E1E]/65">
-                {t("switchLanguage")}
-              </span>
-              <div className="flex items-center rounded-full border border-[#1E1E1E]/15 bg-[#1E1E1E]/8 p-1 shadow-inner">
+            <div className="mx-auto grid max-w-6xl md:grid-cols-[minmax(0,1fr)_18rem]">
+              <div className="min-w-0 p-4 sm:p-6 md:border-r md:border-[#1E1E1E]">
+                <div className="mb-4 flex items-center justify-between gap-4 border-b-2 border-[#1E1E1E] pb-3 sm:hidden">
+                  <span className="font-mono text-[9px] font-black uppercase tracking-[0.16em] text-[#6B7860]">
+                    {t("switchLanguage")}
+                  </span>
+                  <div className="flex h-9 items-stretch border border-[#1E1E1E] bg-white">
                 <button
                   type="button"
                   onClick={() => setLanguage("ID")}
-                  className={`rounded-full px-3 py-1 text-[10px] font-black transition-all ${language === "ID" ? "bg-[#8D9B7D] text-white shadow-sm" : "text-[#1E1E1E]/70 hover:text-[#1E1E1E]"}`}
+                        className={`min-w-11 px-2 font-mono text-[10px] font-black ${language === "ID" ? "bg-[#1E1E1E] text-white" : "text-[#6B7860]"}`}
                   aria-label="Bahasa Indonesia"
                 >
                   ID
@@ -272,19 +314,29 @@ export function Navbar({ onOpenOrder, onOpenAdmin, hidden = false }) {
                 <button
                   type="button"
                   onClick={() => setLanguage("EN")}
-                  className={`rounded-full px-3 py-1 text-[10px] font-black transition-all ${language === "EN" ? "bg-[#8D9B7D] text-white shadow-sm" : "text-[#1E1E1E]/70 hover:text-[#1E1E1E]"}`}
+                        className={`min-w-11 border-l border-[#1E1E1E] px-2 font-mono text-[10px] font-black ${language === "EN" ? "bg-[#1E1E1E] text-white" : "text-[#6B7860]"}`}
                   aria-label="English Language"
                 >
                   EN
                 </button>
+                  </div>
               </div>
-            </div>
 
-            {/* Mobile Navigation Links */}
-            <nav
-              aria-label="Mobile Navigation"
-              className="grid border-t-2 border-[#1E1E1E]"
-            >
+                <div className="mb-4 flex items-end justify-between gap-4">
+                  <div>
+                    <span className="font-mono text-[9px] font-black uppercase tracking-[0.18em] text-[#8D9B7D]">
+                      CPL / Navigation
+                    </span>
+                    <p className="mt-1 font-display text-xl font-black uppercase leading-none text-[#1E1E1E] sm:text-2xl">
+                      {language === "ID" ? "Temukan yang kamu butuhkan." : "Find what you need."}
+                    </p>
+                  </div>
+                  <span className="hidden border border-[#1E1E1E] bg-[#E1ECD3] px-2 py-1 font-mono text-[8px] font-black uppercase tracking-[0.12em] sm:block">
+                    08 sections
+                  </span>
+                </div>
+
+                <nav aria-label="Mobile Navigation" className="grid border-l-2 border-t-2 border-[#1E1E1E] sm:grid-cols-2">
               {navItems.map((item) => {
                 const isActive = activeHref === item.href;
 
@@ -296,35 +348,57 @@ export function Navbar({ onOpenOrder, onOpenAdmin, hidden = false }) {
                     onClick={(event) =>
                       handleMobileNavigation(event, item.href)
                     }
-                    className={`group flex min-h-12 items-center justify-between gap-3 border-b border-[#1E1E1E]/20 py-3 text-xs font-extrabold transition-all focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#8D9B7D] sm:min-h-14 sm:text-sm ${
+                        className={`group flex min-h-14 items-center justify-between gap-3 border-b-2 border-r-2 border-[#1E1E1E] px-3 py-3 font-display text-xs font-black uppercase tracking-[0.04em] transition-colors focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#8D9B7D] sm:min-h-16 sm:px-4 sm:text-sm ${
                       isActive
-                        ? "border-l-4 border-l-[#6B7860] bg-[#E1ECD3] px-3 text-[#3A4A30]"
-                        : "border-l-4 border-l-transparent px-2 text-[#1E1E1E] hover:bg-white/50 hover:px-3 hover:text-[#6B7860]"
+                            ? "bg-[#1E1E1E] text-white"
+                            : item.featured
+                              ? "bg-[#E1ECD3] text-[#1E1E1E] hover:bg-[#8D9B7D]"
+                              : "bg-white text-[#1E1E1E] hover:bg-[#E1ECD3]"
                     }`}
                   >
-                    <span>{item.label}</span>
+                        <span className="flex min-w-0 items-center gap-2">
+                          {item.featured && (
+                            <span className={`h-2 w-2 shrink-0 rounded-full border ${isActive ? "border-white bg-[#D1954E]" : "border-[#1E1E1E] bg-[#8D9B7D]"}`} />
+                          )}
+                          <span>{item.label}</span>
+                        </span>
                     <ArrowRight
-                      size={14}
-                      className={`shrink-0 transition-transform group-hover:translate-x-0.5 ${isActive ? "text-[#6B7860]" : "text-[#8D9B7D]"}`}
+                          size={15}
+                          strokeWidth={2.4}
+                          aria-hidden="true"
+                          className={`shrink-0 ${isActive ? "text-[#D1954E]" : "text-[#6B7860]"}`}
                     />
                   </a>
                 );
               })}
             </nav>
+              </div>
 
-            {/* Drawer Action Buttons */}
-            <div className="border-t border-[#1E1E1E]/15 pt-4">
+              <aside className="border-t-2 border-[#1E1E1E] bg-[#E1ECD3] p-4 sm:p-6 md:border-t-0">
+                <h2 className="font-display text-2xl font-black uppercase leading-[0.95] text-[#1E1E1E]">
+                  {language === "ID" ? "Siap atur paket makanmu?" : "Ready to build your meals?"}
+                </h2>
+                <p className="mt-3 text-[11px] font-medium leading-5 text-[#1E1E1E]/70">
+                  {language === "ID"
+                    ? "Pilih target protein, periode katering, dan jadwal yang paling cocok."
+                    : "Choose your protein target, catering period, and preferred schedule."}
+                </p>
               <Button
                 variant="default"
                 onClick={() => {
                   setMobileMenuOpen(false);
-                  onOpenOrder();
+                    onOpenOrder?.();
                 }}
-                className="flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[#8A9C7A] px-5 text-xs font-extrabold text-white shadow-md transition-transform hover:bg-[#647554] active:scale-[0.98]"
+                  className="mt-5 flex min-h-12 w-full items-center justify-between gap-2 rounded-none border-2 border-[#1E1E1E] bg-[#8D9B7D] px-4 font-display text-xs font-black uppercase tracking-[0.06em] text-white shadow-[4px_4px_0_#1E1E1E] transition-[background-color,box-shadow] hover:bg-[#6B7860] hover:shadow-[2px_2px_0_#1E1E1E]"
               >
                 <span>{copy.nav.build}</span>
-                <ArrowRight size={16} />
+                  <ArrowRight size={16} strokeWidth={2.4} aria-hidden="true" />
               </Button>
+                <div className="mt-6 border-t border-[#1E1E1E]/30 pt-3 font-mono text-[8px] font-bold uppercase leading-4 tracking-[0.14em] text-[#6B7860]">
+                  Makassar · Monday–Saturday<br />
+                  Good food · Clear data
+                </div>
+              </aside>
             </div>
           </div>
         )}
