@@ -4,6 +4,7 @@ import { Navbar } from "./components/Navbar";
 import { Footer } from "./components/Footer";
 import { OrderModal } from "./components/OrderModal";
 import { LanguageWelcomeModal } from "./components/LanguageWelcomeModal";
+import { WhatsAppFloatingCta } from "./components/WhatsAppFloatingCta";
 import HomePage from "./pages/HomePage";
 import AdminPage from "./pages/AdminPage";
 import { analytics, trackEvent } from "./lib/analytics";
@@ -174,6 +175,7 @@ export default function App() {
               <HomePage onBuild={handleBuild} />
             </main>
             <Footer />
+            <WhatsAppFloatingCta hidden={orderModalOpen} />
             <OrderModal
               isOpen={orderModalOpen}
               onClose={handleCloseOrder}

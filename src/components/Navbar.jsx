@@ -111,10 +111,10 @@ export function Navbar({ onOpenOrder, hidden = false }) {
     { label: copy.nav.faq, href: "#faq" },
   ];
 
-  const handleMobileNavigation = (event, href) => {
+  const handleMobileNavigation = (event, href, nextActiveHref = href) => {
     event.preventDefault();
     document.body.style.overflow = "";
-    setActiveHref(href);
+    setActiveHref(nextActiveHref);
     setMobileMenuOpen(false);
 
     window.requestAnimationFrame(() => {
@@ -332,11 +332,27 @@ export function Navbar({ onOpenOrder, hidden = false }) {
                     </p>
                   </div>
                   <span className="hidden border border-[#1E1E1E] bg-[#E1ECD3] px-2 py-1 font-mono text-[8px] font-black uppercase tracking-[0.12em] sm:block">
-                    08 sections
+                    09 sections
                   </span>
                 </div>
 
                 <nav aria-label="Mobile Navigation" className="grid border-l-2 border-t-2 border-[#1E1E1E] sm:grid-cols-2">
+                  <a
+                    href="#main-content"
+                    aria-current={activeHref ? undefined : "location"}
+                    onClick={(event) =>
+                      handleMobileNavigation(event, "#main-content", "")
+                    }
+                    className="group flex min-h-14 items-center justify-between gap-3 border-b-2 border-r-2 border-[#1E1E1E] bg-white px-3 py-3 font-display text-xs font-black uppercase tracking-[0.04em] text-[#1E1E1E] transition-colors hover:bg-[#E1ECD3] focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#8D9B7D] sm:min-h-16 sm:px-4 sm:text-sm"
+                  >
+                    <span>Home</span>
+                    <ArrowRight
+                      size={15}
+                      strokeWidth={2.4}
+                      aria-hidden="true"
+                      className="shrink-0 text-[#6B7860]"
+                    />
+                  </a>
               {navItems.map((item) => {
                 const isActive = activeHref === item.href;
 

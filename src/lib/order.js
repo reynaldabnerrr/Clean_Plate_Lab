@@ -8,6 +8,30 @@ export const ORDER_TIME_ZONE = "Asia/Makassar";
 export const CENTRAL_KITCHEN_MAPS_LINK =
   "https://maps.app.goo.gl/jdJGvQTAin6SwYgq7";
 
+export function buildWhatsAppInterestMessage(language = "ID") {
+  if (language === "EN") {
+    return `Hello Clean Plate Lab team,
+
+I'm interested in Clean Plate Lab's high-protein catering service and would like some help choosing a plan that fits my protein target and daily routine.
+
+Could you share more information about your available plans, this week's menu, pricing, and delivery schedule?
+
+Thank you.`;
+  }
+
+  return `Halo Tim Clean Plate Lab,
+
+Saya tertarik dengan layanan katering tinggi protein Clean Plate Lab dan ingin berkonsultasi mengenai paket yang sesuai dengan target protein serta kebutuhan harian saya.
+
+Boleh dibantu informasi mengenai pilihan paket, menu minggu ini, harga, dan jadwal pengirimannya?
+
+Terima kasih.`;
+}
+
+export function getWhatsAppInterestUrl(language = "ID") {
+  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(buildWhatsAppInterestMessage(language))}`;
+}
+
 export function getDateInputValueInTimeZone(
   date = new Date(),
   timeZone = ORDER_TIME_ZONE,
