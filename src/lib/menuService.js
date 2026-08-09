@@ -57,6 +57,27 @@ export function formatMenuDate(value, locale = "id-ID") {
   }).format(date);
 }
 
+const nutritionFormatters = new Map();
+
+/** Format nutrition data consistently with two decimal places. */
+export function formatNutritionValue(value, locale = "id-ID") {
+  const numericValue = Number(value);
+  if (!Number.isFinite(numericValue)) return "—";
+
+  if (!nutritionFormatters.has(locale)) {
+    nutritionFormatters.set(
+      locale,
+      new Intl.NumberFormat(locale, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+        useGrouping: false,
+      }),
+    );
+  }
+
+  return nutritionFormatters.get(locale).format(numericValue);
+}
+
 const NUTRITION_FIELDS = [
   "protein",
   "carbs",
@@ -479,8 +500,13 @@ export function validateMenuImage(file) {
   return null;
 }
 
-/** Upload a menu image using a unique path to avoid stale CDN cache entries. */
-export async function uploadMenuImage(file, menuCode = "menu") {
+/**
+ * Upload a menu image.
+ *
+ * Replacements overwrite the currently managed object so an old image cannot
+ * be left behind as an orphan. New menu images still receive a unique path.
+ */
+export async function uploadMenuImage(file, menuCode = "menu", currentImage = "") {
   const validationError = validateMenuImage(file);
   if (validationError) return { success: false, error: validationError };
 
@@ -494,7 +520,10 @@ export async function uploadMenuImage(file, menuCode = "menu") {
     .replace(/[^a-z0-9-]+/g, "-")
     .replace(/^-+|-+$/g, "") || "menu";
   const uniqueId = globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`;
-  const objectPath = `weekly/${safeCode}-${uniqueId}.${extensionByType[file.type]}`;
+  const currentPath = getManagedMenuImagePath(currentImage);
+  const createsNewObject = !currentPath;
+  const objectPath = currentPath
+    || `weekly/${safeCode}-${uniqueId}.${extensionByType[file.type]}`;
 
   try {
     const { error } = await supabase.storage
@@ -502,12 +531,20 @@ export async function uploadMenuImage(file, menuCode = "menu") {
       .upload(objectPath, file, {
         cacheControl: "31536000",
         contentType: file.type,
-        upsert: false,
+        upsert: !createsNewObject,
       });
 
     if (error) throw error;
     const { data } = supabase.storage.from(MENU_IMAGE_BUCKET).getPublicUrl(objectPath);
-    return { success: true, publicUrl: data.publicUrl, path: objectPath };
+    const publicUrl = new URL(data.publicUrl);
+    publicUrl.searchParams.set("v", uniqueId);
+
+    return {
+      success: true,
+      publicUrl: publicUrl.toString(),
+      path: objectPath,
+      createsNewObject,
+    };
   } catch (error) {
     console.error("Failed to upload menu image:", error);
     return { success: false, error: error.message || "Upload gambar gagal." };

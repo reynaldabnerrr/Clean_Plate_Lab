@@ -329,16 +329,22 @@ export default function AdminPage() {
 
     setActionLoading(true);
     let uploadedPath = null;
+    let uploadedNewObject = false;
     try {
       const payload = { ...formState };
       if (imageFile) {
-        const uploadResult = await uploadMenuImage(imageFile, formState.code);
+        const uploadResult = await uploadMenuImage(
+          imageFile,
+          formState.code,
+          isEditing ? formState.image : "",
+        );
         if (!uploadResult.success) {
           alert(`Gagal upload gambar: ${uploadResult.error}`);
           return;
         }
         payload.image = uploadResult.publicUrl;
         uploadedPath = uploadResult.path;
+        uploadedNewObject = uploadResult.createsNewObject;
       }
 
       if (!payload.image) {
@@ -351,13 +357,18 @@ export default function AdminPage() {
         : await createMenuItem(payload);
 
       if (!res.success) {
-        if (uploadedPath) await removeMenuImage(uploadedPath);
+        if (uploadedPath && uploadedNewObject) await removeMenuImage(uploadedPath);
         alert(`Gagal menyimpan menu: ${res.error}`);
         return;
       }
 
       const oldManagedPath = getManagedMenuImagePath(formState.image);
-      if (isEditing && oldManagedPath && formState.image !== payload.image) {
+      if (
+        isEditing
+        && uploadedPath
+        && oldManagedPath
+        && oldManagedPath !== uploadedPath
+      ) {
         await removeMenuImage(oldManagedPath);
       }
 

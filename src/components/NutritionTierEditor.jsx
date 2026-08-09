@@ -2,26 +2,64 @@ import React, { useState } from "react";
 import { PROTEIN_TIERS } from "../lib/menuService";
 
 const NUTRIENT_FIELDS = [
-  { key: "protein", label: "Protein aktual", unit: "g", step: "0.1" },
-  { key: "carbs", label: "Karbohidrat", unit: "g", step: "0.1" },
-  { key: "fat", label: "Lemak", unit: "g", step: "0.1" },
-  { key: "fiber", label: "Serat", unit: "g", step: "0.01" },
-  { key: "kcal", label: "Kalori", unit: "kcal", step: "0.1" },
-  { key: "sodium", label: "Natrium", unit: "mg", step: "0.1" },
-  { key: "potassium", label: "Kalium", unit: "mg", step: "0.1" },
+  { key: "protein", label: "Protein aktual", unit: "g" },
+  { key: "carbs", label: "Karbohidrat", unit: "g" },
+  { key: "fat", label: "Lemak", unit: "g" },
+  { key: "fiber", label: "Serat", unit: "g" },
+  { key: "kcal", label: "Kalori", unit: "kcal" },
+  { key: "sodium", label: "Natrium", unit: "mg" },
+  { key: "potassium", label: "Kalium", unit: "mg" },
 ];
+
+const formatInputValue = (value) => {
+  const numericValue = Number(value);
+  return Number.isFinite(numericValue) ? numericValue.toFixed(2) : "";
+};
+
+function NutritionNumberInput({ id, value, onValueChange, disabled }) {
+  const [draftValue, setDraftValue] = useState(() => formatInputValue(value));
+
+  const handleChange = (event) => {
+    const nextValue = event.currentTarget.value;
+    setDraftValue(nextValue);
+    onValueChange(nextValue);
+  };
+
+  const handleBlur = () => {
+    if (draftValue === "") return;
+
+    const formattedValue = formatInputValue(draftValue);
+    setDraftValue(formattedValue);
+    onValueChange(formattedValue);
+  };
+
+  return (
+    <input
+      id={id}
+      type="number"
+      inputMode="decimal"
+      min="0"
+      step="0.01"
+      required
+      disabled={disabled}
+      value={draftValue}
+      onChange={handleChange}
+      onBlur={handleBlur}
+      className="mt-1.5 w-full rounded-md border border-[#1E1E1E] p-2 text-xs font-black text-[#1E1E1E] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8D9B7D] disabled:bg-gray-100"
+    />
+  );
+}
 
 export function NutritionTierEditor({ value, onChange, disabled = false }) {
   const [selectedTier, setSelectedTier] = useState(40);
   const selectedNutrition = value?.[selectedTier] || {};
 
   const updateField = (field, rawValue) => {
-    const numericValue = Number(rawValue);
     onChange({
       ...value,
       [selectedTier]: {
         ...selectedNutrition,
-        [field]: Number.isFinite(numericValue) ? numericValue : 0,
+        [field]: rawValue,
       },
     });
   };
@@ -76,16 +114,12 @@ export function NutritionTierEditor({ value, onChange, disabled = false }) {
               <label htmlFor={inputId} className="block font-mono text-[9px] font-bold uppercase text-[#6B7860]">
                 {field.label} ({field.unit})
               </label>
-              <input
+              <NutritionNumberInput
+                key={`${selectedTier}-${field.key}`}
                 id={inputId}
-                type="number"
-                min="0"
-                step={field.step}
-                required
-                disabled={disabled}
                 value={selectedNutrition[field.key] ?? 0}
-                onChange={(event) => updateField(field.key, event.target.value)}
-                className="mt-1.5 w-full rounded-md border border-[#1E1E1E] p-2 text-xs font-black text-[#1E1E1E] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8D9B7D] disabled:bg-gray-100"
+                onValueChange={(rawValue) => updateField(field.key, rawValue)}
+                disabled={disabled}
               />
             </div>
           );

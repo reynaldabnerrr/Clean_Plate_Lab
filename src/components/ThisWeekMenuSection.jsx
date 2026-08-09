@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import {
   formatMenuDate,
+  formatNutritionValue,
   getMenuNutritionForTier,
   PROTEIN_TIERS,
 } from "../lib/menuService";
@@ -22,6 +23,7 @@ export function ThisWeekMenuSection({ onSelectMeal, onOpenAdmin }) {
   const [selectedTiers, setSelectedTiers] = useState({});
   const [activeMenuIndex, setActiveMenuIndex] = useState(0);
   const menuTrackRef = useRef(null);
+  const nutritionLocale = language === "ID" ? "id-ID" : "en-US";
 
   const scrollToMenu = (index) => {
     const track = menuTrackRef.current;
@@ -166,7 +168,7 @@ export function ThisWeekMenuSection({ onSelectMeal, onOpenAdmin }) {
               const tags = [
                 ...staticTags.filter((tag) => !/(protein|kcal|kkal)/i.test(String(tag))),
                 `${selectedTier}g Protein`,
-                `${nutrition.kcal} ${language === "ID" ? "Kkal" : "Kcal"}`,
+                `${formatNutritionValue(nutrition.kcal, nutritionLocale)} ${language === "ID" ? "Kkal" : "Kcal"}`,
               ];
               const description =
                 language === "ID"
@@ -220,7 +222,7 @@ export function ThisWeekMenuSection({ onSelectMeal, onOpenAdmin }) {
                         </h3>
                       </div>
                       <span className="shrink-0 bg-[#E1ECD3] border border-[#1E1E1E] px-2.5 py-1 font-mono text-[10px] font-extrabold text-[#1E1E1E] mt-4">
-                        {nutrition.kcal} KCAL
+                        {formatNutritionValue(nutrition.kcal, nutritionLocale)} KCAL
                       </span>
                     </div>
 
@@ -285,19 +287,19 @@ export function ThisWeekMenuSection({ onSelectMeal, onOpenAdmin }) {
                         <div className="grid grid-cols-4 gap-1 text-center font-display">
                           <div className="border border-[#1E1E1E] bg-white p-1">
                             <div className="text-[7.5px] font-mono font-bold uppercase text-gray-500">PROTEIN</div>
-                            <div className="text-xs font-black text-[#6B7860] mt-0.5">{nutrition.protein}g</div>
+                            <div className="text-xs font-black text-[#6B7860] mt-0.5">{formatNutritionValue(nutrition.protein, nutritionLocale)}g</div>
                           </div>
                           <div className="border border-[#1E1E1E] bg-white p-1">
                             <div className="text-[7.5px] font-mono font-bold uppercase text-gray-500">CARBS</div>
-                            <div className="text-xs font-black text-[#1E1E1E] mt-0.5">{nutrition.carbs}g</div>
+                            <div className="text-xs font-black text-[#1E1E1E] mt-0.5">{formatNutritionValue(nutrition.carbs, nutritionLocale)}g</div>
                           </div>
                           <div className="border border-[#1E1E1E] bg-white p-1">
                             <div className="text-[7.5px] font-mono font-bold uppercase text-gray-500">FAT</div>
-                            <div className="text-xs font-black text-[#1E1E1E] mt-0.5">{nutrition.fat}g</div>
+                            <div className="text-xs font-black text-[#1E1E1E] mt-0.5">{formatNutritionValue(nutrition.fat, nutritionLocale)}g</div>
                           </div>
                           <div className="border border-[#1E1E1E] bg-white p-1">
                             <div className="text-[7.5px] font-mono font-bold uppercase text-gray-500">FIBER</div>
-                            <div className="text-xs font-black text-[#1E1E1E] mt-0.5">{nutrition.fiber}g</div>
+                            <div className="text-xs font-black text-[#1E1E1E] mt-0.5">{formatNutritionValue(nutrition.fiber, nutritionLocale)}g</div>
                           </div>
                         </div>
 
@@ -305,11 +307,11 @@ export function ThisWeekMenuSection({ onSelectMeal, onOpenAdmin }) {
                         <div className="grid grid-cols-2 gap-1.5 font-mono text-[9px]">
                           <div className="border border-[#1E1E1E]/40 bg-white px-2 py-1 flex items-center justify-between">
                             <span className="text-gray-500 font-bold">SODIUM</span>
-                            <span className="font-extrabold text-[#1E1E1E]">{nutrition.sodium}mg</span>
+                            <span className="font-extrabold text-[#1E1E1E]">{formatNutritionValue(nutrition.sodium, nutritionLocale)}mg</span>
                           </div>
                           <div className="border border-[#1E1E1E]/40 bg-white px-2 py-1 flex items-center justify-between">
                             <span className="text-gray-500 font-bold">POTASSIUM</span>
-                            <span className="font-extrabold text-[#1E1E1E]">{nutrition.potassium}mg</span>
+                            <span className="font-extrabold text-[#1E1E1E]">{formatNutritionValue(nutrition.potassium, nutritionLocale)}mg</span>
                           </div>
                         </div>
                       </div>
