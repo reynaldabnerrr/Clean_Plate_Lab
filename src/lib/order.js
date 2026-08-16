@@ -56,6 +56,23 @@ export function addDaysToDateInputValue(value, days) {
   return date.toISOString().split("T")[0];
 }
 
+export function isSundayDate(dateInputValue) {
+  if (!dateInputValue) return false;
+  return new Date(`${dateInputValue}T00:00:00Z`).getUTCDay() === 0;
+}
+
+export function getDefaultOrderStartDate(today = getDateInputValueInTimeZone()) {
+  return isSundayDate(today) ? addDaysToDateInputValue(today, 1) : today;
+}
+
+export function getDefaultOrderEndDate(startDate) {
+  const candidate = addDaysToDateInputValue(startDate, 4);
+  if (isSundayDate(candidate)) {
+    return addDaysToDateInputValue(candidate, -1);
+  }
+  return candidate;
+}
+
 export function formatCurrency(value) {
   return new Intl.NumberFormat("id-ID", {
     style: "currency",

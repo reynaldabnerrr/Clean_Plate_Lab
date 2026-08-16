@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { CalendarDays, ChevronLeft, ChevronRight, X } from "lucide-react";
+import { getDefaultOrderStartDate } from "../lib/order";
 
 const MONTH_ID = [
   "Januari",
@@ -450,8 +451,9 @@ export function DateRangePicker({
     (event) => {
       event.preventDefault();
       event.stopPropagation();
-      onStartDateChange(today);
-      onEndDateChange(today);
+      const defaultDate = getDefaultOrderStartDate(today);
+      onStartDateChange(defaultDate);
+      onEndDateChange(defaultDate);
       setSelecting("start");
       selectingRef.current = "start";
       setHoverDate(null);

@@ -16,8 +16,10 @@ import { addons, proteinTiers } from "../data/site";
 import { analytics } from "../lib/analytics";
 import { readStoredState, writeStoredState } from "../lib/storage";
 import {
-  addDaysToDateInputValue,
   getDateInputValueInTimeZone,
+  getDefaultOrderStartDate,
+  getDefaultOrderEndDate,
+  isSundayDate,
   WHATSAPP_NUMBER,
   CENTRAL_KITCHEN_MAPS_LINK,
 } from "../lib/order";
@@ -147,6 +149,7 @@ export function OrderModal({
   const { addOrder, t, language } = useCpl();
   const fieldId = useId();
   const [today, setToday] = useState(() => getDateInputValueInTimeZone());
+  const defaultStartDate = getDefaultOrderStartDate(today);
 
   const [storedDraft] = useState(() =>
     readStoredState("order-draft", isOrderDraft),
@@ -156,14 +159,24 @@ export function OrderModal({
   const [proteinTier, setProteinTier] = useState(
     storedDraft?.proteinTier ?? initialProteinTier,
   );
-  const [startDate, setStartDate] = useState(
-    storedDraft?.startDate >= today ? storedDraft.startDate : today,
-  );
-  const [endDate, setEndDate] = useState(
-    storedDraft?.endDate >= today
-      ? storedDraft.endDate
-      : addDaysToDateInputValue(today, 4),
-  );
+  const isValidDraftStartDate =
+    storedDraft?.startDate &&
+    storedDraft.startDate >= defaultStartDate &&
+    !isSundayDate(storedDraft.startDate);
+  const initialStartDate = isValidDraftStartDate
+    ? storedDraft.startDate
+    : defaultStartDate;
+
+  const isValidDraftEndDate =
+    storedDraft?.endDate &&
+    storedDraft.endDate >= initialStartDate &&
+    !isSundayDate(storedDraft.endDate);
+  const initialEndDate = isValidDraftEndDate
+    ? storedDraft.endDate
+    : getDefaultOrderEndDate(initialStartDate);
+
+  const [startDate, setStartDate] = useState(initialStartDate);
+  const [endDate, setEndDate] = useState(initialEndDate);
   const [mealsPerDay, setMealsPerDay] = useState(
     storedDraft?.mealsPerDay ?? initialMealsPerDay,
   );
@@ -358,12 +371,17 @@ export function OrderModal({
 
     const syncWitaDate = () => {
       const currentWitaDate = getDateInputValueInTimeZone();
+      const minStartDate = getDefaultOrderStartDate(currentWitaDate);
       setToday(currentWitaDate);
       setStartDate((current) =>
-        current < currentWitaDate ? currentWitaDate : current,
+        !current || current < minStartDate || isSundayDate(current)
+          ? minStartDate
+          : current,
       );
       setEndDate((current) =>
-        current < currentWitaDate ? currentWitaDate : current,
+        !current || current < minStartDate
+          ? getDefaultOrderEndDate(minStartDate)
+          : current,
       );
     };
 
@@ -374,7 +392,11 @@ export function OrderModal({
   }, [isOpen]);
 
   const handleStartDateChange = (value) => {
-    const nextStartDate = value < today ? today : value;
+    const minStartDate = getDefaultOrderStartDate(today);
+    const nextStartDate =
+      !value || value < minStartDate || isSundayDate(value)
+        ? minStartDate
+        : value;
     setStartDate(nextStartDate);
     setEndDate((current) => {
       if (!current || current < nextStartDate) return nextStartDate;
@@ -383,7 +405,12 @@ export function OrderModal({
   };
 
   const handleEndDateChange = (value) => {
-    setEndDate(value < startDate ? startDate : value);
+    const minStartDate = getDefaultOrderStartDate(today);
+    const effectiveStart =
+      !startDate || startDate < minStartDate || isSundayDate(startDate)
+        ? minStartDate
+        : startDate;
+    setEndDate(value < effectiveStart ? effectiveStart : value);
   };
 
   const toggleAddon = (addonId) => {
@@ -418,13 +445,18 @@ export function OrderModal({
         "Nomor WhatsApp minimal 10 digit (contoh: 081234567890)";
     }
 
+    const minStartDate = getDefaultOrderStartDate(today);
     if (!startDate) {
       newErrors.startDate =
         t("orderStartDateError") || "Tanggal mulai wajib dipilih";
-    } else if (startDate < today) {
+    } else if (startDate < minStartDate) {
       newErrors.startDate =
         t("orderPastDateError") ||
         "Tanggal mulai tidak boleh sebelum hari ini (WITA)";
+    } else if (isSundayDate(startDate)) {
+      newErrors.startDate = isIndonesian
+        ? "Pengiriman tidak beroperasi pada hari Minggu"
+        : "Deliveries are not available on Sundays";
     }
 
     if (!endDate) {
@@ -434,6 +466,10 @@ export function OrderModal({
       newErrors.endDate =
         t("orderDateRangeError") ||
         "Tanggal selesai harus sama atau setelah tanggal mulai";
+    } else if (isSundayDate(endDate) && startDate === endDate) {
+      newErrors.endDate = isIndonesian
+        ? "Pengiriman tidak beroperasi pada hari Minggu"
+        : "Deliveries are not available on Sundays";
     } else if (totalDays === 0) {
       newErrors.endDate =
         t("orderDateRangeError") ||
