@@ -37,7 +37,6 @@ const INITIAL_FORM_STATE = {
   sodium: 1300,
   potassium: 350,
   kcal: 1050,
-  image: "/images/chicken_teriyaki.webp",
   tags_ID: ["Monday / Senin", "80g Protein"],
   tags_EN: ["Monday", "80g Protein"],
   desc_ID: "",
@@ -248,7 +247,6 @@ export function AdminDashboardModal({ isOpen, onClose }) {
       sodium: item.sodium ?? 1300,
       potassium: item.potassium ?? 350,
       kcal: item.kcal ?? 1050,
-      image: item.image || "/images/chicken_teriyaki.webp",
       tags_ID: Array.isArray(item.tags_ID) ? item.tags_ID : [item.day || "Today"],
       tags_EN: Array.isArray(item.tags_EN) ? item.tags_EN : [item.day || "Today"],
       desc_ID: item.desc_ID || "",
@@ -974,61 +972,6 @@ export function AdminDashboardModal({ isOpen, onClose }) {
                     <option value="true">Tersedia (Available)</option>
                     <option value="false">Habis / Sold Out</option>
                   </select>
-                </div>
-              </div>
-
-              {/* Image URL & Live Preview & Presets */}
-              <div className="border-2 border-[#1E1E1E] bg-[#FEFDF9] p-3.5 rounded-xl space-y-3">
-                <div>
-                  <label className="font-mono text-[10px] uppercase text-[#6B7860] mb-1 block">URL Gambar</label>
-                  <input
-                    type="text"
-                    required
-                    value={formState.image}
-                    onChange={(e) => setFormState({ ...formState, image: e.target.value })}
-                    placeholder="/images/chicken_teriyaki.webp"
-                    className="w-full rounded-xl border-2 border-[#1E1E1E] bg-white p-2.5 text-xs font-bold focus:border-[#8D9B7D] focus:outline-none"
-                  />
-                </div>
-
-                <div className="flex flex-col sm:flex-row items-center gap-3 pt-1">
-                  <div className="h-20 w-28 shrink-0 rounded-xl border-2 border-[#1E1E1E] overflow-hidden bg-gray-100 relative">
-                    <img
-                      src={formState.image}
-                      alt="Preview"
-                      className="h-full w-full object-cover"
-                      onError={(e) => {
-                        e.currentTarget.src =
-                          "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80";
-                      }}
-                    />
-                    <span className="absolute bottom-1 right-1 bg-[#1E1E1E] text-white text-[8px] font-mono px-1 py-0.5 rounded">
-                      PREVIEW
-                    </span>
-                  </div>
-
-                  <div className="flex-1 w-full">
-                    <span className="font-mono text-[9px] text-gray-500 uppercase block mb-1.5">
-                      Preset Gambar Contoh:
-                    </span>
-                    <div className="flex flex-wrap gap-1.5">
-                      {[
-                        { name: "Chicken Teriyaki", url: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80" },
-                        { name: "Beef Steak", url: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80" },
-                        { name: "Salmon Bowl", url: "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=800&q=80" },
-                        { name: "Grilled Chicken", url: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=800&q=80" },
-                      ].map((preset) => (
-                        <button
-                          key={preset.name}
-                          type="button"
-                          onClick={() => setFormState({ ...formState, image: preset.url })}
-                          className="px-2 py-1 text-[10px] font-mono font-bold bg-white border border-[#1E1E1E] rounded hover:bg-[#E1ECD3] transition-colors"
-                        >
-                          {preset.name}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
                 </div>
               </div>
 

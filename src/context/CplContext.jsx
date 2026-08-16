@@ -33,7 +33,6 @@ const INITIAL_MENU_ITEMS = [
     sodium: 1380.5,
     potassium: 355,
     kcal: 1100.8,
-    image: "/images/chicken_teriyaki.webp",
     tags_ID: ["Monday / Senin", "82.4g Protein", "1100.8 Kkal"],
     tags_EN: ["Monday", "82.4g Protein", "1100.8 Kcal"],
     desc_ID:
@@ -55,7 +54,6 @@ const INITIAL_MENU_ITEMS = [
     sodium: 1290.0,
     potassium: 365,
     kcal: 1080.7,
-    image: "/images/ayam_cabe_ijo.webp",
     tags_ID: ["Tuesday / Selasa", "79.8g Protein", "1080.7 Kkal"],
     tags_EN: ["Tuesday", "79.8g Protein", "1080.7 Kcal"],
     desc_ID:
@@ -77,7 +75,6 @@ const INITIAL_MENU_ITEMS = [
     sodium: 1420.0,
     potassium: 330,
     kcal: 1127.6,
-    image: "/images/chicken_mentai.webp",
     tags_ID: ["Wednesday / Rabu", "83.2g Protein", "1127.6 Kkal"],
     tags_EN: ["Wednesday", "83.2g Protein", "1127.6 Kcal"],
     desc_ID:
@@ -99,7 +96,6 @@ const INITIAL_MENU_ITEMS = [
     sodium: 1360.0,
     potassium: 370,
     kcal: 1059.5,
-    image: "/images/sate_padang.webp",
     tags_ID: ["Thursday / Kamis", "81.0g Protein", "1059.5 Kkal"],
     tags_EN: ["Thursday", "81.0g Protein", "1059.5 Kcal"],
     desc_ID:
@@ -121,7 +117,6 @@ const INITIAL_MENU_ITEMS = [
     sodium: 1240.0,
     potassium: 385,
     kcal: 1039.0,
-    image: "/images/oseng_ayam_kecombrang.webp",
     tags_ID: ["Friday / Jumat", "78.5g Protein", "1039 Kkal"],
     tags_EN: ["Friday", "78.5g Protein", "1039 Kcal"],
     desc_ID:
@@ -143,7 +138,6 @@ const INITIAL_MENU_ITEMS = [
     sodium: 1310.0,
     potassium: 345,
     kcal: 1114.0,
-    image: "/images/sweet_sour_crispy_chicken.webp",
     tags_ID: ["Saturday / Sabtu", "80.5g Protein", "1114 Kkal"],
     tags_EN: ["Saturday", "80.5g Protein", "1114 Kcal"],
     desc_ID:

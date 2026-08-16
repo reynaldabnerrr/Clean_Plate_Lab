@@ -1,89 +1,212 @@
--- Seed 6 default weekly meals into public.this_week_menu table
-
-INSERT INTO public.this_week_menu (
-  code, name, day, category, protein, carbs, fat, sodium, potassium, kcal, image, tags_id, tags_en, desc_id, desc_en, available, batch
-) VALUES 
-(
-  'CPL-MON',
-  'Chicken Teriyaki',
-  'Monday / Senin',
-  'High Protein',
-  82.4, 132.5, 26.8, 1380.5, 355, 1100.8,
-  '/images/chicken_teriyaki.webp',
-  '["Monday / Senin", "82.4g Protein", "1100.8 Kkal"]'::jsonb,
-  '["Monday", "82.4g Protein", "1100.8 Kcal"]'::jsonb,
-  'Dada ayam empuk berbalut saus teriyaki manis gurih, disajikan dengan spesifikasi nutrisi lengkap 82.4g protein, 132.5g karbo, 26.8g lemak, 1380.5mg natrium, dan 355mg kalium.',
-  'Tender chicken glazed in a sweet & savory teriyaki sauce, served with full lab specs: 82.4g protein, 132.5g carbs, 26.8g fat, 1380.5mg sodium, and 355mg potassium.',
-  true,
-  'MON-01'
+-- Seed the six fixed Monday-Saturday menu slots without meal photography.
+with seed_menu (
+  code,
+  name,
+  day,
+  menu_slot,
+  protein,
+  carbs,
+  fat,
+  fiber,
+  sodium,
+  potassium,
+  kcal,
+  tags_id,
+  tags_en,
+  desc_id,
+  desc_en,
+  batch
+) as (
+  values
+    (
+      'CPL-MON',
+      'Chicken Teriyaki',
+      'Monday / Senin',
+      1,
+      82.4::numeric,
+      132.5::numeric,
+      26.8::numeric,
+      0.14::numeric,
+      1380.5::numeric,
+      355::numeric,
+      1100.8::numeric,
+      '["Monday / Senin", "82.4g Protein", "1100.8 Kkal"]'::jsonb,
+      '["Monday", "82.4g Protein", "1100.8 Kcal"]'::jsonb,
+      'Dada ayam empuk berbalut saus teriyaki manis gurih.',
+      'Tender chicken glazed in a sweet and savory teriyaki sauce.',
+      'MON-01'
+    ),
+    (
+      'CPL-TUE',
+      'Ayam Cabe Ijo',
+      'Tuesday / Selasa',
+      2,
+      79.8::numeric,
+      124::numeric,
+      29.5::numeric,
+      0.14::numeric,
+      1290::numeric,
+      365::numeric,
+      1080.7::numeric,
+      '["Tuesday / Selasa", "79.8g Protein", "1080.7 Kkal"]'::jsonb,
+      '["Tuesday", "79.8g Protein", "1080.7 Kcal"]'::jsonb,
+      'Ayam empuk beraroma sambal cabai hijau segar.',
+      'Tender chicken tossed in an aromatic green chili sauce.',
+      'TUE-02'
+    ),
+    (
+      'CPL-WED',
+      'Chicken Mentai',
+      'Wednesday / Rabu',
+      3,
+      83.2::numeric,
+      128.5::numeric,
+      31.2::numeric,
+      0.14::numeric,
+      1420::numeric,
+      330::numeric,
+      1127.6::numeric,
+      '["Wednesday / Rabu", "83.2g Protein", "1127.6 Kkal"]'::jsonb,
+      '["Wednesday", "83.2g Protein", "1127.6 Kcal"]'::jsonb,
+      'Dada ayam juicy dengan lapisan saus mentai gurih creamy.',
+      'Juicy chicken topped with a creamy, savory mentai sauce.',
+      'WED-03'
+    ),
+    (
+      'CPL-THU',
+      'Sate Padang',
+      'Thursday / Kamis',
+      4,
+      81::numeric,
+      122::numeric,
+      27.5::numeric,
+      0.14::numeric,
+      1360::numeric,
+      370::numeric,
+      1059.5::numeric,
+      '["Thursday / Kamis", "81g Protein", "1059.5 Kkal"]'::jsonb,
+      '["Thursday", "81g Protein", "1059.5 Kcal"]'::jsonb,
+      'Dada ayam empuk dengan kuah sate Padang kaya rempah khas.',
+      'Tender chicken coated in a rich and aromatic Padang-style sauce.',
+      'THU-04'
+    ),
+    (
+      'CPL-FRI',
+      'Oseng Ayam Kecombrang',
+      'Friday / Jumat',
+      5,
+      78.5::numeric,
+      125::numeric,
+      25::numeric,
+      0.14::numeric,
+      1240::numeric,
+      385::numeric,
+      1039::numeric,
+      '["Friday / Jumat", "78.5g Protein", "1039 Kkal"]'::jsonb,
+      '["Friday", "78.5g Protein", "1039 Kcal"]'::jsonb,
+      'Oseng ayam gurih bertabur irisan kecombrang harum.',
+      'Savory stir-fried chicken infused with fragrant kecombrang.',
+      'FRI-05'
+    ),
+    (
+      'CPL-SAT',
+      'Sweet & Sour Crispy Chicken',
+      'Saturday / Sabtu',
+      6,
+      80.5::numeric,
+      135::numeric,
+      28::numeric,
+      0.14::numeric,
+      1310::numeric,
+      345::numeric,
+      1114::numeric,
+      '["Saturday / Sabtu", "80.5g Protein", "1114 Kkal"]'::jsonb,
+      '["Saturday", "80.5g Protein", "1114 Kcal"]'::jsonb,
+      'Ayam renyah berbalut saus asam manis buatan sendiri yang segar.',
+      'Crispy chicken tossed in a sweet and tangy homemade sauce.',
+      'SAT-06'
+    )
 ),
-(
-  'CPL-TUE',
-  'Ayam Cabe Ijo',
-  'Tuesday / Selasa',
-  'Lean Muscle',
-  79.8, 124.0, 29.5, 1290.0, 365, 1080.7,
-  '/images/ayam_cabe_ijo.webp',
-  '["Tuesday / Selasa", "79.8g Protein", "1080.7 Kkal"]'::jsonb,
-  '["Tuesday", "79.8g Protein", "1080.7 Kcal"]'::jsonb,
-  'Ayam empuk beraroma sambal cabai hijau segar, disajikan dengan spesifikasi nutrisi lengkap 79.8g protein, 124g karbo, 29.5g lemak, 1290mg natrium, dan 365mg kalium.',
-  'Tender chicken tossed in aromatic green chili sauce, served with full lab specs: 79.8g protein, 124g carbs, 29.5g fat, 1290mg sodium, and 365mg potassium.',
-  true,
-  'TUE-02'
-),
-(
-  'CPL-WED',
-  'Chicken Mentai',
-  'Wednesday / Rabu',
-  'High Protein',
-  83.2, 128.5, 31.2, 1420.0, 330, 1127.6,
-  '/images/chicken_mentai.webp',
-  '["Wednesday / Rabu", "83.2g Protein", "1127.6 Kkal"]'::jsonb,
-  '["Wednesday", "83.2g Protein", "1127.6 Kcal"]'::jsonb,
-  'Dada ayam juicy dengan lapisan saus mentai gurih creamy, disajikan dengan spesifikasi nutrisi lengkap 83.2g protein, 128.5g karbo, 31.2g lemak, 1420mg natrium, dan 330mg kalium.',
-  'Juicy chicken topped with creamy, savory mentai sauce, served with full lab specs: 83.2g protein, 128.5g carbs, 31.2g fat, 1420mg sodium, and 330mg potassium.',
-  true,
-  'WED-03'
-),
-(
-  'CPL-THU',
-  'Sate Padang',
-  'Thursday / Kamis',
-  'Lean Muscle',
-  81.0, 122.0, 27.5, 1360.0, 370, 1059.5,
-  '/images/sate_padang.webp',
-  '["Thursday / Kamis", "81.0g Protein", "1059.5 Kkal"]'::jsonb,
-  '["Thursday", "81.0g Protein", "1059.5 Kcal"]'::jsonb,
-  'Dada ayam empuk dengan kuah sate Padang kaya rempah khas, disajikan dengan spesifikasi nutrisi lengkap 81.0g protein, 122g karbo, 27.5g lemak, 1360mg natrium, dan 370mg kalium.',
-  'Tender chicken coated in rich and aromatic Padang-style sauce, served with full lab specs: 81.0g protein, 122g carbs, 27.5g fat, 1360mg sodium, and 370mg potassium.',
-  true,
-  'THU-04'
-),
-(
-  'CPL-FRI',
-  'Oseng Ayam Kecombrang',
-  'Friday / Jumat',
-  'High Protein',
-  78.5, 125.0, 25.0, 1240.0, 385, 1039.0,
-  '/images/oseng_ayam_kecombrang.webp',
-  '["Friday / Jumat", "78.5g Protein", "1039 Kkal"]'::jsonb,
-  '["Friday", "78.5g Protein", "1039 Kcal"]'::jsonb,
-  'Oseng ayam gurih bertabur irisan kecombrang harum, disajikan dengan spesifikasi nutrisi lengkap 78.5g protein, 125g karbo, 25g lemak, 1240mg natrium, dan 385mg kalium.',
-  'Savory stir-fried chicken infused with fragrant kecombrang, served with full lab specs: 78.5g protein, 125g carbs, 25g fat, 1240mg sodium, and 385mg potassium.',
-  true,
-  'FRI-05'
-),
-(
-  'CPL-SAT',
-  'Sweet & Sour Crispy Chicken',
-  'Saturday / Sabtu',
-  'Lean Muscle',
-  80.5, 135.0, 28.0, 1310.0, 345, 1114.0,
-  '/images/sweet_sour_crispy_chicken.webp',
-  '["Saturday / Sabtu", "80.5g Protein", "1114 Kkal"]'::jsonb,
-  '["Saturday", "80.5g Protein", "1114 Kcal"]'::jsonb,
-  'Ayam renyah berbalut saus asam manis buatan sendiri yang segar, disajikan dengan spesifikasi nutrisi lengkap 80.5g protein, 135g karbo, 28g lemak, 1310mg natrium, dan 345mg kalium.',
-  'Crispy chicken tossed in a sweet and tangy homemade sauce, served with full lab specs: 80.5g protein, 135g carbs, 28g fat, 1310mg sodium, and 345mg potassium.',
-  true,
-  'SAT-06'
-);
+seed_with_tiers as (
+  select
+    seed_menu.*,
+    current_date
+      + (seed_menu.menu_slot - extract(isodow from current_date)::integer) as menu_date,
+    (
+      select jsonb_object_agg(
+        tier.grams::text,
+        jsonb_build_object(
+          'protein', tier.grams,
+          'carbs', round(seed_menu.carbs * tier.grams / seed_menu.protein, 2),
+          'fat', round(seed_menu.fat * tier.grams / seed_menu.protein, 2),
+          'fiber', round(seed_menu.fiber * tier.grams / seed_menu.protein, 2),
+          'sodium', round(seed_menu.sodium * tier.grams / seed_menu.protein, 2),
+          'potassium', round(seed_menu.potassium * tier.grams / seed_menu.protein, 2),
+          'kcal', round(seed_menu.kcal * tier.grams / seed_menu.protein, 2)
+        )
+        order by tier.grams
+      )
+      from unnest(array[25, 40, 60, 80, 100]) as tier(grams)
+    ) as nutrition_by_tier
+  from seed_menu
+)
+insert into public.this_week_menu (
+  code,
+  name,
+  day,
+  menu_slot,
+  menu_date,
+  protein,
+  carbs,
+  fat,
+  fiber,
+  sodium,
+  potassium,
+  kcal,
+  nutrition_by_tier,
+  tags_id,
+  tags_en,
+  desc_id,
+  desc_en,
+  batch
+)
+select
+  code,
+  name,
+  day,
+  menu_slot,
+  menu_date,
+  protein,
+  carbs,
+  fat,
+  fiber,
+  sodium,
+  potassium,
+  kcal,
+  nutrition_by_tier,
+  tags_id,
+  tags_en,
+  desc_id,
+  desc_en,
+  batch
+from seed_with_tiers
+on conflict (menu_slot) do update
+set
+  code = excluded.code,
+  name = excluded.name,
+  day = excluded.day,
+  menu_date = excluded.menu_date,
+  protein = excluded.protein,
+  carbs = excluded.carbs,
+  fat = excluded.fat,
+  fiber = excluded.fiber,
+  sodium = excluded.sodium,
+  potassium = excluded.potassium,
+  kcal = excluded.kcal,
+  nutrition_by_tier = excluded.nutrition_by_tier,
+  tags_id = excluded.tags_id,
+  tags_en = excluded.tags_en,
+  desc_id = excluded.desc_id,
+  desc_en = excluded.desc_en,
+  batch = excluded.batch,
+  updated_at = now();

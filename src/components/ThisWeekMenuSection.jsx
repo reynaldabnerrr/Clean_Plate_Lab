@@ -4,7 +4,6 @@ import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { Card } from "./ui/card";
 import {
-  ArrowRight,
   CalendarDays,
   ChevronLeft,
   ChevronRight,
@@ -18,7 +17,7 @@ import {
 } from "../lib/menuService";
 import { MenuGridSkeleton } from "./ui/loading";
 
-export function ThisWeekMenuSection({ onSelectMeal, onOpenAdmin }) {
+export function ThisWeekMenuSection({ onOpenAdmin }) {
   const { menuItems, language, isAdminLoggedIn, fetchLatestMenus, loadingMenu } = useCpl();
   const [selectedTiers, setSelectedTiers] = useState({});
   const [activeMenuIndex, setActiveMenuIndex] = useState(0);
@@ -99,7 +98,7 @@ export function ThisWeekMenuSection({ onSelectMeal, onOpenAdmin }) {
 
         {/* Menu Cards Grid */}
         {loadingMenu ? (
-          <MenuGridSkeleton className="lg:grid-cols-3" mobileCarousel />
+          <MenuGridSkeleton className="lg:grid-cols-3" mobileCarousel hideImage />
         ) : menuItems.length === 0 ? (
           <div className="text-center py-16 border-2 border-dashed border-[#1E1E1E]/30 bg-white p-8">
             <p className="font-mono text-xs font-bold uppercase text-[#6B7860]">No Menus Found</p>
@@ -180,27 +179,13 @@ export function ThisWeekMenuSection({ onSelectMeal, onOpenAdmin }) {
                   key={meal.id}
                   className="group grid h-full min-w-0 flex-[0_0_calc(100%-2rem)] snap-start scroll-ml-4 grid-rows-[auto_1fr] overflow-hidden rounded-none border-2 border-[#1E1E1E] bg-white shadow-[6px_6px_0_#1E1E1E] transition-all duration-200 hover:-translate-y-1 hover:shadow-[9px_9px_0_#8D9B7D] md:flex-auto md:scroll-ml-0"
                 >
-                  {/* Image Container */}
-                  <div className="relative h-52 overflow-hidden bg-[#1E1E1E] sm:h-60 border-b-2 border-[#1E1E1E]">
-                    <img
-                      src={meal.image}
-                      alt={meal.name}
-                      loading="lazy"
-                      decoding="async"
-                      onError={(e) => {
-                        e.currentTarget.onerror = null;
-                        e.currentTarget.src =
-                          "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80";
-                      }}
-                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-
-                    {/* Day / Code Badge */}
-                    <div className="absolute left-3 top-3 bg-[#1E1E1E] text-white px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-wider shadow-[2px_2px_0_#8D9B7D] border border-white/20">
+                  {/* Schedule header */}
+                  <div className="flex min-h-14 items-center justify-between gap-3 border-b-2 border-[#1E1E1E] bg-[#1E1E1E] px-4 py-3 sm:px-5">
+                    <div className="border border-white/25 bg-white px-3 py-1 font-mono text-[10px] font-black uppercase tracking-wider text-[#1E1E1E] shadow-[2px_2px_0_#8D9B7D]">
                       {meal.day ? meal.day.toUpperCase() : meal.code}
                     </div>
                     {meal.menuDate && (
-                      <div className="absolute right-3 top-3 inline-flex items-center gap-1.5 border border-[#1E1E1E] bg-[#FEFDF9] px-2.5 py-1 font-mono text-[9px] font-black uppercase text-[#1E1E1E] shadow-[2px_2px_0_#8D9B7D]">
+                      <div className="inline-flex items-center gap-1.5 font-mono text-[9px] font-black uppercase tracking-wide text-white/80">
                         <CalendarDays size={11} aria-hidden="true" />
                         {formatMenuDate(
                           meal.menuDate,
@@ -316,18 +301,6 @@ export function ThisWeekMenuSection({ onSelectMeal, onOpenAdmin }) {
                         </div>
                       </div>
 
-                      {/* Action Button */}
-                      <Button
-                        onClick={() => onSelectMeal?.(selectedTier, meal)}
-                        className="mt-4 min-h-11 w-full justify-between rounded-none border-2 border-[#1E1E1E] px-4 text-xs font-display font-extrabold uppercase shadow-[3px_3px_0_#1E1E1E] bg-[#8D9B7D] text-white hover:bg-[#6B7860]"
-                      >
-                        <span>
-                          {language === "ID"
-                            ? "PESAN MENU INI"
-                            : "ORDER THIS MEAL"}
-                        </span>
-                        <ArrowRight size={15} />
-                      </Button>
                     </div>
                   </div>
                 </Card>

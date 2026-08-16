@@ -32,7 +32,6 @@ import {
   CalendarDays,
 } from "lucide-react";
 import { Button } from "../components/ui/button";
-import { MenuImageUpload } from "../components/MenuImageUpload";
 import { NutritionTierEditor } from "../components/NutritionTierEditor";
 import {
   FullScreenLoader,
@@ -43,14 +42,11 @@ import {
 import {
   buildNutritionByTier,
   formatMenuDate,
-  getManagedMenuImagePath,
   getMenuSlot,
   getMenuSlotFromDate,
   getWeeklyMenuDate,
   isMenuDateForSlot,
   normalizeNutritionByTier,
-  removeMenuImage,
-  uploadMenuImage,
 } from "../lib/menuService";
 
 const INITIAL_NUTRITION_BY_TIER = buildNutritionByTier({
@@ -86,7 +82,6 @@ const INITIAL_FORM_STATE = {
   potassium: 350,
   kcal: 1050,
   nutritionByTier: INITIAL_NUTRITION_BY_TIER,
-  image: "",
   tags_ID: ["Monday / Senin", "80g Protein"],
   tags_EN: ["Monday", "80g Protein"],
   desc_ID: "",
@@ -162,7 +157,6 @@ export default function AdminPage() {
   // Menu CRUD modal state
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [formState, setFormState] = useState(INITIAL_FORM_STATE);
-  const [imageFile, setImageFile] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
@@ -231,14 +225,12 @@ export default function AdminPage() {
   const handleOpenCreate = () => {
     setIsEditing(false);
     setFormState({ ...INITIAL_FORM_STATE, menuDate: getWeeklyMenuDate(1) });
-    setImageFile(null);
     setEditModalOpen(true);
   };
 
   // Open Form to Edit Meal
   const handleOpenEdit = (item) => {
     setIsEditing(true);
-    setImageFile(null);
     setFormState({
       id: item.id,
       code: item.code || "CPL-MENU",
@@ -256,7 +248,6 @@ export default function AdminPage() {
       potassium: item.potassium ?? 350,
       kcal: item.kcal ?? 1050,
       nutritionByTier: normalizeNutritionByTier(item.nutritionByTier, item),
-      image: item.image || "/images/chicken_teriyaki.webp",
       tags_ID: Array.isArray(item.tags_ID) ? item.tags_ID : [item.day || "Today"],
       tags_EN: Array.isArray(item.tags_EN) ? item.tags_EN : [item.day || "Today"],
       desc_ID: item.desc_ID || "",
@@ -328,54 +319,21 @@ export default function AdminPage() {
     }
 
     setActionLoading(true);
-    let uploadedPath = null;
-    let uploadedNewObject = false;
     try {
       const payload = { ...formState };
-      if (imageFile) {
-        const uploadResult = await uploadMenuImage(
-          imageFile,
-          formState.code,
-          isEditing ? formState.image : "",
-        );
-        if (!uploadResult.success) {
-          alert(`Gagal upload gambar: ${uploadResult.error}`);
-          return;
-        }
-        payload.image = uploadResult.publicUrl;
-        uploadedPath = uploadResult.path;
-        uploadedNewObject = uploadResult.createsNewObject;
-      }
-
-      if (!payload.image) {
-        alert("Pilih gambar menu sebelum menyimpan.");
-        return;
-      }
 
       const res = isEditing
         ? await updateMenuItem(formState.id, payload)
         : await createMenuItem(payload);
 
       if (!res.success) {
-        if (uploadedPath && uploadedNewObject) await removeMenuImage(uploadedPath);
         alert(`Gagal menyimpan menu: ${res.error}`);
         return;
       }
 
-      const oldManagedPath = getManagedMenuImagePath(formState.image);
-      if (
-        isEditing
-        && uploadedPath
-        && oldManagedPath
-        && oldManagedPath !== uploadedPath
-      ) {
-        await removeMenuImage(oldManagedPath);
-      }
-
-      setImageFile(null);
       setEditModalOpen(false);
       setStatusMessage(
-        isEditing ? "Menu dan gambarnya berhasil diperbarui!" : "Menu baru berhasil ditambahkan!"
+        isEditing ? "Menu berhasil diperbarui!" : "Menu baru berhasil ditambahkan!"
       );
       setTimeout(() => setStatusMessage(""), 4000);
     } finally {
@@ -384,7 +342,7 @@ export default function AdminPage() {
   };
 
   // Delete Meal
-  const handleDeleteMeal = async (id, name, imageUrl) => {
+  const handleDeleteMeal = async (id, name) => {
     if (!window.confirm(`Apakah Anda yakin ingin menghapus menu "${name}"?`)) {
       return;
     }
@@ -393,7 +351,6 @@ export default function AdminPage() {
     setActionLoading(false);
 
     if (res.success) {
-      await removeMenuImage(imageUrl);
       setStatusMessage(`Menu "${name}" berhasil dihapus.`);
       setTimeout(() => setStatusMessage(""), 4000);
     } else {
@@ -972,7 +929,7 @@ export default function AdminPage() {
 
               {/* VIEW MODE 1: GRID VIEW */}
               {loadingMenu ? (
-                <MenuGridSkeleton />
+                <MenuGridSkeleton hideImage />
               ) : viewMode === "grid" ? (
                 <div className="grid grid-cols-1 gap-6 sm:gap-8 md:grid-cols-2 xl:grid-cols-3">
                   {filteredMenuItems.map((item) => {
@@ -981,26 +938,13 @@ export default function AdminPage() {
                         key={item.id}
                         className="group grid h-full grid-rows-[auto_1fr] overflow-hidden rounded-none border-2 border-[#1E1E1E] bg-white shadow-[6px_6px_0_#1E1E1E] transition-all duration-200 hover:-translate-y-1 hover:shadow-[9px_9px_0_#8D9B7D]"
                       >
-                        {/* Image Header */}
-                        <div className="relative h-52 sm:h-60 bg-[#1E1E1E] border-b-2 border-[#1E1E1E] overflow-hidden">
-                          <img
-                            src={item.image}
-                            alt={item.name}
-                            loading="lazy"
-                            decoding="async"
-                            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                            onError={(e) => {
-                              e.currentTarget.onerror = null;
-                              e.currentTarget.src =
-                                "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80";
-                            }}
-                          />
-                          {/* Day / Code Badge */}
-                          <div className="absolute left-3 top-3 bg-[#1E1E1E] text-white px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-wider shadow-[2px_2px_0_#8D9B7D] border border-white/20">
+                        {/* Schedule Header */}
+                        <div className="flex min-h-14 items-center justify-between gap-3 border-b-2 border-[#1E1E1E] bg-[#1E1E1E] px-4 py-3 sm:px-5">
+                          <div className="border border-white/25 bg-white px-3 py-1 font-mono text-[10px] font-black uppercase tracking-wider text-[#1E1E1E] shadow-[2px_2px_0_#8D9B7D]">
                             {item.day ? item.day.toUpperCase() : item.code}
                           </div>
                           {item.menuDate && (
-                            <div className="absolute right-3 top-3 inline-flex items-center gap-1.5 border border-[#1E1E1E] bg-[#FEFDF9] px-2.5 py-1 font-mono text-[9px] font-black uppercase text-[#1E1E1E] shadow-[2px_2px_0_#8D9B7D]">
+                            <div className="inline-flex items-center gap-1.5 font-mono text-[9px] font-black uppercase tracking-wide text-white/80">
                               <CalendarDays size={11} aria-hidden="true" />
                               {formatMenuDate(item.menuDate)}
                             </div>
@@ -1090,7 +1034,7 @@ export default function AdminPage() {
                               </Button>
                               <Button
                                 size="sm"
-                                onClick={() => handleDeleteMeal(item.id, item.name, item.image)}
+                                onClick={() => handleDeleteMeal(item.id, item.name)}
                                 className="h-10 px-3.5 border-2 border-[#1E1E1E] bg-red-50 text-red-700 shadow-[3px_3px_0_#1E1E1E] hover:bg-red-600 hover:text-white transition-all"
                                 title="Hapus Menu Ini"
                               >
@@ -1123,12 +1067,7 @@ export default function AdminPage() {
                       {filteredMenuItems.map((item) => {
                         return (
                           <tr key={item.id} className="hover:bg-gray-50 font-bold">
-                            <td className="p-3 flex items-center gap-3">
-                              <img
-                                src={item.image}
-                                alt={item.name}
-                                className="h-10 w-10 rounded object-cover border border-[#1E1E1E]"
-                              />
+                            <td className="p-3">
                               <div>
                                 <div className="font-display font-black text-sm uppercase text-[#1E1E1E]">
                                   {item.name}
@@ -1163,7 +1102,7 @@ export default function AdminPage() {
                                 </button>
                                 <button
                                   type="button"
-                                  onClick={() => handleDeleteMeal(item.id, item.name, item.image)}
+                                  onClick={() => handleDeleteMeal(item.id, item.name)}
                                   className="p-1.5 text-red-600 hover:bg-red-50 rounded"
                                 >
                                   <Trash2 size={15} />
@@ -1516,14 +1455,6 @@ export default function AdminPage() {
                   </p>
                 </div>
               </div>
-
-              <MenuImageUpload
-                currentImage={formState.image}
-                file={imageFile}
-                onFileChange={setImageFile}
-                disabled={actionLoading}
-                required={!isEditing}
-              />
 
               <NutritionTierEditor
                 value={formState.nutritionByTier}

@@ -31,7 +31,7 @@ export function Skeleton({ className }) {
   );
 }
 
-function MenuCardSkeleton({ className }) {
+function MenuCardSkeleton({ className, hideImage = false }) {
   return (
     <div
       className={cn(
@@ -39,7 +39,14 @@ function MenuCardSkeleton({ className }) {
         className,
       )}
     >
-      <Skeleton className="h-52 w-full border-b-2 border-[#1E1E1E] sm:h-60" />
+      {hideImage ? (
+        <div className="flex min-h-14 items-center justify-between gap-3 border-b-2 border-[#1E1E1E] bg-[#1E1E1E] px-4 py-3 sm:px-5">
+          <Skeleton className="h-6 w-24 bg-white/80" />
+          <Skeleton className="h-2.5 w-20 bg-white/25" />
+        </div>
+      ) : (
+        <Skeleton className="h-52 w-full border-b-2 border-[#1E1E1E] sm:h-60" />
+      )}
       <div className="space-y-5 p-5 sm:p-6">
         <div className="space-y-2">
           <Skeleton className="h-2.5 w-28" />
@@ -58,7 +65,12 @@ function MenuCardSkeleton({ className }) {
   );
 }
 
-export function MenuGridSkeleton({ count = 6, className, mobileCarousel = false }) {
+export function MenuGridSkeleton({
+  count = 6,
+  className,
+  mobileCarousel = false,
+  hideImage = false,
+}) {
   return (
     <div role="status" aria-label="Memuat data menu dari database">
       <span className="sr-only">Memuat data menu dari database...</span>
@@ -73,6 +85,7 @@ export function MenuGridSkeleton({ count = 6, className, mobileCarousel = false 
         {Array.from({ length: count }).map((_, index) => (
           <MenuCardSkeleton
             key={index}
+            hideImage={hideImage}
             className={
               mobileCarousel
                 ? "min-w-0 flex-[0_0_calc(100%-2rem)] snap-start md:flex-auto"

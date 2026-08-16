@@ -1,8 +1,5 @@
 import { supabase } from "./supabase";
 
-export const MENU_IMAGE_BUCKET = "menu-images";
-export const MENU_IMAGE_MAX_BYTES = 5 * 1024 * 1024;
-export const MENU_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
 export const PROTEIN_TIERS = [25, 40, 60, 80, 100];
 
 const padDatePart = (value) => String(value).padStart(2, "0");
@@ -156,7 +153,6 @@ export const DEFAULT_WEEKLY_MENUS = [
     sodium: 1380.5,
     potassium: 355,
     kcal: 1100.8,
-    image: "/images/chicken_teriyaki.webp",
     tags_ID: ["Monday / Senin", "82.4g Protein", "1100.8 Kkal"],
     tags_EN: ["Monday", "82.4g Protein", "1100.8 Kcal"],
     desc_ID:
@@ -178,7 +174,6 @@ export const DEFAULT_WEEKLY_MENUS = [
     sodium: 1290.0,
     potassium: 365,
     kcal: 1080.7,
-    image: "/images/ayam_cabe_ijo.webp",
     tags_ID: ["Tuesday / Selasa", "79.8g Protein", "1080.7 Kkal"],
     tags_EN: ["Tuesday", "79.8g Protein", "1080.7 Kcal"],
     desc_ID:
@@ -200,7 +195,6 @@ export const DEFAULT_WEEKLY_MENUS = [
     sodium: 1420.0,
     potassium: 330,
     kcal: 1127.6,
-    image: "/images/chicken_mentai.webp",
     tags_ID: ["Wednesday / Rabu", "83.2g Protein", "1127.6 Kkal"],
     tags_EN: ["Wednesday", "83.2g Protein", "1127.6 Kcal"],
     desc_ID:
@@ -222,7 +216,6 @@ export const DEFAULT_WEEKLY_MENUS = [
     sodium: 1360.0,
     potassium: 370,
     kcal: 1059.5,
-    image: "/images/sate_padang.webp",
     tags_ID: ["Thursday / Kamis", "81.0g Protein", "1059.5 Kkal"],
     tags_EN: ["Thursday", "81.0g Protein", "1059.5 Kcal"],
     desc_ID:
@@ -244,7 +237,6 @@ export const DEFAULT_WEEKLY_MENUS = [
     sodium: 1240.0,
     potassium: 385,
     kcal: 1039.0,
-    image: "/images/oseng_ayam_kecombrang.webp",
     tags_ID: ["Friday / Jumat", "78.5g Protein", "1039 Kkal"],
     tags_EN: ["Friday", "78.5g Protein", "1039 Kcal"],
     desc_ID:
@@ -266,7 +258,6 @@ export const DEFAULT_WEEKLY_MENUS = [
     sodium: 1310.0,
     potassium: 345,
     kcal: 1114.0,
-    image: "/images/sweet_sour_crispy_chicken.webp",
     tags_ID: ["Saturday / Sabtu", "80.5g Protein", "1114 Kkal"],
     tags_EN: ["Saturday", "80.5g Protein", "1114 Kcal"],
     desc_ID:
@@ -306,7 +297,6 @@ export function normalizeMenuItem(row) {
     kcal: defaultNutrition.kcal,
     availableProteinTiers: PROTEIN_TIERS,
     nutritionByTier,
-    image: row.image || "/images/chicken_teriyaki.webp",
     tags_ID: Array.isArray(row.tags_id)
       ? row.tags_id
       : typeof row.tags_id === "string"
@@ -349,7 +339,6 @@ export function toDatabaseFormat(item) {
     potassium: defaultNutrition.potassium,
     kcal: defaultNutrition.kcal,
     nutrition_by_tier: nutritionByTier,
-    image: item.image,
     tags_id: Array.isArray(item.tags_ID) ? item.tags_ID : [],
     tags_en: Array.isArray(item.tags_EN) ? item.tags_EN : [],
     desc_id: item.desc_ID || "",
@@ -484,100 +473,6 @@ export async function seedDefaultWeeklyMenus() {
     console.error("Failed to seed default weekly menus:", error);
     return { success: false, error: error.message };
   }
-}
-
-/** Validate an image before sending it to Supabase Storage. */
-export function validateMenuImage(file) {
-  if (typeof File === "undefined" || !(file instanceof File)) {
-    return "Pilih file gambar terlebih dahulu.";
-  }
-  if (!MENU_IMAGE_TYPES.includes(file.type)) {
-    return "Format gambar harus JPG, PNG, atau WebP.";
-  }
-  if (file.size > MENU_IMAGE_MAX_BYTES) {
-    return "Ukuran gambar maksimal 5 MB.";
-  }
-  return null;
-}
-
-/**
- * Upload a menu image.
- *
- * Replacements overwrite the currently managed object so an old image cannot
- * be left behind as an orphan. New menu images still receive a unique path.
- */
-export async function uploadMenuImage(file, menuCode = "menu", currentImage = "") {
-  const validationError = validateMenuImage(file);
-  if (validationError) return { success: false, error: validationError };
-
-  const extensionByType = {
-    "image/jpeg": "jpg",
-    "image/png": "png",
-    "image/webp": "webp",
-  };
-  const safeCode = String(menuCode || "menu")
-    .toLowerCase()
-    .replace(/[^a-z0-9-]+/g, "-")
-    .replace(/^-+|-+$/g, "") || "menu";
-  const uniqueId = globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`;
-  const currentPath = getManagedMenuImagePath(currentImage);
-  const createsNewObject = !currentPath;
-  const objectPath = currentPath
-    || `weekly/${safeCode}-${uniqueId}.${extensionByType[file.type]}`;
-
-  try {
-    const { error } = await supabase.storage
-      .from(MENU_IMAGE_BUCKET)
-      .upload(objectPath, file, {
-        cacheControl: "31536000",
-        contentType: file.type,
-        upsert: !createsNewObject,
-      });
-
-    if (error) throw error;
-    const { data } = supabase.storage.from(MENU_IMAGE_BUCKET).getPublicUrl(objectPath);
-    const publicUrl = new URL(data.publicUrl);
-    publicUrl.searchParams.set("v", uniqueId);
-
-    return {
-      success: true,
-      publicUrl: publicUrl.toString(),
-      path: objectPath,
-      createsNewObject,
-    };
-  } catch (error) {
-    console.error("Failed to upload menu image:", error);
-    return { success: false, error: error.message || "Upload gambar gagal." };
-  }
-}
-
-/** Return the object path only for URLs managed by this app's menu bucket. */
-export function getManagedMenuImagePath(imageUrl) {
-  if (!imageUrl) return null;
-  const marker = `/storage/v1/object/public/${MENU_IMAGE_BUCKET}/`;
-  try {
-    const url = new URL(imageUrl);
-    const markerIndex = url.pathname.indexOf(marker);
-    if (markerIndex === -1) return null;
-    return decodeURIComponent(url.pathname.slice(markerIndex + marker.length));
-  } catch {
-    return null;
-  }
-}
-
-/** Best-effort cleanup for replaced or failed uploads. */
-export async function removeMenuImage(imageOrPath) {
-  const path = imageOrPath?.includes?.("/storage/v1/object/")
-    ? getManagedMenuImagePath(imageOrPath)
-    : imageOrPath;
-  if (!path) return { success: true };
-
-  const { error } = await supabase.storage.from(MENU_IMAGE_BUCKET).remove([path]);
-  if (error) {
-    console.warn("Failed to remove old menu image:", error.message);
-    return { success: false, error: error.message };
-  }
-  return { success: true };
 }
 
 /** Create a new menu item in Supabase */
