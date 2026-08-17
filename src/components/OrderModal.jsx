@@ -799,11 +799,11 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
                   </div>
 
                   <div
-                    className="grid grid-cols-2 gap-2.5 sm:grid-cols-3"
+                    className="grid grid-cols-5 gap-1.5 sm:gap-2"
                     role="radiogroup"
                     aria-label={t("orderProteinTier")}
                   >
-                    {TIER_OPTIONS.map((option) => {
+                    {TIER_OPTIONS.map((option, optionIndex) => {
                       const isSelected = proteinTier === option.tier;
 
                       return (
@@ -812,61 +812,71 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
                           type="button"
                           role="radio"
                           aria-checked={isSelected}
+                          aria-label={`${option.tier}g protein`}
                           onClick={() => {
                             setProteinTier(option.tier);
                             analytics.proteinTierSelected(option.tier);
                           }}
-                          className={`min-h-24 min-w-0 rounded-lg border-2 p-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D1954E] ${
+                          className={`group relative flex min-h-[5.75rem] min-w-0 flex-col overflow-hidden rounded-xl border-2 px-1.5 pb-2 pt-2 text-center transition-[transform,border-color,background-color,box-shadow] motion-reduce:transition-none focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D1954E] focus-visible:ring-offset-2 ${
                             isSelected
-                              ? "border-[#1E1E1E] bg-[#1E1E1E] text-white"
-                              : "border-[#1E1E1E]/15 bg-white text-[#1E1E1E] hover:border-[#D1954E]"
+                              ? "-translate-y-0.5 border-[#1E1E1E] bg-[#1E1E1E] text-white shadow-[0_4px_0_#8D9B7D]"
+                              : "border-[#1E1E1E]/15 bg-white text-[#1E1E1E] hover:-translate-y-0.5 hover:border-[#8D9B7D] hover:bg-[#F7FAF3] hover:shadow-[0_3px_0_#C8D8B8]"
                           }`}
                         >
-                          <span className="flex items-center justify-between gap-1">
-                            <strong className="font-display text-xl font-black leading-none">
-                              {option.tier}g
-                            </strong>
-                            {isSelected ? (
-                              <span className="flex items-center gap-0.5 rounded-full bg-[#C8D8B8] px-1.5 py-0.5 font-display text-[7px] font-extrabold uppercase text-[#1E1E1E]">
-                                <Check size={9} strokeWidth={3} />
-                                {isIndonesian ? "Dipilih" : "Selected"}
-                              </span>
-                            ) : null}
+                          <span className="flex items-center justify-between">
+                            <span
+                              className={`font-mono text-[6px] font-bold tracking-wider ${isSelected ? "text-white/45" : "text-[#1E1E1E]/35"}`}
+                              aria-hidden="true"
+                            >
+                              0{optionIndex + 1}
+                            </span>
+                            <span
+                              className={`flex size-4 items-center justify-center rounded-full transition-colors ${isSelected ? "bg-[#C8D8B8] text-[#1E1E1E]" : "border border-[#1E1E1E]/15 text-transparent group-hover:border-[#8D9B7D]"}`}
+                              aria-hidden="true"
+                            >
+                              <Check size={9} strokeWidth={3} />
+                            </span>
+                          </span>
+                          <strong className="mt-2 whitespace-nowrap font-display text-[15px] font-black leading-none tracking-tight sm:text-lg">
+                            {option.tier}
+                            <span
+                              className={`ml-px text-[9px] sm:text-[10px] ${isSelected ? "text-[#C8D8B8]" : "text-[#6B7860]"}`}
+                            >
+                              g
+                            </span>
+                          </strong>
+                          <span
+                            className={`mt-1 min-h-2.5 font-display text-[6px] font-extrabold uppercase leading-none tracking-wide ${isSelected ? "text-[#C8D8B8]" : "text-transparent"}`}
+                            aria-hidden={!isSelected}
+                          >
+                            {isSelected
+                              ? isIndonesian
+                                ? "Dipilih"
+                                : "Selected"
+                              : "·"}
                           </span>
                           <span
-                            className={`mt-2 block font-mono text-[10px] font-bold ${isSelected ? "text-[#C8D8B8]" : "text-[#6B7860]"}`}
+                            className="mt-auto flex gap-0.5"
+                            aria-hidden="true"
                           >
-                            Rp{" "}
-                            {option.prices[cateringPeriod].toLocaleString(
-                              "id-ID",
-                            )}
-                          </span>
-                          <span
-                            className={`mt-1 block text-[8px] font-bold uppercase tracking-wide ${isSelected ? "text-white/55" : "text-black/40"}`}
-                          >
-                            {periodLabel}
+                            {TIER_OPTIONS.map((segment, segmentIndex) => (
+                              <span
+                                key={segment.tier}
+                                className={`h-1 min-w-0 flex-1 rounded-full ${
+                                  segmentIndex <= optionIndex
+                                    ? isSelected
+                                      ? "bg-[#C8D8B8]"
+                                      : "bg-[#8D9B7D]"
+                                    : isSelected
+                                      ? "bg-white/15"
+                                      : "bg-[#1E1E1E]/10"
+                                }`}
+                              />
+                            ))}
                           </span>
                         </button>
                       );
                     })}
-                  </div>
-
-                  <div
-                    role="status"
-                    className="mt-3 flex items-center justify-between gap-3 rounded-lg bg-[#1E1E1E] px-3 py-2 text-white"
-                    aria-label={
-                      isIndonesian
-                        ? `Periode harga otomatis: ${periodLabel}, ${periodRangeLabel}`
-                        : `Automatic pricing period: ${periodLabel}, ${periodRangeLabel}`
-                    }
-                    aria-live="polite"
-                  >
-                    <span className="font-mono text-[9px] font-bold uppercase">
-                      {periodLabel}
-                    </span>
-                    <span className="font-sans text-[9px] text-white/70">
-                      {periodRangeLabel}
-                    </span>
                   </div>
 
                   <div className="mt-3 flex min-w-0 items-start gap-3 rounded-lg border border-[#8D9B7D]/50 bg-[#E1ECD3] p-3.5">
@@ -993,6 +1003,43 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
                     hasError={!!(errors.startDate || errors.endDate)}
                     errorMsg={errors.startDate || errors.endDate}
                   />
+                </div>
+
+                <div
+                  role="status"
+                  aria-live="polite"
+                  aria-atomic="true"
+                  aria-label={
+                    isIndonesian
+                      ? `Periode harga otomatis: ${periodLabel}, ${periodRangeLabel}, protein ${selectedTier.tier} gram, Rp ${selectedPrice.toLocaleString("id-ID")} per porsi`
+                      : `Automatic pricing period: ${periodLabel}, ${periodRangeLabel}, ${selectedTier.tier} grams of protein, Rp ${selectedPrice.toLocaleString("id-ID")} per serving`
+                  }
+                  className="mt-3 flex min-w-0 items-center justify-between gap-3 rounded-lg bg-[#1E1E1E] px-3 py-2.5 text-white"
+                >
+                  <div className="flex min-w-0 items-center gap-2.5">
+                    <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#C8D8B8] text-[#1E1E1E]">
+                      <CalendarDays size={15} aria-hidden="true" />
+                    </span>
+                    <div className="min-w-0">
+                      <p className="font-display text-[10px] font-extrabold uppercase leading-tight">
+                        {periodLabel}
+                      </p>
+                      <p className="mt-0.5 font-sans text-[8px] text-white/65">
+                        {periodRangeLabel}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="shrink-0 border-l border-white/20 pl-3 text-right">
+                    <p className="font-mono text-[8px] font-bold uppercase text-[#C8D8B8]">
+                      {selectedTier.tier}g protein
+                    </p>
+                    <p className="mt-0.5 whitespace-nowrap font-display text-sm font-black leading-none">
+                      Rp {selectedPrice.toLocaleString("id-ID")}
+                      <span className="ml-1 font-sans text-[7px] font-medium text-white/60">
+                        / {isIndonesian ? "porsi" : "serving"}
+                      </span>
+                    </p>
+                  </div>
                 </div>
 
                 <div className="mt-5">
