@@ -23,6 +23,9 @@ export const siteCopy = {
       daily: "Daily",
       weekly: "Weekly",
       monthly: "Monthly",
+      dailyDuration: "1–5 days",
+      weeklyDuration: "6–23 days",
+      monthlyDuration: "24+ days",
       perServing: "per serving",
       swipeHint: "Swipe to compare protein tiers",
       calculatorPrompt: "Not sure which protein tier fits you?",
@@ -64,7 +67,7 @@ export const siteCopy = {
         "Direct confirmation with our team through WhatsApp",
       ],
       quote:
-        '"Better you" is not a finish line. It is a meal that works a little better for the life you already live.',
+        '"Better You" is not a finish line. It\'s about making better choices, one meal at a time.',
     },
     standard: {
       eyebrow: "Our standard",
@@ -78,7 +81,7 @@ export const siteCopy = {
       description:
         "Our mission is to make high-protein eating easier to understand and genuinely satisfying. Food science gives each recipe structure, nutrition transparency makes the choices inspectable, and the Better You philosophy keeps progress practical.",
       quote:
-        "“Better you” is not a finish line. It is a meal that works a little better for the life you already live.",
+        "“Better You” is not a finish line. It's about making better choices, one meal at a time.",
     },
     founder: {
       eyebrow: "Meet the Founder",
@@ -195,6 +198,9 @@ export const siteCopy = {
       daily: "Harian",
       weekly: "Mingguan",
       monthly: "Bulanan",
+      dailyDuration: "1–5 hari",
+      weeklyDuration: "6–23 hari",
+      monthlyDuration: "24+ hari",
       perServing: "per porsi",
       swipeHint: "Geser untuk membandingkan pilihan protein",
       calculatorPrompt: "Belum yakin menentukan pilihan protein?",
@@ -237,7 +243,7 @@ export const siteCopy = {
         "Konfirmasi langsung bersama tim kami melalui WhatsApp",
       ],
       quote:
-        '"Better you" bukan garis akhir. Ini adalah makanan yang bekerja sedikit lebih baik untuk kehidupan yang sudah kamu jalani.',
+        '"Better You" bukan garis akhir. Ini tentang membuat pilihan yang lebih baik, satu hidangan demi satu hidangan.',
     },
     standard: {
       eyebrow: "Standar kami",
@@ -251,7 +257,7 @@ export const siteCopy = {
       description:
         "Misi kami adalah membuat pola makan tinggi protein lebih mudah dipahami dan tetap memuaskan. Ilmu pangan memberi struktur pada resep, transparansi nutrisi membuat pilihan dapat diperiksa, dan filosofi Better You menjaga progres tetap realistis.",
       quote:
-        "“Better you” bukan garis akhir. Ini adalah makanan yang bekerja sedikit lebih baik untuk kehidupan yang sudah kamu jalani.",
+        "“Better You” bukan garis akhir. Ini tentang membuat pilihan yang lebih baik, satu hidangan demi satu hidangan.",
     },
     founder: {
       eyebrow: "Pendiri Kami",

@@ -81,6 +81,16 @@ export const faqs = [
   {
     category: "Ordering",
     categoryID: "Pemesanan",
+    question: "Are the catering dates and duration flexible?",
+    questionID: "Apakah tanggal dan durasi katering fleksibel?",
+    answer:
+      "Yes. Choose your preferred available start and end dates, starting from one service day. Deliveries run Monday–Saturday, so Sundays are not counted. The daily, weekly, or monthly rate is applied automatically based on the number of service days.",
+    answerID:
+      "Ya. Kamu bebas menentukan tanggal mulai dan selesai yang tersedia, mulai dari satu hari layanan. Pengiriman berjalan Senin–Sabtu, jadi hari Minggu tidak dihitung. Tarif harian, mingguan, atau bulanan diterapkan otomatis berdasarkan jumlah hari layanan.",
+  },
+  {
+    category: "Ordering",
+    categoryID: "Pemesanan",
     question: "Can I order two meals per day?",
     questionID: "Apakah saya bisa memesan dua porsi per hari?",
     answer:

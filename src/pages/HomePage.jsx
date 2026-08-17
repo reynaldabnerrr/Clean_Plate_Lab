@@ -145,13 +145,18 @@ export default function HomePage({ onBuild, onOpenAdmin }) {
                     type="button"
                     aria-pressed={isActive}
                     onClick={() => setPricingPeriod(period)}
-                    className={`min-h-10 px-2 font-display text-[10px] font-extrabold uppercase tracking-wider transition-colors focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8D9B7D] focus-visible:ring-inset sm:min-h-11 sm:text-xs ${
+                    className={`min-h-12 px-2 py-1.5 font-display text-[10px] font-extrabold uppercase tracking-wider transition-colors focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8D9B7D] focus-visible:ring-inset sm:min-h-14 sm:text-xs ${
                       isActive
                         ? "bg-[#8D9B7D] text-white"
                         : "bg-white text-[#1E1E1E] hover:bg-[#E1ECD3] hover:text-[#6B7860]"
                     }`}
                   >
-                    {copy.protein[period]}
+                    <span className="block">{copy.protein[period]}</span>
+                    <span
+                      className={`mt-0.5 block font-sans text-[8px] font-medium normal-case tracking-normal sm:text-[9px] ${isActive ? "text-white/75" : "text-[#6B7860]"}`}
+                    >
+                      {copy.protein[`${period}Duration`]}
+                    </span>
                   </button>
                 );
               })}

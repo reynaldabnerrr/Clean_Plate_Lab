@@ -194,12 +194,8 @@ export function OrderModal({
   const [copiedMapLink, setCopiedMapLink] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState({});
-  const [selectedPeriod, setSelectedPeriod] = useState(null);
-
   const totalDays = calculateDeliveryDays(startDate, endDate);
-  const autoCateringPeriod = getCateringPeriod(totalDays);
-  const displayPeriod = selectedPeriod ?? autoCateringPeriod;
-  const cateringPeriod = autoCateringPeriod;
+  const cateringPeriod = getCateringPeriod(totalDays);
   const selectedTier =
     TIER_OPTIONS.find((option) => option.tier === proteinTier) ||
     TIER_OPTIONS[0];
@@ -219,24 +215,11 @@ export function OrderModal({
     ? { daily: "Harian", weekly: "Mingguan", monthly: "Bulanan" }
     : { daily: "Daily", weekly: "Weekly", monthly: "Monthly" };
   const periodLabel = periodLabels[cateringPeriod];
-  const displayPeriodLabel = periodLabels[displayPeriod];
-  const periodOptions = [
-    {
-      key: "daily",
-      label: periodLabels.daily,
-      subtitle: `1–5 ${isIndonesian ? "hari" : "days"}`,
-    },
-    {
-      key: "weekly",
-      label: periodLabels.weekly,
-      subtitle: `6–23 ${isIndonesian ? "hari" : "days"}`,
-    },
-    {
-      key: "monthly",
-      label: periodLabels.monthly,
-      subtitle: `24+ ${isIndonesian ? "hari" : "days"}`,
-    },
-  ];
+  const periodRangeLabel = {
+    daily: `1–5 ${isIndonesian ? "hari" : "days"}`,
+    weekly: `6–23 ${isIndonesian ? "hari" : "days"}`,
+    monthly: `24+ ${isIndonesian ? "hari" : "days"}`,
+  }[cateringPeriod];
   const orderCopy = isIndonesian
     ? {
         servingsPerDay: "Porsi per hari",
@@ -357,14 +340,6 @@ export function OrderModal({
     singleMealReadyTime,
     startDate,
   ]);
-
-  useEffect(() => {
-    if (!isOpen) return undefined;
-
-    setSelectedPeriod(getCateringPeriod(totalDays));
-
-    return undefined;
-  }, [isOpen, totalDays]);
 
   useEffect(() => {
     if (!isOpen) return undefined;
@@ -862,44 +837,36 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
                             className={`mt-2 block font-mono text-[10px] font-bold ${isSelected ? "text-[#C8D8B8]" : "text-[#6B7860]"}`}
                           >
                             Rp{" "}
-                            {option.prices[displayPeriod].toLocaleString(
+                            {option.prices[cateringPeriod].toLocaleString(
                               "id-ID",
                             )}
                           </span>
                           <span
                             className={`mt-1 block text-[8px] font-bold uppercase tracking-wide ${isSelected ? "text-white/55" : "text-black/40"}`}
                           >
-                            {displayPeriodLabel}
+                            {periodLabel}
                           </span>
                         </button>
                       );
                     })}
                   </div>
 
-                  <div className="mt-3 grid grid-cols-3 overflow-hidden rounded-lg border border-[#1E1E1E]/20 bg-white text-center font-mono text-[9px] font-bold uppercase">
-                    {periodOptions.map((option) => {
-                      const isSelectedPlan = displayPeriod === option.key;
-                      const borderClass =
-                        option.key === "weekly"
-                          ? "border-x border-[#1E1E1E]/20"
-                          : "";
-
-                      return (
-                        <button
-                          key={option.key}
-                          type="button"
-                          onClick={() => setSelectedPeriod(option.key)}
-                          className={`p-2 transition-colors ${isSelectedPlan ? "bg-[#1E1E1E] text-white" : ""} ${borderClass}`}
-                        >
-                          <span className="block">{option.label}</span>
-                          <span
-                            className={`mt-0.5 block font-sans text-[8px] font-normal normal-case ${isSelectedPlan ? "text-white/70" : "text-[#6B7860]"}`}
-                          >
-                            {option.subtitle}
-                          </span>
-                        </button>
-                      );
-                    })}
+                  <div
+                    role="status"
+                    className="mt-3 flex items-center justify-between gap-3 rounded-lg bg-[#1E1E1E] px-3 py-2 text-white"
+                    aria-label={
+                      isIndonesian
+                        ? `Periode harga otomatis: ${periodLabel}, ${periodRangeLabel}`
+                        : `Automatic pricing period: ${periodLabel}, ${periodRangeLabel}`
+                    }
+                    aria-live="polite"
+                  >
+                    <span className="font-mono text-[9px] font-bold uppercase">
+                      {periodLabel}
+                    </span>
+                    <span className="font-sans text-[9px] text-white/70">
+                      {periodRangeLabel}
+                    </span>
                   </div>
 
                   <div className="mt-3 flex min-w-0 items-start gap-3 rounded-lg border border-[#8D9B7D]/50 bg-[#E1ECD3] p-3.5">
