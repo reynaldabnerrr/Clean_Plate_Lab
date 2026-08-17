@@ -193,7 +193,9 @@ export function CplProvider({ children }) {
   const [userRole, setUserRole] = useState("admin");
   const [isFromDb, setIsFromDb] = useState(false);
   const [loadingMenu, setLoadingMenu] = useState(false);
-  const [loadingAdminSession, setLoadingAdminSession] = useState(Boolean(supabase));
+  const [loadingAdminSession, setLoadingAdminSession] = useState(
+    Boolean(supabase),
+  );
   const [announcementText, setAnnouncementText] = useState(
     "100% Lab Verified High Protein Meal Prep • Free Delivery Jabodetabek",
   );
@@ -331,10 +333,9 @@ export function CplProvider({ children }) {
       heroWholeFood: "Harga Mulai Dari",
       heroWholeFoodDesc: "Menu tinggi protein terjangkau",
       heroDeliveryBadge: "TERJADWAL",
-      heroDeliveryValue: "1+ Hari",
-      heroMacroAcc: "Rentang Tanggal Fleksibel",
-      heroMacroAccDesc:
-        "Tentukan sendiri tanggal mulai dan selesai sesuai kebutuhanmu",
+      heroDeliveryValue: "1–2x/Hari",
+      heroMacroAcc: "Jadwal Makanan Harian",
+      heroMacroAccDesc: "Jadwal makan yang menyesuaikan rutinitas harianmu",
       heroCtaPrimary: "Pilih Paket Katering",
       heroCtaSecondary: "Jelajahi Menu",
       heroFeature1: "Tinggi Protein Harian",
@@ -632,10 +633,9 @@ export function CplProvider({ children }) {
       heroWholeFood: "Starting Price",
       heroWholeFoodDesc: "Affordable high-protein meals",
       heroDeliveryBadge: "SCHEDULED",
-      heroDeliveryValue: "1+ Days",
-      heroMacroAcc: "Flexible Date Range",
-      heroMacroAccDesc:
-        "Choose your own start and end dates to fit your schedule",
+      heroDeliveryValue: "1–2x/Day",
+      heroMacroAcc: "Scheduled Daily Meals",
+      heroMacroAccDesc: "Meal timing designed around your daily routine",
       heroCtaPrimary: "Build Your Meal",
       heroCtaSecondary: "Explore Menu",
       heroFeature1: "High Daily Protein",
