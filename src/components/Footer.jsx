@@ -28,7 +28,7 @@ const InstagramIcon = ({ size = 18, className = "" }) => (
   </svg>
 );
 
-export function Footer({ onOpenAdmin }) {
+export function Footer() {
   const { t } = useCpl();
   const copy = useSiteCopy();
 

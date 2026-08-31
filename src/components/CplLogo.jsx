@@ -1,5 +1,6 @@
 import React from "react";
-import logoImg from "../assets/CPL_logo.webp";
+
+const logoImg = "/CPL_logo.webp";
 
 export function CplLogoImage({ size = 42, className = "" }) {
   return (

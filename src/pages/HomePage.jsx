@@ -51,7 +51,7 @@ function LegacySectionHeader({
   );
 }
 
-export default function HomePage({ onBuild, onOpenAdmin }) {
+export default function HomePage({ onBuild }) {
   const { language } = useCpl();
   const copy = useSiteCopy();
   const isIndonesian = language === "ID";

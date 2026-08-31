@@ -19,6 +19,9 @@ dist-ssr
 !.vscode/extensions.json
 .idea
 .DS_Store
+__pycache__/
+*.py[cod]
+supabase/.temp/
 *.suo
 *.ntvs*
 *.njsproj

@@ -369,45 +369,11 @@ export function DateRangePicker({
     [startDate, endDate, baseY, baseM, notifyOpen],
   );
 
-  const [sheetTranslateY, setSheetTranslateY] = useState(0);
-  const touchStartYRef = useRef(0);
-  const isSwipingSheetRef = useRef(false);
-
-  const handleSheetTouchStart = useCallback((e) => {
-    touchStartYRef.current = e.touches[0].clientY;
-    isSwipingSheetRef.current = true;
-  }, []);
-
-  const handleSheetTouchMove = useCallback((e) => {
-    if (!isSwipingSheetRef.current) return;
-    const currentY = e.touches[0].clientY;
-    const diffY = currentY - touchStartYRef.current;
-    if (diffY > 0) {
-      setSheetTranslateY(diffY);
-    }
-  }, []);
-
   const closePicker = useCallback(() => {
     setOpen(false);
     setHoverDate(null);
-    setSheetTranslateY(0);
     notifyOpen(false);
   }, [notifyOpen]);
-
-  const handleSheetTouchEnd = useCallback(
-    (e) => {
-      if (!isSwipingSheetRef.current) return;
-      const currentY = e.changedTouches[0]?.clientY || touchStartYRef.current;
-      const diffY = currentY - touchStartYRef.current;
-
-      if (diffY > 60 || sheetTranslateY > 60) {
-        closePicker();
-      }
-      setSheetTranslateY(0);
-      isSwipingSheetRef.current = false;
-    },
-    [closePicker, sheetTranslateY],
-  );
 
   const handleDayClick = useCallback(
     (ds) => {

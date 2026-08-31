@@ -9,8 +9,6 @@ import { useCpl } from "../hooks/useCpl";
 import { calculateMacroTargets } from "../lib/calculations";
 import { analytics } from "../lib/analytics";
 import { useSiteCopy } from "../hooks/useSiteCopy";
-import { proteinTiers } from "../data/site";
-import { formatCurrency } from "../lib/order";
 import { readStoredState, writeStoredState } from "../lib/storage";
 
 const isMacroInputs = (value) =>
@@ -71,9 +69,6 @@ export function MacroCalculator({ onOpenOrder }) {
   } = result;
 
   const recommendedMealsPerDay = 2;
-  const recommendedTierData =
-    proteinTiers.find((tier) => tier.protein === recommendedProteinTier) ||
-    proteinTiers[0];
   const recommendedPlanName = `${recommendedProteinTier}g ${language === "ID" ? "Protein" : "Protein Plan"}`;
   const upToLabel = language === "ID" ? "Hingga" : "Up to";
   const activityOptions = [

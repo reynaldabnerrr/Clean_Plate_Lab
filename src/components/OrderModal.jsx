@@ -109,17 +109,6 @@ function formatOrderDate(value, locale = "id-ID") {
   }).format(new Date(`${value}T00:00:00+08:00`));
 }
 
-function formatOrderDateCompact(value, locale = "id-ID") {
-  if (!value) return "-";
-
-  return new Intl.DateTimeFormat(locale, {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    timeZone: "Asia/Makassar",
-  }).format(new Date(`${value}T00:00:00+08:00`));
-}
-
 function getCateringPeriod(totalDays) {
   if (totalDays >= 24) return "monthly";
   if (totalDays >= 6) return "weekly";
