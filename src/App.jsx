@@ -4,6 +4,7 @@ import { Navbar } from "./components/Navbar";
 import { Footer } from "./components/Footer";
 import { OrderModal } from "./components/OrderModal";
 import { LanguageWelcomeModal } from "./components/LanguageWelcomeModal";
+import { KitchenBreakNotice } from "./components/KitchenBreakNotice";
 import { WhatsAppFloatingCta } from "./components/WhatsAppFloatingCta";
 import HomePage from "./pages/HomePage";
 import AdminPage from "./pages/AdminPage";
@@ -170,6 +171,7 @@ export default function App() {
         ) : (
           <div className="min-h-screen bg-[var(--cpl-cream)] text-[var(--cpl-dark)]">
             <LanguageWelcomeModal />
+            <KitchenBreakNotice enabled={!orderModalOpen} onOrder={() => handleBuild("kitchen_break")} />
             <Navbar onOpenOrder={() => handleBuild("navigation")} hidden={orderModalOpen} />
             <main id="main-content" tabIndex="-1" className="outline-none">
               <HomePage onBuild={handleBuild} />

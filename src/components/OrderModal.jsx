@@ -1,4 +1,8 @@
 import React, { useEffect, useId, useRef, useState } from "react";
+import { getServiceDates, getOrderDateError, isServiceDate, kitchenCopy } from "../lib/kitchen";
+import { KitchenBreakNotice } from "./KitchenBreakNotice";
+import { MealCustomization, MealCustomizationSummary } from "./MealCustomization";
+import { buildMealItems, normalizeMealCustomizations, formatKitchenMealItems } from "../lib/mealCustomization";
 import confetti from "canvas-confetti";
 import { useCpl } from "../hooks/useCpl";
 import { CplLogoImage } from "./CplLogo";
@@ -19,7 +23,6 @@ import {
   getDateInputValueInTimeZone,
   getDefaultOrderStartDate,
   getDefaultOrderEndDate,
-  isSundayDate,
   WHATSAPP_NUMBER,
   CENTRAL_KITCHEN_MAPS_LINK,
 } from "../lib/order";
@@ -75,29 +78,6 @@ function formatReadyTime(value) {
   return value.replace(":", ".");
 }
 
-function calculateDeliveryDays(start, end) {
-  if (!start || !end) return 0;
-
-  const startDate = new Date(`${start}T00:00:00Z`);
-  const endDate = new Date(`${end}T00:00:00Z`);
-  if (
-    Number.isNaN(startDate.getTime()) ||
-    Number.isNaN(endDate.getTime()) ||
-    endDate < startDate
-  )
-    return 0;
-
-  let deliveryDays = 0;
-  const cursor = new Date(startDate);
-
-  while (cursor <= endDate) {
-    if (cursor.getUTCDay() !== 0) deliveryDays += 1;
-    cursor.setUTCDate(cursor.getUTCDate() + 1);
-  }
-
-  return deliveryDays;
-}
-
 function formatOrderDate(value, locale = "id-ID") {
   if (!value) return "-";
 
@@ -135,7 +115,7 @@ export function OrderModal({
   initialMealsPerDay = 1,
   hasExplicitInitialValues = false,
 }) {
-  const { addOrder, t, language } = useCpl();
+  const { addOrder, t, language, hasSelectedLanguage } = useCpl();
   const fieldId = useId();
   const [today, setToday] = useState(() => getDateInputValueInTimeZone());
   const defaultStartDate = getDefaultOrderStartDate(today);
@@ -151,7 +131,7 @@ export function OrderModal({
   const isValidDraftStartDate =
     storedDraft?.startDate &&
     storedDraft.startDate >= defaultStartDate &&
-    !isSundayDate(storedDraft.startDate);
+    isServiceDate(storedDraft.startDate);
   const initialStartDate = isValidDraftStartDate
     ? storedDraft.startDate
     : defaultStartDate;
@@ -159,7 +139,7 @@ export function OrderModal({
   const isValidDraftEndDate =
     storedDraft?.endDate &&
     storedDraft.endDate >= initialStartDate &&
-    !isSundayDate(storedDraft.endDate);
+    isServiceDate(storedDraft.endDate);
   const initialEndDate = isValidDraftEndDate
     ? storedDraft.endDate
     : getDefaultOrderEndDate(initialStartDate);
@@ -174,6 +154,19 @@ export function OrderModal({
   );
   const readyTimeMeal1 = mealsPerDay === 1 ? singleMealReadyTime : "12:00";
   const readyTimeMeal2 = "18:00";
+  const [mealCustomizations, setMealCustomizations] = useState(() => normalizeMealCustomizations(storedDraft?.mealCustomizations));
+  const serviceDates = getServiceDates(startDate, endDate);
+  const mealItems = buildMealItems({
+    mealsPerDay, singleMealReadyTime, mealCustomizations, proteinTier, serviceDates,
+  });
+  const toggleCustomization = (index, optionId) => {
+    setMealCustomizations((current) => current.map((ids, itemIndex) => {
+      if (itemIndex !== index) return ids;
+      return ids.includes(optionId)
+        ? ids.filter((id) => id !== optionId)
+        : [...ids, optionId];
+    }));
+  };
   const [addonIds, setAddonIds] = useState(storedDraft?.addonIds ?? []);
   const [fulfillment, setFulfillment] = useState(
     storedDraft?.fulfillment ?? "Self-arranged",
@@ -183,7 +176,7 @@ export function OrderModal({
   const [copiedMapLink, setCopiedMapLink] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState({});
-  const totalDays = calculateDeliveryDays(startDate, endDate);
+  const totalDays = serviceDates.length;
   const cateringPeriod = getCateringPeriod(totalDays);
   const selectedTier =
     TIER_OPTIONS.find((option) => option.tier === proteinTier) ||
@@ -223,10 +216,10 @@ export function OrderModal({
         lunch: "Makan siang",
         dinner: "Makan malam",
         ready: "siap",
-        addons: "Kustomisasi menu",
+        addons: "Ganti Karbo",
         addonsHelp:
           "Paket standar menggunakan nasi putih. Opsi Baby Potato + Jagung menggantikan nasi putih, bukan menambah karbo baru. Semua biaya dihitung per box.",
-        addonTotal: "Total kustomisasi",
+        addonTotal: "Total ganti karbo",
         fulfillment: "Metode pengambilan / pengiriman",
         onlineDelivery: "Online Delivery",
         selfArranged: "Ambil Sendiri / Atur Kurir",
@@ -254,10 +247,10 @@ export function OrderModal({
         lunch: "Lunch",
         dinner: "Dinner",
         ready: "ready",
-        addons: "Meal customizations",
+        addons: "Carb swap",
         addonsHelp:
           "The standard meal includes white rice. Baby Potato + Corn replaces the white rice—it is not an additional carb. All charges are calculated per box.",
-        addonTotal: "Total customizations",
+        addonTotal: "Carb swap total",
         fulfillment: "Pickup or delivery method",
         onlineDelivery: "Online Delivery",
         selfArranged: "Self-pickup / Arrange courier",
@@ -318,9 +311,11 @@ export function OrderModal({
       mealsPerDay,
       singleMealReadyTime,
       addonIds,
+      mealCustomizations,
       fulfillment,
     });
   }, [
+    mealCustomizations,
     addonIds,
     endDate,
     fulfillment,
@@ -338,12 +333,12 @@ export function OrderModal({
       const minStartDate = getDefaultOrderStartDate(currentWitaDate);
       setToday(currentWitaDate);
       setStartDate((current) =>
-        !current || current < minStartDate || isSundayDate(current)
+        !current || current < minStartDate || !isServiceDate(current)
           ? minStartDate
           : current,
       );
       setEndDate((current) =>
-        !current || current < minStartDate
+        !current || current < minStartDate || !isServiceDate(current)
           ? getDefaultOrderEndDate(minStartDate)
           : current,
       );
@@ -356,9 +351,9 @@ export function OrderModal({
   }, [isOpen]);
 
   const handleStartDateChange = (value) => {
-    const minStartDate = getDefaultOrderStartDate(today);
+    const minStartDate = getDefaultOrderStartDate(getDateInputValueInTimeZone());
     const nextStartDate =
-      !value || value < minStartDate || isSundayDate(value)
+      !value || value < minStartDate || !isServiceDate(value)
         ? minStartDate
         : value;
     setStartDate(nextStartDate);
@@ -369,12 +364,12 @@ export function OrderModal({
   };
 
   const handleEndDateChange = (value) => {
-    const minStartDate = getDefaultOrderStartDate(today);
+    const minStartDate = getDefaultOrderStartDate(getDateInputValueInTimeZone());
     const effectiveStart =
-      !startDate || startDate < minStartDate || isSundayDate(startDate)
+      !startDate || startDate < minStartDate || !isServiceDate(startDate)
         ? minStartDate
         : startDate;
-    setEndDate(value < effectiveStart ? effectiveStart : value);
+    setEndDate(!isServiceDate(value) || value < effectiveStart ? effectiveStart : value);
   };
 
   const toggleAddon = (addonId) => {
@@ -409,35 +404,15 @@ export function OrderModal({
         "Nomor WhatsApp minimal 10 digit (contoh: 081234567890)";
     }
 
-    const minStartDate = getDefaultOrderStartDate(today);
-    if (!startDate) {
-      newErrors.startDate =
-        t("orderStartDateError") || "Tanggal mulai wajib dipilih";
-    } else if (startDate < minStartDate) {
-      newErrors.startDate =
-        t("orderPastDateError") ||
-        "Tanggal mulai tidak boleh sebelum hari ini (WITA)";
-    } else if (isSundayDate(startDate)) {
-      newErrors.startDate = isIndonesian
-        ? "Pengiriman tidak beroperasi pada hari Minggu"
-        : "Deliveries are not available on Sundays";
-    }
-
-    if (!endDate) {
-      newErrors.endDate =
-        t("orderEndDateError") || "Tanggal selesai wajib dipilih";
-    } else if (startDate && endDate < startDate) {
-      newErrors.endDate =
-        t("orderDateRangeError") ||
-        "Tanggal selesai harus sama atau setelah tanggal mulai";
-    } else if (isSundayDate(endDate) && startDate === endDate) {
-      newErrors.endDate = isIndonesian
-        ? "Pengiriman tidak beroperasi pada hari Minggu"
-        : "Deliveries are not available on Sundays";
-    } else if (totalDays === 0) {
-      newErrors.endDate =
-        t("orderDateRangeError") ||
-        "Tanggal selesai harus sama atau setelah tanggal mulai";
+    const dateError = getOrderDateError(startDate, endDate, getDateInputValueInTimeZone());
+    if (!startDate) newErrors.startDate = t("orderStartDateError");
+    if (!endDate) newErrors.endDate = t("orderEndDateError");
+    if (dateError === "kitchenClosed") {
+      newErrors.startDate = kitchenCopy[language].validation;
+    } else if (dateError === "pastDate") {
+      newErrors.startDate = t("orderPastDateError");
+    } else if (dateError === "invalidRange" && startDate && endDate) {
+      newErrors.endDate = t("orderDateRangeError");
     }
 
     if (requiresDeliveryAddress && !address.trim()) {
@@ -475,12 +450,15 @@ export function OrderModal({
       startDate,
       endDate,
       totalDays,
+      serviceDates,
       mealsPerDay,
       totalBoxes,
       readyTimeMeal1,
       readyTimeMeal2: mealsPerDay === 2 ? readyTimeMeal2 : null,
       addonIds,
       addons: selectedAddonNames,
+      items: mealItems,
+      proteinTier,
       fulfillment,
       address,
       mapsUrl,
@@ -560,8 +538,12 @@ Halo Tim Clean Plate Lab, saya ingin memesan meal plan dengan rincian berikut:
 • Periode harga: *${whatsappPeriodLabel} · Rp ${selectedPrice.toLocaleString("id-ID")}/porsi*
 • Tanggal katering: *${formatOrderDate(startDate, "id-ID")} – ${formatOrderDate(endDate, "id-ID")}*
 • Jumlah: *${mealsPerDay} porsi/hari · ${totalBoxes} box (${totalDays} hari layanan)*
-• Jadwal layanan: *Senin–Sabtu, Minggu tidak dihitung*
+• Jadwal layanan: *Senin–Sabtu, Minggu dan tanggal libur kitchen tidak dihitung*
+• Tanggal makan: ${serviceDates.join(", ")}
 • Jadwal makan: *${mealsPerDay === 1 ? `${singleMealReadyTime === "12:00" ? "Makan siang" : "Makan malam"} pukul ${formatReadyTime(readyTimeMeal1)}` : `Makan siang pukul ${formatReadyTime(readyTimeMeal1)} · Makan malam pukul ${formatReadyTime(readyTimeMeal2)}`}*
+• Custom per meal (berlaku sepanjang periode, harga tetap):
+${formatKitchenMealItems(mealItems)}
+• Porsi protein disesuaikan untuk memenuhi target protein.
 • Add-on: ${addonSummary}
 • Metode pengambilan/pengiriman: ${fulfillmentSummary}${deliveryLocationDetails}
 
@@ -575,6 +557,12 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
   };
 
   const handleReopenWhatsApp = () => {
+    const validationErrors = validateForm();
+    if (Object.keys(validationErrors).length) {
+      setErrors(validationErrors);
+      setSubmitted(false);
+      return;
+    }
     const message = buildWhatsAppMessage();
     const whatsappUrl = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, "_blank", "noopener,noreferrer");
@@ -583,7 +571,7 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
   const datePickerOpenRef = useRef(false);
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+    <Dialog open={isOpen && hasSelectedLanguage} onOpenChange={handleOpenChange}>
       <DialogContent
         style={{ width: "min(calc(100vw - 1rem), 52rem)", maxWidth: "none" }}
         onPointerDownOutside={(event) => {
@@ -898,10 +886,8 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
                 </section>
 
                 <section aria-labelledby={`${fieldId}-addons-title`}>
+                  <MealCustomization items={mealItems} language={language} onChange={toggleCustomization} />
                   <div className="mb-3 flex items-center gap-2.5">
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#1E1E1E] font-mono text-[10px] font-bold text-white">
-                      03
-                    </span>
                     <h3
                       id={`${fieldId}-addons-title`}
                       className="min-w-0 font-display text-xs font-extrabold uppercase"
@@ -1352,7 +1338,7 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
                           {mealsPerDay}x / {isIndonesian ? "hari" : "day"}
                         </p>
                         <p className="mt-0.5 text-[9px] leading-4 text-[#6B7860]">
-                          {t("orderSundayExcluded")}
+                          {kitchenCopy[language].excluded}
                         </p>
                       </div>
                     </div>
@@ -1433,6 +1419,7 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
                       </div>
                     </div>
 
+                    <MealCustomizationSummary items={mealItems} language={language} />
                     <div className="overflow-hidden rounded-xl border border-[#8D9B7D]/25 bg-white font-mono text-[9px]">
                       <div className="flex items-start justify-between gap-3 px-3 py-2.5">
                         <span className="text-[#6B7860]">
@@ -1624,6 +1611,7 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
                         : `${orderCopy.lunch} ${orderCopy.ready} ${formatReadyTime(readyTimeMeal1)} · ${orderCopy.dinner} ${orderCopy.ready} ${formatReadyTime(readyTimeMeal2)} · ${orderCopy.sameMenu}`}
                     </p>
                   </div>
+                  <MealCustomizationSummary items={mealItems} language={language} />
                   <div>
                     <p className="font-display text-[9px] font-bold uppercase tracking-wider text-[#6B7860]">
                       {orderCopy.addons}
@@ -1738,6 +1726,7 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
             </div>
           </div>
         )}
+        {isOpen && <KitchenBreakNotice context="order" />}
       </DialogContent>
     </Dialog>
   );

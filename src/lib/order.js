@@ -1,5 +1,6 @@
 import { addons, proteinTiers } from "../data/site.js";
 import { getMealById } from "../data/meals.js";
+import { isServiceDate } from "./kitchen.js";
 
 export const WHATSAPP_NUMBER = "6285111215704";
 export const WHATSAPP_DISPLAY = "+62 851-1121-5704";
@@ -62,15 +63,14 @@ export function isSundayDate(dateInputValue) {
 }
 
 export function getDefaultOrderStartDate(today = getDateInputValueInTimeZone()) {
-  return isSundayDate(today) ? addDaysToDateInputValue(today, 1) : today;
+  let next = today;
+  while (!isServiceDate(next)) next = addDaysToDateInputValue(next, 1);
+  return next;
 }
 
 export function getDefaultOrderEndDate(startDate) {
   const candidate = addDaysToDateInputValue(startDate, 4);
-  if (isSundayDate(candidate)) {
-    return addDaysToDateInputValue(candidate, -1);
-  }
-  return candidate;
+  return getDefaultOrderStartDate(isSundayDate(candidate) ? addDaysToDateInputValue(candidate, -1) : candidate);
 }
 
 export function formatCurrency(value) {

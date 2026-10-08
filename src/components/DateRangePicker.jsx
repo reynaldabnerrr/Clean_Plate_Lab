@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { CalendarDays, ChevronLeft, ChevronRight, X } from "lucide-react";
+import { getServiceDates, isKitchenClosed, kitchenCopy } from "../lib/kitchen";
 import { getDefaultOrderStartDate } from "../lib/order";
 
 const MONTH_ID = [
@@ -67,29 +68,6 @@ function fmtDate(value, locale) {
   };
 }
 
-function countDeliveryDays(start, end) {
-  if (!start || !end) return 0;
-
-  const startDate = new Date(`${start}T00:00:00Z`);
-  const endDate = new Date(`${end}T00:00:00Z`);
-  if (
-    Number.isNaN(startDate.getTime()) ||
-    Number.isNaN(endDate.getTime()) ||
-    endDate < startDate
-  )
-    return 0;
-
-  let days = 0;
-  const cursor = new Date(startDate);
-
-  while (cursor <= endDate) {
-    if (cursor.getUTCDay() !== 0) days += 1;
-    cursor.setUTCDate(cursor.getUTCDate() + 1);
-  }
-
-  return days;
-}
-
 function getMonthOffset(value, baseYear, baseMonth) {
   if (!value) return 0;
 
@@ -143,6 +121,7 @@ function MonthGrid({
 
           const ds = toStr(year, month, day);
           const isPast = ds < today;
+          const isClosed = isKitchenClosed(ds);
           const isSunday = new Date(`${ds}T00:00:00Z`).getUTCDay() === 0;
           const isStart = ds === startDate;
           const isEnd = Boolean(
@@ -163,7 +142,7 @@ function MonthGrid({
           let wrapperClass = "cpl-cal-day-wrapper";
           if (
             !isPast &&
-            !isSunday &&
+            !isSunday && !isClosed &&
             startDate &&
             effectiveEnd &&
             effectiveEnd !== startDate
@@ -175,7 +154,7 @@ function MonthGrid({
 
           let buttonClass = "cpl-cal-day";
           if (isPast) buttonClass += " past";
-          else if (isSunday) buttonClass += " sunday";
+          else if (isSunday || isClosed) buttonClass += " sunday";
           else if (isStart) buttonClass += " start";
           else if (isEnd) buttonClass += " end";
           else if (isInRange) buttonClass += " in-range";
@@ -186,10 +165,10 @@ function MonthGrid({
             <div key={ds} className={wrapperClass}>
               <button
                 type="button"
-                disabled={isPast || isSunday}
+                disabled={isPast || isSunday || isClosed}
                 className={buttonClass}
                 onPointerDown={(event) => {
-                  if (isPast || isSunday) return;
+                  if (isPast || isSunday || isClosed) return;
                   if (event.pointerType === "mouse" && event.button !== 0)
                     return;
                   event.preventDefault();
@@ -199,9 +178,11 @@ function MonthGrid({
                 onClick={(event) => {
                   event.preventDefault();
                   event.stopPropagation();
+                  if (event.detail === 0 && !isPast && !isSunday && !isClosed) onDayClick(ds);
                 }}
-                onMouseEnter={() => !isPast && !isSunday && onDayHover(ds)}
+                onMouseEnter={() => !isPast && !isSunday && !isClosed && onDayHover(ds)}
                 onMouseLeave={() => onDayHover(null)}
+                title={isClosed ? kitchenCopy[isIndonesian ? "ID" : "EN"].validation : undefined}
                 aria-label={ds}
                 aria-pressed={isStart || isEnd}
               >
@@ -432,7 +413,7 @@ export function DateRangePicker({
   const locale = isIndonesian ? "id-ID" : "en-GB";
   const sp = fmtDate(startDate, locale);
   const ep = fmtDate(endDate, locale);
-  const totalDays = countDeliveryDays(startDate, endDate);
+  const totalDays = getServiceDates(startDate, endDate).length;
 
   const dayLabel = isIndonesian
     ? `${totalDays} hari`
