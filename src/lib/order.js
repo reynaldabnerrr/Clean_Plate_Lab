@@ -1,6 +1,7 @@
 import { addons, proteinTiers } from "../data/site.js";
 import { getMealById } from "../data/meals.js";
 import { isServiceDate } from "./kitchen.js";
+import { describeCustomization } from "./mealCustomization.js";
 
 export const WHATSAPP_NUMBER = "6285111215704";
 export const WHATSAPP_DISPLAY = "+62 851-1121-5704";
@@ -8,6 +9,180 @@ export const CONTACT_EMAIL = "cleanplatelab.id@gmail.com";
 export const ORDER_TIME_ZONE = "Asia/Makassar";
 export const CENTRAL_KITCHEN_MAPS_LINK =
   "https://maps.app.goo.gl/jdJGvQTAin6SwYgq7";
+
+export const INDONESIA_MONTHS = [
+  "Januari",
+  "Februari",
+  "Maret",
+  "April",
+  "Mei",
+  "Juni",
+  "Juli",
+  "Agustus",
+  "September",
+  "Oktober",
+  "November",
+  "Desember",
+];
+
+export function formatServicePeriod(startDate, endDate) {
+  if (!startDate) return "-";
+  if (!endDate || startDate === endDate) {
+    const [y, m, d] = startDate.split("-").map(Number);
+    return `${d} ${INDONESIA_MONTHS[m - 1]} ${y}`;
+  }
+
+  const [sY, sM, sD] = startDate.split("-").map(Number);
+  const [eY, eM, eD] = endDate.split("-").map(Number);
+
+  if (sY === eY && sM === eM) {
+    return `${sD}–${eD} ${INDONESIA_MONTHS[sM - 1]} ${sY}`;
+  }
+
+  if (sY === eY) {
+    return `${sD} ${INDONESIA_MONTHS[sM - 1]} – ${eD} ${INDONESIA_MONTHS[eM - 1]} ${sY}`;
+  }
+
+  return `${sD} ${INDONESIA_MONTHS[sM - 1]} ${sY} – ${eD} ${INDONESIA_MONTHS[eM - 1]} ${eY}`;
+}
+
+function formatReadyTimeDisplay(value) {
+  return (value || "12:00").replace(":", ".");
+}
+
+export function buildSimplifiedWhatsAppOrderMessage({
+  customerName = "",
+  phone = "",
+  referralCode = "",
+  proteinTier = 40,
+  startDate = "",
+  endDate = "",
+  totalDays = 1,
+  totalBoxes = 1,
+  mealsPerDay = 1,
+  singleMealReadyTime = "12:00",
+  readyTimeMeal1 = "12:00",
+  readyTimeMeal2 = "18:00",
+  mealItems = [],
+  selectedAddons = [],
+  fulfillment = "Online-delivery",
+  address = "",
+  mapsUrl = "",
+  selectedPrice = 40000,
+  totalCost = 40000,
+  centralKitchenAddress = "Jalan G. Bulusaraung no. 18AA, RW.01, Pisang Utara, Ujung Pandang, Makassar City, South Sulawesi 90115",
+}) {
+  const customerLines = [
+    `Nama: ${customerName || "-"}`,
+    `WhatsApp: ${phone || "-"}`,
+  ];
+  if (referralCode && referralCode.trim()) {
+    customerLines.push(`Kode referral: ${referralCode.trim()}`);
+  }
+
+  const periodText = formatServicePeriod(startDate, endDate);
+
+  const meal1Name =
+    (singleMealReadyTime || readyTimeMeal1) === "18:00"
+      ? "Makan malam"
+      : "Makan siang";
+  const scheduleText =
+    mealsPerDay === 1
+      ? `${meal1Name}, pukul ${formatReadyTimeDisplay(readyTimeMeal1 || singleMealReadyTime || "12:00")}`
+      : `Makan siang, pukul ${formatReadyTimeDisplay(readyTimeMeal1 || "12:00")} & Makan malam, pukul ${formatReadyTimeDisplay(readyTimeMeal2 || "18:00")}`;
+
+  let customizationText = "Meal lengkap";
+  if (Array.isArray(mealItems) && mealItems.length > 0) {
+    if (mealsPerDay === 1) {
+      customizationText = describeCustomization(
+        mealItems[0]?.customizationIds || [],
+        "ID",
+      );
+    } else {
+      const c1 = describeCustomization(
+        mealItems[0]?.customizationIds || [],
+        "ID",
+      );
+      const c2 = describeCustomization(
+        mealItems[1]?.customizationIds || [],
+        "ID",
+      );
+      if (c1 === c2) {
+        customizationText = c1;
+      } else {
+        customizationText = `Makan siang (${c1}), Makan malam (${c2})`;
+      }
+    }
+  }
+
+  let addonText = "Tidak ada";
+  if (selectedAddons && selectedAddons.length > 0) {
+    addonText = selectedAddons
+      .map(
+        (addon) =>
+          `${addon.nameID || addon.name} (+Rp${addon.price.toLocaleString("id-ID")}/box)`,
+      )
+      .join(", ");
+  }
+
+  const isOnlineDelivery = fulfillment === "Online-delivery";
+  const deliveryLines = [];
+  if (isOnlineDelivery) {
+    deliveryLines.push("Metode: Online Delivery");
+    deliveryLines.push(`Alamat: ${address || "-"}`);
+    if (mapsUrl && mapsUrl.trim()) {
+      deliveryLines.push(`Google Maps: ${mapsUrl.trim()}`);
+    }
+  } else {
+    deliveryLines.push("Metode: Ambil Sendiri (Pickup di Clean Plate Lab)");
+    if (centralKitchenAddress) {
+      deliveryLines.push(`Lokasi pickup: ${centralKitchenAddress}`);
+    }
+    deliveryLines.push(`Google Maps: ${CENTRAL_KITCHEN_MAPS_LINK}`);
+  }
+
+  const costLines = [];
+  if (!selectedAddons || selectedAddons.length === 0) {
+    costLines.push(
+      `Rp${selectedPrice.toLocaleString("id-ID")} × ${totalBoxes} box = Rp${totalCost.toLocaleString("id-ID")}`,
+    );
+  } else {
+    costLines.push(
+      `Paket: Rp${selectedPrice.toLocaleString("id-ID")} × ${totalBoxes} box = Rp${(selectedPrice * totalBoxes).toLocaleString("id-ID")}`,
+    );
+    selectedAddons.forEach((addon) => {
+      costLines.push(
+        `Add-on (${addon.nameID || addon.name}): Rp${addon.price.toLocaleString("id-ID")} × ${totalBoxes} box = Rp${(addon.price * totalBoxes).toLocaleString("id-ID")}`,
+      );
+    });
+  }
+
+  return `CLEAN PLATE LAB MAKASSAR
+Good Food. Clear Data. Better You.
+
+Halo Tim Clean Plate Lab, saya ingin memesan meal plan dengan detail berikut:
+
+DATA PEMESAN
+${customerLines.join("\n")}
+
+DETAIL PESANAN
+Target protein: ${proteinTier}g/porsi
+Periode layanan: ${periodText}
+Jumlah: ${totalBoxes} box (${totalDays} hari)
+Jadwal makan: ${scheduleText}
+Kustomisasi: ${customizationText}
+Add-on: ${addonText}
+
+PENGIRIMAN
+${deliveryLines.join("\n")}
+
+RINGKASAN BIAYA
+${costLines.join("\n")}
+
+TOTAL: Rp${totalCost.toLocaleString("id-ID")}
+
+Mohon konfirmasi ketersediaan dan petunjuk pembayaran. Terima kasih.`;
+}
 
 export function buildWhatsAppInterestMessage(language = "ID") {
   if (language === "EN") {
@@ -109,36 +284,38 @@ export function calculateOrderPricing({
 }
 
 export function buildWhatsAppMessage(order) {
-  const meal = getMealById(order.mealId);
   const selectedAddons = addons.filter((addon) =>
-    order.addonIds.includes(addon.id),
+    (order.addonIds || []).includes(addon.id),
   );
   const pricing = calculateOrderPricing(order);
+  const totalDays = order.totalDays || order.serviceDates?.length || 1;
+  const totalBoxes = order.totalBoxes || pricing.quantity;
 
-  return `*CLEAN PLATE LAB — MEAL ORDER*
-_Good food. Clear data. Better you._
-
-*CUSTOMER*
-• Name: ${order.customerName || "-"}
-
-*MEAL SPECIFICATION*
-• Protein tier: ${order.proteinTier}g
-• Meal: ${meal?.name || "-"}
-• Ordering period: ${order.orderPeriod}
-• Quantity: ${pricing.quantity} meal${pricing.quantity > 1 ? "s" : ""}
-• Add-ons: ${selectedAddons.length ? selectedAddons.map((addon) => addon.name).join(", ") : "None"}
-
-*DELIVERY*
-• Method: ${order.deliveryMethod}
-• Address: ${order.deliveryAddress || "-"}
-• Preferred time: ${order.deliveryTime || "-"}
-
-*ESTIMATED TOTAL*
-${formatCurrency(pricing.total)}
-
-Please confirm menu availability, delivery fee if applicable, final total, and payment instructions. Thank you.`;
+  return buildSimplifiedWhatsAppOrderMessage({
+    customerName: order.customerName,
+    phone: order.phone,
+    referralCode: order.referralCode,
+    proteinTier: order.proteinTier,
+    startDate: order.startDate,
+    endDate: order.endDate,
+    totalDays,
+    totalBoxes,
+    mealsPerDay: order.mealsPerDay || 1,
+    singleMealReadyTime: order.singleMealReadyTime || "12:00",
+    readyTimeMeal1: order.readyTimeMeal1 || "12:00",
+    readyTimeMeal2: order.readyTimeMeal2 || "18:00",
+    mealItems: order.items || [],
+    selectedAddons,
+    fulfillment: order.fulfillment || order.deliveryMethod || "Online-delivery",
+    address: order.address || order.deliveryAddress,
+    mapsUrl: order.mapsUrl,
+    selectedPrice: pricing.basePrice,
+    totalCost: pricing.total,
+    centralKitchenAddress: order.centralKitchenAddress,
+  });
 }
 
 export function getWhatsAppUrl(order) {
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(buildWhatsAppMessage(order))}`;
 }
+

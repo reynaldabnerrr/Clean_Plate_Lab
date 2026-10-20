@@ -25,6 +25,7 @@ import {
   getDefaultOrderEndDate,
   WHATSAPP_NUMBER,
   CENTRAL_KITCHEN_MAPS_LINK,
+  buildSimplifiedWhatsAppOrderMessage,
 } from "../lib/order";
 import {
   AlertCircle,
@@ -40,6 +41,7 @@ import {
   PackageCheck,
   Phone,
   ShieldCheck,
+  Tag,
   Truck,
   User,
   UtensilsCrossed,
@@ -125,6 +127,14 @@ export function OrderModal({
   );
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [referralCode, setReferralCode] = useState(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const paramRef = params.get("ref") || params.get("referral");
+      if (paramRef) return paramRef.trim();
+    }
+    return storedDraft?.referralCode ?? "";
+  });
   const [proteinTier, setProteinTier] = useState(
     storedDraft?.proteinTier ?? initialProteinTier,
   );
@@ -313,6 +323,7 @@ export function OrderModal({
       addonIds,
       mealCustomizations,
       fulfillment,
+      referralCode,
     });
   }, [
     mealCustomizations,
@@ -321,6 +332,7 @@ export function OrderModal({
     fulfillment,
     mealsPerDay,
     proteinTier,
+    referralCode,
     singleMealReadyTime,
     startDate,
   ]);
@@ -446,6 +458,7 @@ export function OrderModal({
     addOrder({
       customerName: name,
       phone,
+      referralCode: referralCode.trim(),
       plan: planString,
       startDate,
       endDate,
@@ -473,6 +486,7 @@ export function OrderModal({
       mealsPerDay,
       totalBoxes,
       totalCost,
+      hasReferral: Boolean(referralCode.trim()),
     });
 
     const message = buildWhatsAppMessage();
@@ -499,61 +513,29 @@ export function OrderModal({
   };
 
   const buildWhatsAppMessage = () => {
-    const whatsappPeriodLabel = {
-      daily: "Harian",
-      weekly: "Mingguan",
-      monthly: "Bulanan",
-    }[cateringPeriod];
-    const addonSummary = selectedAddons.length
-      ? selectedAddons.map((addon) => addon.nameID).join(", ")
-      : "Tanpa add-on";
-    const addonCostBreakdown = selectedAddons.length
-      ? `${selectedAddons.map((addon) => `• ${addon.nameID}: *Rp ${addon.price.toLocaleString("id-ID")} × ${totalBoxes} box = Rp ${(addon.price * totalBoxes).toLocaleString("id-ID")}*`).join("\n")}
-• Total add-on: *Rp ${(addonsPerBox * totalBoxes).toLocaleString("id-ID")}*`
-      : "• Add-on: *Tidak ada*";
-    const fulfillmentSummary = requiresDeliveryAddress
-      ? "Online Delivery"
-      : "Ambil sendiri / kurir diatur pelanggan · pengambilan di Clean Plate Lab";
-    const deliveryLocationDetails = requiresDeliveryAddress
-      ? `
-• Alamat lengkap: *${address || "-"}*${
-          mapsUrl.trim()
-            ? `
-• Titik Google Maps: ${mapsUrl.trim()}`
-            : ""
-        }`
-      : "";
-
-    return `*CLEAN PLATE LAB MAKASSAR*
-_GOOD FOOD. CLEAR DATA. BETTER YOU._
-
-Halo Tim Clean Plate Lab, saya ingin memesan meal plan dengan rincian berikut:
-
-*PEMESAN*
-• Nama: *${name}*
-• WhatsApp: *${phone}*
-
-*DETAIL MEAL PLAN*
-• Target protein: *${selectedTier.tier}g per porsi*
-• Periode harga: *${whatsappPeriodLabel} · Rp ${selectedPrice.toLocaleString("id-ID")}/porsi*
-• Tanggal katering: *${formatOrderDate(startDate, "id-ID")} – ${formatOrderDate(endDate, "id-ID")}*
-• Jumlah: *${mealsPerDay} porsi/hari · ${totalBoxes} box (${totalDays} hari layanan)*
-• Jadwal layanan: *Senin–Sabtu, Minggu dan tanggal libur kitchen tidak dihitung*
-• Tanggal makan: ${serviceDates.join(", ")}
-• Jadwal makan: *${mealsPerDay === 1 ? `${singleMealReadyTime === "12:00" ? "Makan siang" : "Makan malam"} pukul ${formatReadyTime(readyTimeMeal1)}` : `Makan siang pukul ${formatReadyTime(readyTimeMeal1)} · Makan malam pukul ${formatReadyTime(readyTimeMeal2)}`}*
-• Custom per meal (berlaku sepanjang periode, harga tetap):
-${formatKitchenMealItems(mealItems)}
-• Porsi protein disesuaikan untuk memenuhi target protein.
-• Add-on: ${addonSummary}
-• Metode pengambilan/pengiriman: ${fulfillmentSummary}${deliveryLocationDetails}
-
-*RINCIAN BIAYA*
-• Harga paket: *Rp ${selectedPrice.toLocaleString("id-ID")} × ${totalBoxes} box = Rp ${(selectedPrice * totalBoxes).toLocaleString("id-ID")}*
-${addonCostBreakdown}
-
-*TOTAL BIAYA: Rp ${totalCost.toLocaleString("id-ID")}*
-
-Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasih.`;
+    return buildSimplifiedWhatsAppOrderMessage({
+      customerName: name,
+      phone,
+      referralCode: referralCode.trim(),
+      proteinTier: selectedTier.tier,
+      startDate,
+      endDate,
+      totalDays,
+      totalBoxes,
+      mealsPerDay,
+      singleMealReadyTime,
+      readyTimeMeal1,
+      readyTimeMeal2,
+      mealItems,
+      selectedAddons,
+      fulfillment,
+      address,
+      mapsUrl,
+      selectedPrice,
+      addonsPerBox,
+      totalCost,
+      centralKitchenAddress,
+    });
   };
 
   const handleReopenWhatsApp = () => {
@@ -757,6 +739,40 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
                           </div>
                         )}
                       </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-3 min-w-0 space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <label
+                        htmlFor={`${fieldId}-referral`}
+                        className="block font-display text-[10px] font-bold uppercase text-[#4D4D4D]"
+                      >
+                        {t("orderReferralCode") || "Kode Referral"}
+                      </label>
+                      <span className="font-sans text-[10px] text-[#6B7860]/70">
+                        {isIndonesian ? "Opsional" : "Optional"}
+                      </span>
+                    </div>
+                    <div className="relative">
+                      <Tag
+                        size={15}
+                        className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#6B7860]"
+                      />
+                      <Input
+                        id={`${fieldId}-referral`}
+                        type="text"
+                        autoComplete="off"
+                        value={referralCode}
+                        onChange={(event) =>
+                          setReferralCode(event.target.value)
+                        }
+                        placeholder={
+                          t("orderReferralPlaceholder") ||
+                          "Masukkan kode referral (jika ada)"
+                        }
+                        className="h-11 w-full max-w-full min-w-0 rounded-lg border-[#1E1E1E]/25 bg-white pl-9 pr-3 font-sans text-xs font-semibold transition-all duration-200 placeholder:font-normal placeholder:text-[#1E1E1E]/40"
+                      />
                     </div>
                   </div>
                 </section>
@@ -1572,6 +1588,17 @@ Mohon konfirmasi ketersediaan, total akhir, dan petunjuk pembayaran. Terima kasi
                       {phone}
                     </p>
                   </div>
+
+                  {referralCode.trim() ? (
+                    <div>
+                      <p className="font-display text-[9px] font-bold uppercase tracking-wider text-[#6B7860]">
+                        {t("orderReferralCode") || "Kode Referral"}
+                      </p>
+                      <p className="mt-0.5 font-mono text-xs font-bold text-[#3A4A30]">
+                        {referralCode.trim()}
+                      </p>
+                    </div>
+                  ) : null}
 
                   <div>
                     <p className="font-display text-[9px] font-bold uppercase tracking-wider text-[#6B7860]">

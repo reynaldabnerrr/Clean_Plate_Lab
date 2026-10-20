@@ -541,6 +541,8 @@ export function CplProvider({ children }) {
       orderName: "Nama Lengkap",
       orderPhone: "Nomor WhatsApp",
       orderPhonePlaceholder: "0812 3456 7890",
+      orderReferralCode: "Kode Referral",
+      orderReferralPlaceholder: "Masukkan kode referral (jika ada)",
       orderNameReqError: "Nama lengkap wajib diisi",
       orderPhoneReqError: "Nomor WhatsApp wajib diisi",
       orderPhoneMinError:
@@ -844,6 +846,8 @@ export function CplProvider({ children }) {
       orderName: "Full Name",
       orderPhone: "WhatsApp Phone Number",
       orderPhonePlaceholder: "0812 3456 7890",
+      orderReferralCode: "Referral Code",
+      orderReferralPlaceholder: "Enter referral code (if any)",
       orderNameReqError: "Full name is required",
       orderPhoneReqError: "WhatsApp phone number is required",
       orderPhoneMinError:
