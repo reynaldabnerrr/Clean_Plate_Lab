@@ -1,5 +1,4 @@
 import { addons, proteinTiers } from "../data/site.js";
-import { getMealById } from "../data/meals.js";
 import { isServiceDate } from "./kitchen.js";
 import { describeCustomization } from "./mealCustomization.js";
 

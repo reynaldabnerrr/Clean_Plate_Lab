@@ -2,7 +2,7 @@ import React, { useEffect, useId, useRef, useState } from "react";
 import { getServiceDates, getOrderDateError, isServiceDate, kitchenCopy } from "../lib/kitchen";
 import { KitchenBreakNotice } from "./KitchenBreakNotice";
 import { MealCustomization, MealCustomizationSummary } from "./MealCustomization";
-import { buildMealItems, normalizeMealCustomizations, formatKitchenMealItems } from "../lib/mealCustomization";
+import { buildMealItems, normalizeMealCustomizations } from "../lib/mealCustomization";
 import confetti from "canvas-confetti";
 import { useCpl } from "../hooks/useCpl";
 import { CplLogoImage } from "./CplLogo";
