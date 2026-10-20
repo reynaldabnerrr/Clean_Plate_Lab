@@ -7,9 +7,24 @@ import { LanguageWelcomeModal } from "./components/LanguageWelcomeModal";
 import { KitchenBreakNotice } from "./components/KitchenBreakNotice";
 import { WhatsAppFloatingCta } from "./components/WhatsAppFloatingCta";
 import HomePage from "./pages/HomePage";
-import AdminPage from "./pages/AdminPage";
+import { SectionErrorBoundary } from "./components/SectionErrorBoundary";
 import { analytics, trackEvent } from "./lib/analytics";
 import { useCpl } from "./hooks/useCpl";
+
+const AdminPage = React.lazy(() => import("./pages/AdminPage"));
+
+function AdminLoadingFallback() {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-[#FEFDF9] text-[#1E1E1E]">
+      <div className="flex flex-col items-center gap-3">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#1E1E1E] border-t-transparent" />
+        <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#6B7860]">
+          Memuat Admin Panel...
+        </span>
+      </div>
+    </div>
+  );
+}
 
 function HashScrollHandler() {
   const { hasSelectedLanguage } = useCpl();
@@ -167,7 +182,11 @@ export default function App() {
       <CplProvider>
         <HashScrollHandler />
         {isAdminPage ? (
-          <AdminPage />
+          <SectionErrorBoundary sectionName="Admin Panel">
+            <React.Suspense fallback={<AdminLoadingFallback />}>
+              <AdminPage />
+            </React.Suspense>
+          </SectionErrorBoundary>
         ) : (
           <div className="min-h-screen bg-[var(--cpl-cream)] text-[var(--cpl-dark)]">
             <LanguageWelcomeModal />
@@ -178,13 +197,15 @@ export default function App() {
             </main>
             <Footer />
             <WhatsAppFloatingCta hidden={orderModalOpen} />
-            <OrderModal
-              isOpen={orderModalOpen}
-              onClose={handleCloseOrder}
-              initialProteinTier={initialProteinTier}
-              initialMealsPerDay={initialMealsPerDay}
-              hasExplicitInitialValues={hasExplicitOrderDefaults}
-            />
+            <SectionErrorBoundary sectionName="Formulir Pemesanan">
+              <OrderModal
+                isOpen={orderModalOpen}
+                onClose={handleCloseOrder}
+                initialProteinTier={initialProteinTier}
+                initialMealsPerDay={initialMealsPerDay}
+                hasExplicitInitialValues={hasExplicitOrderDefaults}
+              />
+            </SectionErrorBoundary>
           </div>
         )}
       </CplProvider>

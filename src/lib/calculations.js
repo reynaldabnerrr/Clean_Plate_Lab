@@ -7,29 +7,40 @@ const GOAL_SETTINGS = {
 };
 
 function nearestProteinTier(target) {
+  const numTarget = Number(target);
+  if (!Number.isFinite(numTarget) || numTarget <= 0) {
+    return proteinTiers[0]?.protein || 40;
+  }
   return proteinTiers.reduce((nearest, tier) =>
-    Math.abs(tier.protein - target) < Math.abs(nearest.protein - target)
+    Math.abs(tier.protein - numTarget) < Math.abs(nearest.protein - numTarget)
       ? tier
       : nearest,
   ).protein;
 }
 
-export function calculateMacroTargets({
-  weight,
-  height,
-  age,
-  gender,
-  activity,
-  goal,
-}) {
-  const safeWeight = Number(weight);
-  const safeHeight = Number(height);
-  const safeAge = Number(age);
-  const safeActivity = Number(activity);
+export function calculateMacroTargets(params = {}) {
+  const {
+    weight = 70,
+    height = 170,
+    age = 25,
+    gender = "male",
+    activity = 1.375,
+    goal = "maintain",
+  } = params || {};
+
+  const rawWeight = Number(weight);
+  const safeWeight = Number.isFinite(rawWeight) && rawWeight > 0 ? rawWeight : 70;
+  const rawHeight = Number(height);
+  const safeHeight = Number.isFinite(rawHeight) && rawHeight > 0 ? rawHeight : 170;
+  const rawAge = Number(age);
+  const safeAge = Number.isFinite(rawAge) && rawAge > 0 ? rawAge : 25;
+  const rawActivity = Number(activity);
+  const safeActivity = Number.isFinite(rawActivity) && rawActivity > 0 ? rawActivity : 1.375;
+  const safeGender = gender === "female" ? "female" : "male";
   const settings = GOAL_SETTINGS[goal] || GOAL_SETTINGS.maintain;
 
   const bmr =
-    gender === "female"
+    safeGender === "female"
       ? 447.593 + 9.247 * safeWeight + 3.098 * safeHeight - 4.33 * safeAge
       : 88.362 + 13.397 * safeWeight + 4.799 * safeHeight - 5.677 * safeAge;
 

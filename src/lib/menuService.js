@@ -1,4 +1,4 @@
-import { supabase } from "./supabase";
+import { supabase } from "./supabase.js";
 
 export const PROTEIN_TIERS = [25, 40, 60, 80, 100];
 
@@ -58,6 +58,7 @@ const nutritionFormatters = new Map();
 
 /** Format nutrition data consistently with two decimal places. */
 export function formatNutritionValue(value, locale = "id-ID") {
+  if (value === null || value === undefined || value === "") return "—";
   const numericValue = Number(value);
   if (!Number.isFinite(numericValue)) return "—";
 
@@ -269,8 +270,21 @@ export const DEFAULT_WEEKLY_MENUS = [
   },
 ];
 
+const safeParseTags = (val, fallback) => {
+  if (Array.isArray(val)) return val;
+  if (typeof val === "string") {
+    try {
+      const parsed = JSON.parse(val);
+      if (Array.isArray(parsed)) return parsed;
+    } catch {
+      // Ignore JSON parse errors and return fallback
+    }
+  }
+  return fallback;
+};
+
 /** Normalize DB row to frontend camelCase item */
-export function normalizeMenuItem(row) {
+export function normalizeMenuItem(row = {}) {
   const nutritionByTier = normalizeNutritionByTier(
     row.nutrition_by_tier || row.nutritionByTier,
     row,
@@ -297,16 +311,8 @@ export function normalizeMenuItem(row) {
     kcal: defaultNutrition.kcal,
     availableProteinTiers: PROTEIN_TIERS,
     nutritionByTier,
-    tags_ID: Array.isArray(row.tags_id)
-      ? row.tags_id
-      : typeof row.tags_id === "string"
-        ? JSON.parse(row.tags_id || "[]")
-        : row.tags_ID || [row.day || "Today"],
-    tags_EN: Array.isArray(row.tags_en)
-      ? row.tags_en
-      : typeof row.tags_en === "string"
-        ? JSON.parse(row.tags_en || "[]")
-        : row.tags_EN || [row.day || "Today"],
+    tags_ID: safeParseTags(row.tags_id, row.tags_ID || [row.day || "Today"]),
+    tags_EN: safeParseTags(row.tags_en, row.tags_EN || [row.day || "Today"]),
     desc_ID: row.desc_id || row.desc_ID || "",
     desc_EN: row.desc_en || row.desc_EN || "",
     batch: row.batch || "CPL-BATCH",
@@ -433,6 +439,10 @@ const getDefaultWeeklyMenus = () =>
 
 /** Fetch all weekly menus from Supabase */
 export async function fetchWeeklyMenusFromSupabase() {
+  if (!supabase) {
+    return { data: sortMealsByDay(getDefaultWeeklyMenus()), isFromDb: false, error: null };
+  }
+
   try {
     const { data, error } = await supabase
       .from("this_week_menu")
@@ -460,6 +470,10 @@ export async function fetchWeeklyMenusFromSupabase() {
 
 /** Update or create the six fixed default slots without adding duplicates. */
 export async function seedDefaultWeeklyMenus() {
+  if (!supabase) {
+    return { success: false, error: "Supabase client is not configured." };
+  }
+
   try {
     const dbPayloads = DEFAULT_WEEKLY_MENUS.map((item) => toDatabaseFormat(item));
     const { data, error } = await supabase
@@ -477,6 +491,10 @@ export async function seedDefaultWeeklyMenus() {
 
 /** Create a new menu item in Supabase */
 export async function createWeeklyMenuItem(item) {
+  if (!supabase) {
+    return { success: false, error: "Supabase client is not configured." };
+  }
+
   try {
     const payload = toDatabaseFormat(item);
     const { data, error } = await supabase
@@ -494,6 +512,10 @@ export async function createWeeklyMenuItem(item) {
 
 /** Update an existing menu item in Supabase */
 export async function updateWeeklyMenuItem(id, item) {
+  if (!supabase) {
+    return { success: false, error: "Supabase client is not configured." };
+  }
+
   try {
     const payload = toDatabaseFormat(item);
     const { data, error } = await supabase
@@ -512,6 +534,10 @@ export async function updateWeeklyMenuItem(id, item) {
 
 /** Delete a menu item in Supabase */
 export async function deleteWeeklyMenuItem(id) {
+  if (!supabase) {
+    return { success: false, error: "Supabase client is not configured." };
+  }
+
   try {
     const { error } = await supabase
       .from("this_week_menu")
@@ -528,6 +554,10 @@ export async function deleteWeeklyMenuItem(id) {
 
 /** Toggle availability of a menu item */
 export async function toggleWeeklyMenuItemAvailability(id, currentAvailableState) {
+  if (!supabase) {
+    return { success: false, error: "Supabase client is not configured." };
+  }
+
   try {
     const { data, error } = await supabase
       .from("this_week_menu")

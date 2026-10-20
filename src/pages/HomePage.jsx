@@ -8,6 +8,7 @@ import { FaqSection } from "../components/FaqSection";
 
 import { FounderSection } from "../components/FounderSection";
 import { MacroCalculator } from "../components/MacroCalculator";
+import { SectionErrorBoundary } from "../components/SectionErrorBoundary";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { Card } from "../components/ui/card";
@@ -243,13 +244,19 @@ export default function HomePage({ onBuild }) {
         </div>
       </section>
 
-      <ThisWeekMenuSection />
+      <SectionErrorBoundary sectionName="Menu Minggu Ini">
+        <ThisWeekMenuSection />
+      </SectionErrorBoundary>
 
-      <MenuArchiveSection />
+      <SectionErrorBoundary sectionName="Arsip Menu">
+        <MenuArchiveSection />
+      </SectionErrorBoundary>
 
-      <MacroCalculator
-        onOpenOrder={(proteinTier) => onBuild("calculator", proteinTier, 2)}
-      />
+      <SectionErrorBoundary sectionName="Kalkulator Makro">
+        <MacroCalculator
+          onOpenOrder={(proteinTier) => onBuild("calculator", proteinTier, 2)}
+        />
+      </SectionErrorBoundary>
 
       <section
         id="why-cpl"

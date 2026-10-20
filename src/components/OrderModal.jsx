@@ -177,6 +177,12 @@ export function OrderModal({
         : [...ids, optionId];
     }));
   };
+  const setCustomizationForMeal = (index, newIds) => {
+    setMealCustomizations((current) => current.map((ids, itemIndex) => {
+      if (itemIndex !== index) return ids;
+      return newIds;
+    }));
+  };
   const [addonIds, setAddonIds] = useState(storedDraft?.addonIds ?? []);
   const [fulfillment, setFulfillment] = useState(
     storedDraft?.fulfillment ?? "Self-arranged",
@@ -901,8 +907,28 @@ export function OrderModal({
                   </div>
                 </section>
 
+                <section aria-labelledby={`${fieldId}-customization-title`}>
+                  <div className="mb-3 flex items-center gap-2.5">
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#1E1E1E] font-mono text-[10px] font-bold text-white">
+                      03
+                    </span>
+                    <h3
+                      id={`${fieldId}-customization-title`}
+                      className="min-w-0 font-display text-xs font-extrabold uppercase"
+                    >
+                      {isIndonesian ? "Kustomisasi Meal (Bebas Biaya)" : "Meal Customization (Free)"}
+                    </h3>
+                    <span className="h-px min-w-[8px] flex-1 bg-[#1E1E1E]/15" />
+                  </div>
+                  <MealCustomization
+                    items={mealItems}
+                    language={language}
+                    onChange={toggleCustomization}
+                    onSetCustomization={setCustomizationForMeal}
+                  />
+                </section>
+
                 <section aria-labelledby={`${fieldId}-addons-title`}>
-                  <MealCustomization items={mealItems} language={language} onChange={toggleCustomization} />
                   <div className="mb-3 flex items-center gap-2.5">
                     <h3
                       id={`${fieldId}-addons-title`}
