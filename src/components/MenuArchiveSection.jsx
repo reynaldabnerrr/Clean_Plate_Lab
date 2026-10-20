@@ -76,7 +76,7 @@ export function MenuArchiveSection() {
         </div>
 
         <div
-          className="mt-6 grid grid-cols-3 border-2 border-[#1E1E1E] sm:mt-10"
+          className="mt-6 grid grid-cols-3 divide-x-2 divide-[#1E1E1E] border-2 border-[#1E1E1E] sm:mt-10"
           role="tablist"
           aria-label={copy.menu.weekFilter}
         >
@@ -88,7 +88,7 @@ export function MenuArchiveSection() {
               aria-selected={activeWeek === week}
               aria-controls="weekly-menu-panel"
               onClick={() => setActiveWeek(week)}
-              className={`min-h-11 border-r border-[#1E1E1E] px-1 font-display text-[9px] font-extrabold uppercase tracking-wide transition-colors last:border-r-0 sm:min-h-14 sm:px-4 sm:text-xs sm:tracking-wider ${activeWeek === week ? "bg-[#1E1E1E] text-white" : "bg-[var(--cpl-cream)] hover:bg-[var(--cpl-sage-light)]"}`}
+              className={`min-h-11 px-1 font-display text-[9px] font-extrabold uppercase tracking-wide transition-colors sm:min-h-14 sm:px-4 sm:text-xs sm:tracking-wider ${activeWeek === week ? "bg-[#1E1E1E] text-white" : "bg-[var(--cpl-cream)] hover:bg-[var(--cpl-sage-light)]"}`}
             >
               {copy.menu.week} {week}
             </button>
@@ -183,7 +183,7 @@ export function MenuArchiveSection() {
                         {copy.menu.chooseTier}
                       </p>
                       <div
-                        className="mt-2 grid grid-cols-5 border-2 border-[#1E1E1E]"
+                        className="mt-2 grid grid-cols-5 divide-x divide-[#1E1E1E] border-2 border-[#1E1E1E]"
                         role="radiogroup"
                         aria-label={`${copy.menu.chooseTier}: ${meal.name}`}
                       >
@@ -199,7 +199,7 @@ export function MenuArchiveSection() {
                                 [meal.id]: tier,
                               }))
                             }
-                            className={`min-h-10 border-r border-[#1E1E1E] px-1 font-mono text-[9px] font-bold last:border-r-0 sm:min-h-11 sm:text-[10px] ${selectedTier === tier ? "bg-[#1E1E1E] text-white" : "bg-[var(--cpl-cream)] hover:bg-[var(--cpl-sage-light)]"}`}
+                            className={`min-h-10 px-1 font-mono text-[9px] font-bold sm:min-h-11 sm:text-[10px] ${selectedTier === tier ? "bg-[#1E1E1E] text-white" : "bg-[var(--cpl-cream)] hover:bg-[var(--cpl-sage-light)]"}`}
                           >
                             {tier}g
                           </button>

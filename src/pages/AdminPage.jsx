@@ -891,7 +891,7 @@ export default function AdminPage() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Cari hidangan menu, hari, atau kategori..."
-                    className="w-full rounded-xl border border-[#1E1E1E] bg-[#FEFDF9] py-2 pl-10 pr-4 text-xs font-bold text-[#1E1E1E] placeholder-gray-400 focus:outline-none focus:border-[#8D9B7D]"
+                    className="w-full rounded-xl border border-[#1E1E1E] bg-[#FEFDF9] py-2 pl-10 pr-4 text-xs font-bold text-[#1E1E1E] placeholder:text-gray-400 focus:outline-none focus:border-[#8D9B7D]"
                   />
                 </div>
 
