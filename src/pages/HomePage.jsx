@@ -99,7 +99,7 @@ export default function HomePage({ onBuild }) {
             {copy.how.steps.map((step, index) => (
               <article
                 key={step.title}
-                className="grid grid-cols-[2.5rem_1fr] gap-x-3 border-b border-white/25 p-4 last:border-b-0 sm:p-5 md:block md:border-b-0 md:border-r md:p-9 md:last:border-r-0"
+                className="grid grid-cols-[2.5rem_1fr] gap-x-3 border-b border-white/25 p-4 sm:p-5 md:block md:border-b-0 md:border-r md:p-9 md:last:border-r-0"
               >
                 <span className="row-span-2 font-mono text-xs font-bold text-[#8D9B7D] md:row-span-auto">
                   0{index + 1}
@@ -145,11 +145,10 @@ export default function HomePage({ onBuild }) {
                     type="button"
                     aria-pressed={isActive}
                     onClick={() => setPricingPeriod(period)}
-                    className={`min-h-12 px-2 py-1.5 font-display text-[10px] font-extrabold uppercase tracking-wider transition-colors focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8D9B7D] focus-visible:ring-inset sm:min-h-14 sm:text-xs ${
-                      isActive
-                        ? "bg-[#8D9B7D] text-white"
-                        : "bg-white text-[#1E1E1E] hover:bg-[#E1ECD3] hover:text-[#6B7860]"
-                    }`}
+                    className={`min-h-12 px-2 py-1.5 font-display text-[10px] font-extrabold uppercase tracking-wider transition-colors focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8D9B7D] focus-visible:ring-inset sm:min-h-14 sm:text-xs ${isActive
+                      ? "bg-[#8D9B7D] text-white"
+                      : "bg-white text-[#1E1E1E] hover:bg-[#E1ECD3] hover:text-[#6B7860]"
+                      }`}
                   >
                     <span className="block">{copy.protein[period]}</span>
                     <span
