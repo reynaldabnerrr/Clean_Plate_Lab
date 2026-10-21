@@ -25,14 +25,14 @@ const SelectTrigger = React.forwardRef(({ className, children, ...props }, ref) 
 ));
 SelectTrigger.displayName = SelectPrimitive.Trigger.displayName;
 
-const SelectContent = React.forwardRef(({ className, children, position = 'popper', ...props }, ref) => (
-  <SelectPrimitive.Portal>
+const SelectContent = React.forwardRef(({ className, children, position = 'popper', container, ...props }, ref) => (
+  <SelectPrimitive.Portal container={container}>
     <SelectPrimitive.Content
       ref={ref}
       position={position}
       sideOffset={7}
       className={cn(
-        'relative z-[80] max-h-80 min-w-[var(--radix-select-trigger-width)] overflow-hidden rounded-2xl border-2 border-[#1E1E1E] bg-[#FEFDF9] p-1.5 text-[#1E1E1E] shadow-[7px_7px_0_rgba(30,30,30,0.92)] data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
+        'relative z-[200] max-h-80 min-w-[var(--radix-select-trigger-width)] overflow-hidden rounded-2xl border-2 border-[#1E1E1E] bg-[#FEFDF9] p-1.5 text-[#1E1E1E] shadow-[7px_7px_0_rgba(30,30,30,0.92)] data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
         position === 'popper' && 'data-[side=bottom]:translate-y-1 data-[side=top]:-translate-y-1',
         className,
       )}

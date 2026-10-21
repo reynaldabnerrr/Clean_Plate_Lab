@@ -1095,3 +1095,45 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 .cpl-cal-popup .cpl-cal-months {
   grid-template-columns: 1fr 1px 1fr;
 }
+
+/* Ensure Radix Popper dropdowns appear above Radix Dialog modals (z-110) */
+[data-radix-popper-content-wrapper] {
+  z-index: 200 !important;
+}
+
+/* Shake animation for invalid form field feedback */
+@keyframes cpl-shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  15% {
+    transform: translateX(-7px);
+  }
+  30% {
+    transform: translateX(7px);
+  }
+  45% {
+    transform: translateX(-5px);
+  }
+  60% {
+    transform: translateX(5px);
+  }
+  75% {
+    transform: translateX(-2px);
+  }
+  90% {
+    transform: translateX(2px);
+  }
+}
+
+.animate-shake {
+  animation: cpl-shake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-shake {
+    animation: none;
+  }
+}
+
+

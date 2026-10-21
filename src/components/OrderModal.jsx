@@ -177,7 +177,7 @@ export function OrderModal({
         : [...ids, optionId];
     }));
   };
-  const setCustomizationForMeal = (index, newIds) => {
+  const handleSetCustomization = (index, newIds) => {
     setMealCustomizations((current) => current.map((ids, itemIndex) => {
       if (itemIndex !== index) return ids;
       return newIds;
@@ -450,12 +450,73 @@ export function OrderModal({
     return newErrors;
   };
 
+  const triggerShakeAndScroll = (validationErrors) => {
+    const errorKeys = Object.keys(validationErrors);
+    if (errorKeys.length === 0) return;
+
+    const errorPriority = [
+      "name",
+      "phone",
+      "startDate",
+      "endDate",
+      "address",
+      "mapsUrl",
+    ];
+    const firstKey = errorPriority.find((key) => errorKeys.includes(key));
+
+    const elementMap = {
+      name: { target: `${fieldId}-name`, group: `${fieldId}-name-group` },
+      phone: { target: `${fieldId}-phone`, group: `${fieldId}-phone-group` },
+      startDate: { target: `${fieldId}-dates-group`, group: `${fieldId}-dates-group` },
+      endDate: { target: `${fieldId}-dates-group`, group: `${fieldId}-dates-group` },
+      address: { target: `${fieldId}-address`, group: `${fieldId}-address-group` },
+      mapsUrl: { target: `${fieldId}-maps-url`, group: `${fieldId}-maps-url-group` },
+    };
+
+    // Apply shake animation to all invalid field groups
+    errorKeys.forEach((key) => {
+      const groupId = elementMap[key]?.group;
+      if (!groupId) return;
+      const groupEl = document.getElementById(groupId);
+      if (groupEl) {
+        groupEl.classList.remove("animate-shake");
+        // Force reflow so animation re-triggers reliably
+        void groupEl.offsetWidth;
+        groupEl.classList.add("animate-shake");
+        groupEl.addEventListener(
+          "animationend",
+          () => groupEl.classList.remove("animate-shake"),
+          { once: true },
+        );
+      }
+    });
+
+    // Smoothly scroll up to the first problematic field and focus it
+    if (firstKey && elementMap[firstKey]) {
+      const targetId = elementMap[firstKey].target;
+      const targetEl = document.getElementById(targetId);
+      if (targetEl) {
+        targetEl.scrollIntoView({ behavior: "smooth", block: "center" });
+        if (typeof targetEl.focus === "function") {
+          try {
+            targetEl.focus({ preventScroll: true });
+          } catch {
+            // ignore if element cannot be focused
+          }
+        }
+      }
+    }
+  };
+
   const handleSubmit = (event) => {
     event.preventDefault();
 
     const validationErrors = validateForm();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
+      setTimeout(() => {
+        triggerShakeAndScroll(validationErrors);
+      }, 30);
       return;
     }
 
@@ -549,6 +610,9 @@ export function OrderModal({
     if (Object.keys(validationErrors).length) {
       setErrors(validationErrors);
       setSubmitted(false);
+      setTimeout(() => {
+        triggerShakeAndScroll(validationErrors);
+      }, 30);
       return;
     }
     const message = buildWhatsAppMessage();
@@ -641,7 +705,7 @@ export function OrderModal({
                   </div>
 
                   <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
-                    <div className="min-w-0 space-y-1.5">
+                    <div id={`${fieldId}-name-group`} className="min-w-0 space-y-1.5 transition-transform">
                       <label
                         htmlFor={`${fieldId}-name`}
                         className="block font-display text-[10px] font-bold uppercase text-[#4D4D4D]"
@@ -690,7 +754,7 @@ export function OrderModal({
                       </div>
                     </div>
 
-                    <div className="min-w-0 space-y-1.5">
+                    <div id={`${fieldId}-phone-group`} className="min-w-0 space-y-1.5 transition-transform">
                       <label
                         htmlFor={`${fieldId}-phone`}
                         className="block font-display text-[10px] font-bold uppercase text-[#4D4D4D]"
@@ -924,7 +988,7 @@ export function OrderModal({
                     items={mealItems}
                     language={language}
                     onChange={toggleCustomization}
-                    onSetCustomization={setCustomizationForMeal}
+                    onSetCustomization={handleSetCustomization}
                   />
                 </section>
 
@@ -976,8 +1040,9 @@ export function OrderModal({
               </div>
 
               <section
+                id={`${fieldId}-dates-group`}
                 aria-labelledby={`${fieldId}-delivery-title`}
-                className="min-w-0"
+                className="min-w-0 transition-transform"
               >
                 <div className="mb-3 flex items-center gap-2.5">
                   <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#1E1E1E] font-mono text-[10px] font-bold text-white">
@@ -1195,7 +1260,7 @@ export function OrderModal({
 
                 {requiresDeliveryAddress ? (
                   <div className="mt-4 space-y-3">
-                    <div className="space-y-1.5">
+                    <div id={`${fieldId}-address-group`} className="space-y-1.5 transition-transform">
                       <label
                         htmlFor={`${fieldId}-address`}
                         className="block font-display text-[10px] font-bold uppercase text-[#4D4D4D]"
@@ -1246,7 +1311,7 @@ export function OrderModal({
                       </div>
                     </div>
 
-                    <div className="space-y-1.5">
+                    <div id={`${fieldId}-maps-url-group`} className="space-y-1.5 transition-transform">
                       <label
                         htmlFor={`${fieldId}-maps-url`}
                         className="block font-display text-[10px] font-bold uppercase text-[#4D4D4D]"
