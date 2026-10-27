@@ -187,6 +187,9 @@ export function OrderModal({
   const [fulfillment, setFulfillment] = useState(
     storedDraft?.fulfillment ?? "Self-arranged",
   );
+  const [cutlery, setCutlery] = useState(
+    ["yes", "no"].includes(storedDraft?.cutlery) ? storedDraft.cutlery : "",
+  );
   const [address, setAddress] = useState("");
   const [mapsUrl, setMapsUrl] = useState(storedDraft?.mapsUrl ?? "");
   const [copiedMapLink, setCopiedMapLink] = useState(false);
@@ -237,6 +240,11 @@ export function OrderModal({
           "Paket standar menggunakan nasi putih. Opsi Baby Potato + Jagung menggantikan nasi putih, bukan menambah karbo baru. Semua biaya dihitung per box.",
         addonTotal: "Total ganti karbo",
         fulfillment: "Metode pengambilan / pengiriman",
+        cutlery: "Perlu alat makan (cutlery)?",
+        cutleryYes: "Ya, perlu alat makan",
+        cutleryNo: "Tidak perlu alat makan",
+        cutleryHint: "Kami siapkan hanya jika diperlukan.",
+        cutleryRequired: "Pilih kebutuhan alat makan.",
         onlineDelivery: "Online Delivery",
         selfArranged: "Ambil Sendiri / Atur Kurir",
         centralKitchen: "Alamat Clean Plate Lab",
@@ -268,6 +276,11 @@ export function OrderModal({
           "The standard meal includes white rice. Baby Potato + Corn replaces the white rice—it is not an additional carb. All charges are calculated per box.",
         addonTotal: "Carb swap total",
         fulfillment: "Pickup or delivery method",
+        cutlery: "Need cutlery?",
+        cutleryYes: "Yes, I need cutlery",
+        cutleryNo: "No cutlery needed",
+        cutleryHint: "We include it only when needed.",
+        cutleryRequired: "Please choose whether you need cutlery.",
         onlineDelivery: "Online Delivery",
         selfArranged: "Self-pickup / Arrange courier",
         centralKitchen: "Clean Plate Lab address",
@@ -329,6 +342,7 @@ export function OrderModal({
       addonIds,
       mealCustomizations,
       fulfillment,
+      cutlery,
       referralCode,
     });
   }, [
@@ -336,6 +350,7 @@ export function OrderModal({
     addonIds,
     endDate,
     fulfillment,
+    cutlery,
     mealsPerDay,
     proteinTier,
     referralCode,
@@ -438,6 +453,10 @@ export function OrderModal({
         t("orderAddressReqError") || "Alamat pengiriman lengkap wajib diisi";
     }
 
+    if (!cutlery) {
+      newErrors.cutlery = orderCopy.cutleryRequired;
+    }
+
     if (
       requiresDeliveryAddress &&
       mapsUrl.trim() &&
@@ -461,6 +480,7 @@ export function OrderModal({
       "endDate",
       "address",
       "mapsUrl",
+      "cutlery",
     ];
     const firstKey = errorPriority.find((key) => errorKeys.includes(key));
 
@@ -471,6 +491,7 @@ export function OrderModal({
       endDate: { target: `${fieldId}-dates-group`, group: `${fieldId}-dates-group` },
       address: { target: `${fieldId}-address`, group: `${fieldId}-address-group` },
       mapsUrl: { target: `${fieldId}-maps-url`, group: `${fieldId}-maps-url-group` },
+      cutlery: { target: `${fieldId}-cutlery-yes`, group: `${fieldId}-cutlery-group` },
     };
 
     // Apply shake animation to all invalid field groups
@@ -540,6 +561,7 @@ export function OrderModal({
       items: mealItems,
       proteinTier,
       fulfillment,
+      cutlery,
       address,
       mapsUrl,
       amount: totalCost,
@@ -596,6 +618,7 @@ export function OrderModal({
       mealItems,
       selectedAddons,
       fulfillment,
+      cutlery,
       address,
       mapsUrl,
       selectedPrice,
@@ -1410,6 +1433,60 @@ export function OrderModal({
                   </div>
                 )}
 
+                <fieldset
+                  id={`${fieldId}-cutlery-group`}
+                  aria-invalid={Boolean(errors.cutlery)}
+                  aria-describedby={errors.cutlery ? `${fieldId}-cutlery-error` : undefined}
+                  className={`mt-4 min-w-0 rounded-xl border p-3.5 transition-transform sm:p-4 ${errors.cutlery ? "border-[#C93B2B] bg-[#FFF5F4]" : "border-[#8D9B7D]/45 bg-[#F2F6ED]"}`}
+                >
+                  <legend className="px-1 font-display text-[11px] font-extrabold uppercase text-[#1E1E1E]">
+                    <span className="inline-flex items-center gap-2">
+                      <UtensilsCrossed size={15} className="text-[#6B7860]" aria-hidden="true" />
+                      {orderCopy.cutlery}
+                    </span>
+                  </legend>
+                  <p className="mb-3 mt-0.5 text-[10px] leading-4 text-[#6B7860]">
+                    {orderCopy.cutleryHint}
+                  </p>
+                  <div className="grid grid-cols-2 gap-2.5">
+                    {[
+                      { value: "yes", label: orderCopy.cutleryYes },
+                      { value: "no", label: orderCopy.cutleryNo },
+                    ].map((option) => (
+                      <label
+                        key={option.value}
+                        className={`flex min-h-[3.25rem] cursor-pointer items-center gap-2.5 rounded-lg border-2 px-3 py-2 font-display text-[10px] font-extrabold leading-tight transition-colors focus-within:ring-2 focus-within:ring-[#D1954E] focus-within:ring-offset-2 ${cutlery === option.value ? "border-[#1E1E1E] bg-[#1E1E1E] text-white" : "border-[#1E1E1E]/15 bg-white text-[#1E1E1E] hover:border-[#8D9B7D]"}`}
+                      >
+                        <input
+                          id={`${fieldId}-cutlery-${option.value}`}
+                          type="radio"
+                          name={`${fieldId}-cutlery`}
+                          value={option.value}
+                          checked={cutlery === option.value}
+                          required
+                          onChange={() => {
+                            setCutlery(option.value);
+                            setErrors((current) => ({ ...current, cutlery: undefined }));
+                          }}
+                          className="sr-only"
+                        />
+                        <span
+                          aria-hidden="true"
+                          className={`grid size-4 shrink-0 place-items-center rounded-full border ${cutlery === option.value ? "border-[#C8D8B8] bg-[#C8D8B8] text-[#1E1E1E]" : "border-[#8D9B7D] bg-white"}`}
+                        >
+                          {cutlery === option.value && <Check size={11} strokeWidth={3} />}
+                        </span>
+                        <span>{option.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                  {errors.cutlery && (
+                    <p id={`${fieldId}-cutlery-error`} role="alert" className="mt-2.5 text-[10px] font-bold text-[#8A1F17]">
+                      {errors.cutlery}
+                    </p>
+                  )}
+                </fieldset>
+
                 <div
                   className="mt-5 overflow-hidden rounded-2xl border-2 border-[#8D9B7D] bg-[#E1ECD3]"
                   aria-live="polite"
@@ -1479,6 +1556,17 @@ export function OrderModal({
                           </p>
                           <p className="mt-0.5 text-[10px] font-bold text-[#1E1E1E]">
                             {selectedFulfillmentLabel}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-2.5 py-2.5">
+                        <UtensilsCrossed size={14} className="mt-0.5 shrink-0 text-[#6B7860]" />
+                        <div className="min-w-0">
+                          <p className="font-display text-[8px] font-bold uppercase tracking-wide text-[#6B7860]">
+                            {orderCopy.cutlery}
+                          </p>
+                          <p className="mt-0.5 text-[10px] font-bold text-[#1E1E1E]">
+                            {cutlery === "yes" ? orderCopy.cutleryYes : cutlery === "no" ? orderCopy.cutleryNo : "—"}
                           </p>
                         </div>
                       </div>
@@ -1746,6 +1834,12 @@ export function OrderModal({
                     </p>
                     <p className="mt-0.5 text-[10px] font-bold text-[#1E1E1E]">
                       {selectedFulfillmentLabel}
+                    </p>
+                    <p className="mt-2 font-display text-[9px] font-bold uppercase tracking-wider text-[#6B7860]">
+                      {orderCopy.cutlery}
+                    </p>
+                    <p className="mt-0.5 text-[10px] font-bold text-[#1E1E1E]">
+                      {cutlery === "yes" ? orderCopy.cutleryYes : orderCopy.cutleryNo}
                     </p>
                     {requiresDeliveryAddress ? (
                       <div className="sm:col-span-2">

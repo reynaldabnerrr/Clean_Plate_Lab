@@ -39,6 +39,7 @@ test("buildSimplifiedWhatsAppOrderMessage exactly matches the example in the bri
     readyTimeMeal1: "12:00",
     mealItems: [{ mealNumber: 1, customizationIds: [] }],
     selectedAddons: [],
+    cutlery: "yes",
     fulfillment: "Online-delivery",
     address: "Kantor Notaris Widartiningsih, Jalan Gunung Bawakaraeng No. 75 B",
     mapsUrl: "https://maps.app.goo.gl/fgnmuE5B8scMuwdB6?g_st=ic",
@@ -63,6 +64,7 @@ Jumlah: 2 box (2 hari)
 Jadwal makan: Makan siang, pukul 12.00
 Kustomisasi: Meal lengkap
 Add-on: Tidak ada
+Alat makan (cutlery): Ya, perlu alat makan
 
 PENGIRIMAN
 Metode: Online Delivery
@@ -94,6 +96,7 @@ test("omits referral line when referral code is empty or whitespace", () => {
     readyTimeMeal1: "12:00",
     mealItems: [{ mealNumber: 1, customizationIds: [] }],
     selectedAddons: [],
+    cutlery: "no",
     fulfillment: "Online-delivery",
     address: "Jl. Veteran No. 10",
     selectedPrice: 50000,
@@ -103,6 +106,7 @@ test("omits referral line when referral code is empty or whitespace", () => {
   assert.ok(!message.includes("Kode referral:"));
   assert.ok(message.includes("Nama: Budi Santoso"));
   assert.ok(message.includes("WhatsApp: 081234567890"));
+  assert.ok(message.includes("Alat makan (cutlery): Tidak perlu alat makan"));
 });
 
 test("handles addons, two meals per day, and pickup method dynamically", () => {
@@ -129,6 +133,7 @@ test("handles addons, two meals per day, and pickup method dynamically", () => {
         price: 5000,
       },
     ],
+    cutlery: "yes",
     fulfillment: "Self-arranged",
     selectedPrice: 65000,
     totalCost: 420000,

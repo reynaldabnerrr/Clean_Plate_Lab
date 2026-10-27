@@ -64,6 +64,7 @@ export function buildSimplifiedWhatsAppOrderMessage({
   readyTimeMeal2 = "18:00",
   mealItems = [],
   selectedAddons = [],
+  cutlery = "",
   fulfillment = "Online-delivery",
   address = "",
   mapsUrl = "",
@@ -171,6 +172,7 @@ Jumlah: ${totalBoxes} box (${totalDays} hari)
 Jadwal makan: ${scheduleText}
 Kustomisasi: ${customizationText}
 Add-on: ${addonText}
+Alat makan (cutlery): ${cutlery === "yes" ? "Ya, perlu alat makan" : cutlery === "no" ? "Tidak perlu alat makan" : "-"}
 
 PENGIRIMAN
 ${deliveryLines.join("\n")}
@@ -305,6 +307,7 @@ export function buildWhatsAppMessage(order) {
     readyTimeMeal2: order.readyTimeMeal2 || "18:00",
     mealItems: order.items || [],
     selectedAddons,
+    cutlery: order.cutlery,
     fulfillment: order.fulfillment || order.deliveryMethod || "Online-delivery",
     address: order.address || order.deliveryAddress,
     mapsUrl: order.mapsUrl,
