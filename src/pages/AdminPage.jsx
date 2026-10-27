@@ -128,8 +128,8 @@ export default function AdminPage() {
     try {
       const res = await fetch(
         `https://api.mymemory.translated.net/get?q=${encodeURIComponent(
-          formState.desc_ID
-        )}&langpair=id|en`
+          formState.desc_ID,
+        )}&langpair=id|en`,
       );
       const data = await res.json();
       if (data?.responseData?.translatedText) {
@@ -194,7 +194,9 @@ export default function AdminPage() {
         setAdminUsers(res.data);
       }
       if (res.error) {
-        setUserMgmtError(res.error.message || "Gagal memuat daftar akun admin.");
+        setUserMgmtError(
+          res.error.message || "Gagal memuat daftar akun admin.",
+        );
       }
     } finally {
       setLoadingUsers(false);
@@ -217,7 +219,9 @@ export default function AdminPage() {
     setAuthLoading(false);
 
     if (!res.success) {
-      setAuthError(res.error || "Login gagal. Periksa email dan password Anda.");
+      setAuthError(
+        res.error || "Login gagal. Periksa email dan password Anda.",
+      );
     }
   };
 
@@ -237,9 +241,7 @@ export default function AdminPage() {
       name: item.name || "",
       day: item.day || "Monday / Senin",
       menuDate:
-        item.menuDate
-        || item.menu_date
-        || getWeeklyMenuDate(getMenuSlot(item)),
+        item.menuDate || item.menu_date || getWeeklyMenuDate(getMenuSlot(item)),
       protein: item.protein ?? 80,
       carbs: item.carbs ?? 120,
       fat: item.fat ?? 25,
@@ -248,8 +250,12 @@ export default function AdminPage() {
       potassium: item.potassium ?? 350,
       kcal: item.kcal ?? 1050,
       nutritionByTier: normalizeNutritionByTier(item.nutritionByTier, item),
-      tags_ID: Array.isArray(item.tags_ID) ? item.tags_ID : [item.day || "Today"],
-      tags_EN: Array.isArray(item.tags_EN) ? item.tags_EN : [item.day || "Today"],
+      tags_ID: Array.isArray(item.tags_ID)
+        ? item.tags_ID
+        : [item.day || "Today"],
+      tags_EN: Array.isArray(item.tags_EN)
+        ? item.tags_EN
+        : [item.day || "Today"],
       desc_ID: item.desc_ID || "",
       desc_EN: item.desc_EN || "",
       batch: item.batch || "BATCH-01",
@@ -303,18 +309,20 @@ export default function AdminPage() {
     if (!isEditing) {
       const dayKeyword = (formState.day || "").slice(0, 3).toLowerCase();
       const existingMeal = menuItems.find((item) =>
-        (item.day || "").toLowerCase().includes(dayKeyword)
+        (item.day || "").toLowerCase().includes(dayKeyword),
       );
       if (existingMeal) {
         alert(
-          `Hari "${formState.day}" sudah memiliki menu (${existingMeal.name}). Katalog katering ini khusus 6 hari (Senin - Sabtu). Silakan gunakan tombol Edit pada menu "${existingMeal.name}" untuk memperbaruinya.`
+          `Hari "${formState.day}" sudah memiliki menu (${existingMeal.name}). Katalog katering ini khusus 6 hari (Senin - Sabtu). Silakan gunakan tombol Edit pada menu "${existingMeal.name}" untuk memperbaruinya.`,
         );
         return;
       }
     }
 
     if (!isEditing && menuItems.length >= 6) {
-      alert("Katalog sudah memiliki 6 menu. Edit salah satu slot atau hapus slot terlebih dahulu.");
+      alert(
+        "Katalog sudah memiliki 6 menu. Edit salah satu slot atau hapus slot terlebih dahulu.",
+      );
       return;
     }
 
@@ -333,7 +341,9 @@ export default function AdminPage() {
 
       setEditModalOpen(false);
       setStatusMessage(
-        isEditing ? "Menu berhasil diperbarui!" : "Menu baru berhasil ditambahkan!"
+        isEditing
+          ? "Menu berhasil diperbarui!"
+          : "Menu baru berhasil ditambahkan!",
       );
       setTimeout(() => setStatusMessage(""), 4000);
     } finally {
@@ -362,7 +372,7 @@ export default function AdminPage() {
   const handleSeedPresets = async () => {
     if (
       !window.confirm(
-        "Perbarui 6 slot menu dengan preset Clean Plate Lab? Data pada slot Senin-Sabtu akan diganti, tanpa menambah baris baru."
+        "Perbarui 6 slot menu dengan preset Clean Plate Lab? Data pada slot Senin-Sabtu akan diganti, tanpa menambah baris baru.",
       )
     )
       return;
@@ -400,7 +410,9 @@ export default function AdminPage() {
 
     if (res.success) {
       if (res.requiresEmailConfirmation) {
-        setPassSuccess(res.message || "Tautan reset password telah dikirim ke email Anda.");
+        setPassSuccess(
+          res.message || "Tautan reset password telah dikirim ke email Anda.",
+        );
       } else {
         setPassSuccess("Password berhasil diubah!");
       }
@@ -525,7 +537,10 @@ export default function AdminPage() {
                   Email Admin
                 </label>
                 <div className="relative">
-                  <Mail size={16} className="absolute left-3.5 top-3.5 text-gray-400" />
+                  <Mail
+                    size={16}
+                    className="absolute left-3.5 top-3.5 text-gray-400"
+                  />
                   <input
                     type="email"
                     required
@@ -542,7 +557,10 @@ export default function AdminPage() {
                   Password
                 </label>
                 <div className="relative">
-                  <Lock size={16} className="absolute left-3.5 top-3.5 text-gray-400" />
+                  <Lock
+                    size={16}
+                    className="absolute left-3.5 top-3.5 text-gray-400"
+                  />
                   <input
                     type={showPassword ? "text" : "password"}
                     required
@@ -568,7 +586,10 @@ export default function AdminPage() {
               >
                 {authLoading ? (
                   <span className="flex items-center gap-2">
-                    <RefreshCw size={15} className="animate-spin text-[#8D9B7D]" />
+                    <RefreshCw
+                      size={15}
+                      className="animate-spin text-[#8D9B7D]"
+                    />
                     Memverifikasi...
                   </span>
                 ) : (
@@ -712,7 +733,10 @@ export default function AdminPage() {
                 {userRole.toUpperCase()}
               </span>
             </div>
-            <p className="font-mono text-xs font-bold text-white truncate" title={loggedInEmail}>
+            <p
+              className="font-mono text-xs font-bold text-white truncate"
+              title={loggedInEmail}
+            >
               {loggedInEmail}
             </p>
           </div>
@@ -766,16 +790,16 @@ export default function AdminPage() {
                     {activeTab === "menu"
                       ? "Katalog Menu Minggu Ini"
                       : activeTab === "users"
-                      ? "User Management"
-                      : "Pengaturan Keamanan Password"}
+                        ? "User Management"
+                        : "Pengaturan Keamanan Password"}
                   </span>
                 </div>
                 <h2 className="line-clamp-2 font-display text-base font-black uppercase leading-tight tracking-tight text-[#1E1E1E] sm:text-2xl lg:text-3xl">
                   {activeTab === "menu"
                     ? "KATALOG THIS WEEK MENU"
                     : activeTab === "users"
-                    ? "MANAJEMEN AKUN ADMIN"
-                    : "PENGATURAN KEAMANAN"}
+                      ? "MANAJEMEN AKUN ADMIN"
+                      : "PENGATURAN KEAMANAN"}
                 </h2>
               </div>
             </div>
@@ -835,7 +859,14 @@ export default function AdminPage() {
                   className="col-span-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-3 py-2 border-2 border-[#1E1E1E] bg-white text-xs font-mono font-bold uppercase shadow-[2px_2px_0_#1E1E1E] hover:bg-[#E1ECD3] transition-all disabled:opacity-50 active:translate-x-0.5 active:translate-y-0.5"
                   title="Refresh Menu from Database"
                 >
-                  <RefreshCw size={14} className={loadingMenu ? "animate-spin text-[#6B7860]" : "text-[#6B7860]"} />
+                  <RefreshCw
+                    size={14}
+                    className={
+                      loadingMenu
+                        ? "animate-spin text-[#6B7860]"
+                        : "text-[#6B7860]"
+                    }
+                  />
                   <span>{loadingMenu ? "Syncing..." : "Refresh"}</span>
                 </button>
 
@@ -853,7 +884,11 @@ export default function AdminPage() {
                 <Button
                   onClick={handleOpenCreate}
                   disabled={actionLoading || menuItems.length >= 6}
-                  title={menuItems.length >= 6 ? "Enam slot sudah terisi. Gunakan Edit untuk memperbarui menu." : "Tambah menu ke slot yang kosong"}
+                  title={
+                    menuItems.length >= 6
+                      ? "Enam slot sudah terisi. Gunakan Edit untuk memperbarui menu."
+                      : "Tambah menu ke slot yang kosong"
+                  }
                   className="col-span-2 sm:flex-none w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2 border-2 border-[#1E1E1E] bg-[#8D9B7D] text-white text-xs font-display font-black uppercase shadow-[3px_3px_0_#1E1E1E] hover:bg-[#6B7860] transition-all active:translate-x-0.5 active:translate-y-0.5"
                 >
                   <Plus size={16} />
@@ -871,7 +906,11 @@ export default function AdminPage() {
               <CheckCircle size={18} className="text-emerald-600 shrink-0" />
               <span>{statusMessage}</span>
             </div>
-            <button type="button" onClick={() => setStatusMessage("")} className="text-emerald-700 hover:text-emerald-900">
+            <button
+              type="button"
+              onClick={() => setStatusMessage("")}
+              className="text-emerald-700 hover:text-emerald-900"
+            >
               <X size={16} />
             </button>
           </div>
@@ -885,7 +924,10 @@ export default function AdminPage() {
               {/* Top Search & Filter Bar */}
               <div className="flex flex-col justify-between gap-3 border-2 border-[#1E1E1E] bg-white p-3 shadow-[4px_4px_0_#1E1E1E] sm:flex-row sm:items-center sm:p-4">
                 <div className="relative w-full flex-1 sm:max-w-md">
-                  <Search size={16} className="absolute left-3.5 top-3 text-gray-400" />
+                  <Search
+                    size={16}
+                    className="absolute left-3.5 top-3 text-gray-400"
+                  />
                   <input
                     type="text"
                     value={searchQuery}
@@ -897,7 +939,8 @@ export default function AdminPage() {
 
                 <div className="flex w-full flex-wrap items-center justify-between gap-2 sm:w-auto sm:flex-nowrap sm:justify-end">
                   <span className="mr-auto font-mono text-[10px] font-bold text-gray-500 sm:mr-2 sm:text-xs">
-                    Menampilkan {filteredMenuItems.length} dari {menuItems.length} menu
+                    Menampilkan {filteredMenuItems.length} dari{" "}
+                    {menuItems.length} menu
                   </span>
 
                   <button
@@ -957,7 +1000,8 @@ export default function AdminPage() {
                             <div className="flex items-start justify-between gap-3">
                               <div className="flex-1 min-w-0">
                                 <span className="font-mono text-[9px] font-bold uppercase tracking-widest text-[#6B7860] block mb-1">
-                                  {item.code || "CPL-MENU"} • {item.batch || "BATCH 01"}
+                                  {item.code || "CPL-MENU"} •{" "}
+                                  {item.batch || "BATCH 01"}
                                 </span>
                                 <h3 className="font-display text-xl sm:text-2xl font-black uppercase tracking-tight text-[#1E1E1E] min-h-[3.25rem] flex items-center">
                                   {item.name}
@@ -969,10 +1013,19 @@ export default function AdminPage() {
                             </div>
 
                             <p className="mt-3 text-xs leading-relaxed text-[#1E1E1E]/80">
-                              {item.desc_ID || item.desc_EN || "Spesifikasi nutrisi lengkap tinggi protein."}
+                              {item.desc_ID ||
+                                item.desc_EN ||
+                                "Spesifikasi nutrisi lengkap tinggi protein."}
                             </p>
-                            <div className="mt-3 flex flex-wrap gap-1.5" aria-label="Varian protein tersedia">
-                              {(item.availableProteinTiers || [25, 40, 60, 80, 100]).map((tier) => (
+                            <div
+                              className="mt-3 flex flex-wrap gap-1.5"
+                              aria-label="Varian protein tersedia"
+                            >
+                              {(
+                                item.availableProteinTiers || [
+                                  25, 40, 60, 80, 100,
+                                ]
+                              ).map((tier) => (
                                 <span
                                   key={tier}
                                   className="border border-[#1E1E1E] bg-[#E1ECD3] px-2 py-1 font-mono text-[9px] font-black text-[#1E1E1E]"
@@ -987,38 +1040,64 @@ export default function AdminPage() {
                           <div className="mt-auto pt-4 border-t border-[#1E1E1E]/15 space-y-3">
                             <div className="border-2 border-[#1E1E1E] bg-[#FEFDF9] p-3 space-y-2 rounded-none">
                               <div className="border-b border-[#1E1E1E]/20 pb-1.5 font-mono text-[9px] font-black uppercase tracking-wider text-[#6B7860]">
-                                <span>LAB NUTRITION SPECS · DEFAULT 40G TIER</span>
+                                <span>
+                                  LAB NUTRITION SPECS · DEFAULT 40G TIER
+                                </span>
                               </div>
 
                               {/* 4-Column Macros Grid */}
                               <div className="grid grid-cols-4 gap-1 text-center font-display">
                                 <div className="border border-[#1E1E1E] bg-white p-1">
-                                  <div className="text-[7.5px] font-mono font-bold uppercase text-gray-500">PROTEIN</div>
-                                  <div className="text-xs font-black text-[#6B7860] mt-0.5">{item.protein}g</div>
+                                  <div className="text-[7.5px] font-mono font-bold uppercase text-gray-500">
+                                    PROTEIN
+                                  </div>
+                                  <div className="text-xs font-black text-[#6B7860] mt-0.5">
+                                    {item.protein}g
+                                  </div>
                                 </div>
                                 <div className="border border-[#1E1E1E] bg-white p-1">
-                                  <div className="text-[7.5px] font-mono font-bold uppercase text-gray-500">CARBS</div>
-                                  <div className="text-xs font-black text-[#1E1E1E] mt-0.5">{item.carbs}g</div>
+                                  <div className="text-[7.5px] font-mono font-bold uppercase text-gray-500">
+                                    CARBS
+                                  </div>
+                                  <div className="text-xs font-black text-[#1E1E1E] mt-0.5">
+                                    {item.carbs}g
+                                  </div>
                                 </div>
                                 <div className="border border-[#1E1E1E] bg-white p-1">
-                                  <div className="text-[7.5px] font-mono font-bold uppercase text-gray-500">FAT</div>
-                                  <div className="text-xs font-black text-[#1E1E1E] mt-0.5">{item.fat}g</div>
+                                  <div className="text-[7.5px] font-mono font-bold uppercase text-gray-500">
+                                    FAT
+                                  </div>
+                                  <div className="text-xs font-black text-[#1E1E1E] mt-0.5">
+                                    {item.fat}g
+                                  </div>
                                 </div>
                                 <div className="border border-[#1E1E1E] bg-white p-1">
-                                  <div className="text-[7.5px] font-mono font-bold uppercase text-gray-500">FIBER</div>
-                                  <div className="text-xs font-black text-[#1E1E1E] mt-0.5">{item.fiber ?? 0.14}g</div>
+                                  <div className="text-[7.5px] font-mono font-bold uppercase text-gray-500">
+                                    FIBER
+                                  </div>
+                                  <div className="text-xs font-black text-[#1E1E1E] mt-0.5">
+                                    {item.fiber ?? 0.14}g
+                                  </div>
                                 </div>
                               </div>
 
                               {/* 2-Column Micros Grid */}
                               <div className="grid grid-cols-2 gap-1.5 font-mono text-[9px]">
                                 <div className="border border-[#1E1E1E]/40 bg-white px-2 py-1 flex items-center justify-between">
-                                  <span className="text-gray-500 font-bold">SODIUM</span>
-                                  <span className="font-extrabold text-[#1E1E1E]">{item.sodium}mg</span>
+                                  <span className="text-gray-500 font-bold">
+                                    SODIUM
+                                  </span>
+                                  <span className="font-extrabold text-[#1E1E1E]">
+                                    {item.sodium}mg
+                                  </span>
                                 </div>
                                 <div className="border border-[#1E1E1E]/40 bg-white px-2 py-1 flex items-center justify-between">
-                                  <span className="text-gray-500 font-bold">POTASSIUM</span>
-                                  <span className="font-extrabold text-[#1E1E1E]">{item.potassium}mg</span>
+                                  <span className="text-gray-500 font-bold">
+                                    POTASSIUM
+                                  </span>
+                                  <span className="font-extrabold text-[#1E1E1E]">
+                                    {item.potassium}mg
+                                  </span>
                                 </div>
                               </div>
                             </div>
@@ -1034,7 +1113,9 @@ export default function AdminPage() {
                               </Button>
                               <Button
                                 size="sm"
-                                onClick={() => handleDeleteMeal(item.id, item.name)}
+                                onClick={() =>
+                                  handleDeleteMeal(item.id, item.name)
+                                }
                                 className="h-10 px-3.5 border-2 border-[#1E1E1E] bg-red-50 text-red-700 shadow-[3px_3px_0_#1E1E1E] hover:bg-red-600 hover:text-white transition-all"
                                 title="Hapus Menu Ini"
                               >
@@ -1066,7 +1147,10 @@ export default function AdminPage() {
                     <tbody className="divide-y border-[#1E1E1E]/20">
                       {filteredMenuItems.map((item) => {
                         return (
-                          <tr key={item.id} className="hover:bg-gray-50 font-bold">
+                          <tr
+                            key={item.id}
+                            className="hover:bg-gray-50 font-bold"
+                          >
                             <td className="p-3">
                               <div>
                                 <div className="font-display font-black text-sm uppercase text-[#1E1E1E]">
@@ -1087,10 +1171,14 @@ export default function AdminPage() {
                               )}
                             </td>
                             <td className="p-3">{item.category}</td>
-                            <td className="p-3 text-center text-[#6B7860] font-black">{item.protein}g</td>
+                            <td className="p-3 text-center text-[#6B7860] font-black">
+                              {item.protein}g
+                            </td>
                             <td className="p-3 text-center">{item.carbs}g</td>
                             <td className="p-3 text-center">{item.fat}g</td>
-                            <td className="p-3 text-center font-mono">{item.kcal}</td>
+                            <td className="p-3 text-center font-mono">
+                              {item.kcal}
+                            </td>
                             <td className="p-3 text-right">
                               <div className="flex items-center justify-end gap-1.5">
                                 <button
@@ -1102,7 +1190,9 @@ export default function AdminPage() {
                                 </button>
                                 <button
                                   type="button"
-                                  onClick={() => handleDeleteMeal(item.id, item.name)}
+                                  onClick={() =>
+                                    handleDeleteMeal(item.id, item.name)
+                                  }
                                   className="p-1.5 text-red-600 hover:bg-red-50 rounded"
                                 >
                                   <Trash2 size={15} />
@@ -1126,10 +1216,13 @@ export default function AdminPage() {
                 <div>
                   <div className="flex items-center gap-2">
                     <Crown size={18} className="text-amber-500" />
-                    <h3 className="font-display text-xl font-black uppercase">User Management</h3>
+                    <h3 className="font-display text-xl font-black uppercase">
+                      User Management
+                    </h3>
                   </div>
                   <p className="text-xs text-[#1E1E1E]/70 mt-1">
-                    Kelola daftar akun Admin & Superadmin yang memiliki hak akses ke portal CMS.
+                    Kelola daftar akun Admin & Superadmin yang memiliki hak
+                    akses ke portal CMS.
                   </p>
                 </div>
                 <Button
@@ -1143,26 +1236,42 @@ export default function AdminPage() {
 
               {/* Admin Users Table */}
               {userMgmtError && (
-                <div className="flex items-center gap-2 rounded-xl border border-red-300 bg-red-50 p-3 text-xs font-bold text-red-800" role="alert">
+                <div
+                  className="flex items-center gap-2 rounded-xl border border-red-300 bg-red-50 p-3 text-xs font-bold text-red-800"
+                  role="alert"
+                >
                   <AlertTriangle size={15} className="shrink-0" />
                   <span>{userMgmtError}</span>
                 </div>
               )}
               {userMgmtSuccess && (
-                <div className="flex items-center gap-2 rounded-xl border border-emerald-300 bg-emerald-50 p-3 text-xs font-bold text-emerald-900" role="status">
-                  <CheckCircle size={15} className="shrink-0 text-emerald-600" />
+                <div
+                  className="flex items-center gap-2 rounded-xl border border-emerald-300 bg-emerald-50 p-3 text-xs font-bold text-emerald-900"
+                  role="status"
+                >
+                  <CheckCircle
+                    size={15}
+                    className="shrink-0 text-emerald-600"
+                  />
                   <span>{userMgmtSuccess}</span>
                 </div>
               )}
 
               {loadingUsers ? (
-                <div className="space-y-3 border-2 border-[#1E1E1E] bg-white p-4 shadow-[6px_6px_0_#1E1E1E]" role="status" aria-label="Memuat daftar akun admin">
+                <div
+                  className="space-y-3 border-2 border-[#1E1E1E] bg-white p-4 shadow-[6px_6px_0_#1E1E1E]"
+                  role="status"
+                  aria-label="Memuat daftar akun admin"
+                >
                   <LoadingSpinner
                     label="Memuat daftar akun admin..."
                     className="w-full py-2 font-mono text-xs font-bold uppercase text-[#6B7860]"
                   />
                   {Array.from({ length: 3 }).map((_, index) => (
-                    <div key={index} className="grid gap-2 border-t border-[#1E1E1E]/15 pt-3 sm:grid-cols-[1fr_7rem_8rem]">
+                    <div
+                      key={index}
+                      className="grid gap-2 border-t border-[#1E1E1E]/15 pt-3 sm:grid-cols-[1fr_7rem_8rem]"
+                    >
                       <div className="space-y-2">
                         <Skeleton className="h-4 w-40" />
                         <Skeleton className="h-3 w-56 max-w-full" />
@@ -1211,12 +1320,19 @@ export default function AdminPage() {
                           </div>
                           <div className="mt-4 flex items-center justify-between gap-3 border-t border-[#1E1E1E]/15 pt-3">
                             <span className="font-mono text-[10px] text-gray-500">
-                              Dibuat {user.created_at ? new Date(user.created_at).toLocaleDateString("id-ID") : "-"}
+                              Dibuat{" "}
+                              {user.created_at
+                                ? new Date(user.created_at).toLocaleDateString(
+                                    "id-ID",
+                                  )
+                                : "-"}
                             </span>
                             {user.email !== "cleanplatelab.id@gmail.com" ? (
                               <button
                                 type="button"
-                                onClick={() => handleDeleteUser(user.id, user.email)}
+                                onClick={() =>
+                                  handleDeleteUser(user.id, user.email)
+                                }
                                 className="min-h-10 rounded-lg px-2 font-mono text-[10px] font-bold text-red-600 hover:bg-red-50 hover:text-red-800"
                               >
                                 Hapus Akun
@@ -1232,65 +1348,82 @@ export default function AdminPage() {
                     )}
                   </div>
 
-              <div className="hidden max-w-full overflow-x-auto border-2 border-[#1E1E1E] bg-white shadow-[6px_6px_0_#1E1E1E] md:block">
-                <table className="min-w-[680px] w-full text-left text-xs">
-                  <thead className="border-b-2 border-[#1E1E1E] bg-[#1E1E1E] font-mono text-white text-[10px] uppercase">
-                    <tr>
-                      <th className="p-3.5">Nama & Email</th>
-                      <th className="p-3.5">Role Akses</th>
-                      <th className="p-3.5">Tanggal Dibuat</th>
-                      <th className="p-3.5 text-right">Aksi</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y border-[#1E1E1E]/20 font-bold">
-                    {adminUsers.length === 0 && (
-                      <tr>
-                        <td colSpan={4} className="p-8 text-center font-mono text-xs uppercase text-gray-500">
-                          Belum ada akun admin yang dapat ditampilkan.
-                        </td>
-                      </tr>
-                    )}
-                    {adminUsers.map((u) => (
-                      <tr key={u.id} className="hover:bg-gray-50">
-                        <td className="p-3.5">
-                          <div className="font-display font-black text-sm text-[#1E1E1E]">
-                            {u.full_name || "Admin CPL"}
-                          </div>
-                          <div className="font-mono text-xs text-gray-500">{u.email}</div>
-                        </td>
-                        <td className="p-3.5">
-                          <span
-                            className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 font-mono text-[10px] font-black uppercase ${
-                              u.role === "superadmin"
-                                ? "bg-amber-100 text-amber-900 border border-amber-300"
-                                : "bg-blue-100 text-blue-900 border border-blue-300"
-                            }`}
-                          >
-                            {u.role === "superadmin" ? <Crown size={11} /> : <UserCheck size={11} />}
-                            {u.role?.toUpperCase()}
-                          </span>
-                        </td>
-                        <td className="p-3.5 font-mono text-gray-500 text-[11px]">
-                          {u.created_at ? new Date(u.created_at).toLocaleDateString("id-ID") : "-"}
-                        </td>
-                        <td className="p-3.5 text-right">
-                          {u.email !== "cleanplatelab.id@gmail.com" ? (
-                            <button
-                              type="button"
-                              onClick={() => handleDeleteUser(u.id, u.email)}
-                              className="text-red-600 hover:text-red-800 p-1 font-mono text-xs font-bold"
+                  <div className="hidden max-w-full overflow-x-auto border-2 border-[#1E1E1E] bg-white shadow-[6px_6px_0_#1E1E1E] md:block">
+                    <table className="min-w-[680px] w-full text-left text-xs">
+                      <thead className="border-b-2 border-[#1E1E1E] bg-[#1E1E1E] font-mono text-white text-[10px] uppercase">
+                        <tr>
+                          <th className="p-3.5">Nama & Email</th>
+                          <th className="p-3.5">Role Akses</th>
+                          <th className="p-3.5">Tanggal Dibuat</th>
+                          <th className="p-3.5 text-right">Aksi</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y border-[#1E1E1E]/20 font-bold">
+                        {adminUsers.length === 0 && (
+                          <tr>
+                            <td
+                              colSpan={4}
+                              className="p-8 text-center font-mono text-xs uppercase text-gray-500"
                             >
-                              Hapus Akun
-                            </button>
-                          ) : (
-                            <span className="font-mono text-[10px] text-gray-400 italic">Primary Owner</span>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                              Belum ada akun admin yang dapat ditampilkan.
+                            </td>
+                          </tr>
+                        )}
+                        {adminUsers.map((u) => (
+                          <tr key={u.id} className="hover:bg-gray-50">
+                            <td className="p-3.5">
+                              <div className="font-display font-black text-sm text-[#1E1E1E]">
+                                {u.full_name || "Admin CPL"}
+                              </div>
+                              <div className="font-mono text-xs text-gray-500">
+                                {u.email}
+                              </div>
+                            </td>
+                            <td className="p-3.5">
+                              <span
+                                className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 font-mono text-[10px] font-black uppercase ${
+                                  u.role === "superadmin"
+                                    ? "bg-amber-100 text-amber-900 border border-amber-300"
+                                    : "bg-blue-100 text-blue-900 border border-blue-300"
+                                }`}
+                              >
+                                {u.role === "superadmin" ? (
+                                  <Crown size={11} />
+                                ) : (
+                                  <UserCheck size={11} />
+                                )}
+                                {u.role?.toUpperCase()}
+                              </span>
+                            </td>
+                            <td className="p-3.5 font-mono text-gray-500 text-[11px]">
+                              {u.created_at
+                                ? new Date(u.created_at).toLocaleDateString(
+                                    "id-ID",
+                                  )
+                                : "-"}
+                            </td>
+                            <td className="p-3.5 text-right">
+                              {u.email !== "cleanplatelab.id@gmail.com" ? (
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    handleDeleteUser(u.id, u.email)
+                                  }
+                                  className="text-red-600 hover:text-red-800 p-1 font-mono text-xs font-bold"
+                                >
+                                  Hapus Akun
+                                </button>
+                              ) : (
+                                <span className="font-mono text-[10px] text-gray-400 italic">
+                                  Primary Owner
+                                </span>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </>
               )}
             </div>
@@ -1304,8 +1437,12 @@ export default function AdminPage() {
                   <Key size={20} />
                 </div>
                 <div>
-                  <h3 className="font-display text-xl font-black uppercase">Keamanan Password</h3>
-                  <p className="text-xs text-[#1E1E1E]/70 font-mono">Ubah password akun admin Anda saat ini.</p>
+                  <h3 className="font-display text-xl font-black uppercase">
+                    Keamanan Password
+                  </h3>
+                  <p className="text-xs text-[#1E1E1E]/70 font-mono">
+                    Ubah password akun admin Anda saat ini.
+                  </p>
                 </div>
               </div>
 
@@ -1341,7 +1478,11 @@ export default function AdminPage() {
                       onClick={() => setShowNewPassword(!showNewPassword)}
                       className="absolute right-3 top-3 text-gray-400"
                     >
-                      {showNewPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                      {showNewPassword ? (
+                        <EyeOff size={15} />
+                      ) : (
+                        <Eye size={15} />
+                      )}
                     </button>
                   </div>
                 </div>
@@ -1387,7 +1528,9 @@ export default function AdminPage() {
                   {isEditing ? "EDIT DATA MENU" : "FORMULARIO TAMBAH MENU"}
                 </span>
                 <h3 className="font-display text-lg sm:text-xl font-black uppercase text-[#1E1E1E]">
-                  {isEditing ? `Edit Menu: ${formState.name}` : "Tambah Menu Baru"}
+                  {isEditing
+                    ? `Edit Menu: ${formState.name}`
+                    : "Tambah Menu Baru"}
                 </h3>
               </div>
               <button
@@ -1399,7 +1542,10 @@ export default function AdminPage() {
               </button>
             </div>
 
-            <form onSubmit={handleFormSave} className="space-y-4 text-xs font-sans font-bold">
+            <form
+              onSubmit={handleFormSave}
+              className="space-y-4 text-xs font-sans font-bold"
+            >
               {/* Basic info grid */}
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="md:col-span-2">
@@ -1410,14 +1556,19 @@ export default function AdminPage() {
                     type="text"
                     required
                     value={formState.name}
-                    onChange={(e) => setFormState({ ...formState, name: e.target.value })}
+                    onChange={(e) =>
+                      setFormState({ ...formState, name: e.target.value })
+                    }
                     placeholder="misal: Chicken Teriyaki & Brown Rice"
                     className="w-full rounded-xl border-2 border-[#1E1E1E] p-2.5 text-xs font-bold focus:border-[#8D9B7D] focus:outline-none"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="menu-date" className="mb-1 block font-mono text-[10px] uppercase text-[#6B7860]">
+                  <label
+                    htmlFor="menu-date"
+                    className="mb-1 block font-mono text-[10px] uppercase text-[#6B7860]"
+                  >
                     Tanggal Menu <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -1429,8 +1580,12 @@ export default function AdminPage() {
                     aria-describedby="menu-date-help"
                     className="w-full min-h-10 rounded-xl border-2 border-[#1E1E1E] p-2.5 text-xs font-bold focus:border-[#8D9B7D] focus:outline-none"
                   />
-                  <p id="menu-date-help" className="mt-1.5 text-[10px] font-medium leading-relaxed text-[#1E1E1E]/60">
-                    Pilih tanggal Senin–Sabtu. Hari, kode, dan slot akan terisi otomatis.
+                  <p
+                    id="menu-date-help"
+                    className="mt-1.5 text-[10px] font-medium leading-relaxed text-[#1E1E1E]/60"
+                  >
+                    Pilih tanggal Senin–Sabtu. Hari, kode, dan slot akan terisi
+                    otomatis.
                   </p>
                 </div>
 
@@ -1450,8 +1605,12 @@ export default function AdminPage() {
                       </option>
                     ))}
                   </select>
-                  <p id="menu-day-help" className="mt-1.5 text-[10px] font-medium leading-relaxed text-[#1E1E1E]/60">
-                    Slot {getMenuSlot(formState)} mengikuti tanggal yang dipilih.
+                  <p
+                    id="menu-day-help"
+                    className="mt-1.5 text-[10px] font-medium leading-relaxed text-[#1E1E1E]/60"
+                  >
+                    Slot {getMenuSlot(formState)} mengikuti tanggal yang
+                    dipilih.
                   </p>
                 </div>
               </div>
@@ -1467,11 +1626,15 @@ export default function AdminPage() {
               {/* Descriptions Dual-Language */}
               <div className="space-y-3 pt-2">
                 <div>
-                  <label className="font-mono text-[10px] uppercase text-[#6B7860] mb-1 block">Deskripsi (Bahasa Indonesia)</label>
+                  <label className="font-mono text-[10px] uppercase text-[#6B7860] mb-1 block">
+                    Deskripsi (Bahasa Indonesia)
+                  </label>
                   <textarea
                     rows={2}
                     value={formState.desc_ID}
-                    onChange={(e) => setFormState({ ...formState, desc_ID: e.target.value })}
+                    onChange={(e) =>
+                      setFormState({ ...formState, desc_ID: e.target.value })
+                    }
                     placeholder="Penjelasan hidangan dalam Bahasa Indonesia..."
                     className="w-full rounded-xl border-2 border-[#1E1E1E] p-2.5 text-xs font-bold focus:border-[#8D9B7D] focus:outline-none"
                   />
@@ -1479,7 +1642,9 @@ export default function AdminPage() {
 
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <label className="font-mono text-[10px] uppercase text-[#6B7860]">Description (English)</label>
+                    <label className="font-mono text-[10px] uppercase text-[#6B7860]">
+                      Description (English)
+                    </label>
                     <button
                       type="button"
                       onClick={handleAutoTranslate}
@@ -1488,13 +1653,19 @@ export default function AdminPage() {
                       title="Terjemahkan otomatis dari deskripsi Bahasa Indonesia"
                     >
                       <Sparkles size={11} />
-                      <span>{translating ? "Menerjemahkan..." : "⚡ Auto-Translate EN"}</span>
+                      <span>
+                        {translating
+                          ? "Menerjemahkan..."
+                          : "⚡ Auto-Translate EN"}
+                      </span>
                     </button>
                   </div>
                   <textarea
                     rows={2}
                     value={formState.desc_EN}
-                    onChange={(e) => setFormState({ ...formState, desc_EN: e.target.value })}
+                    onChange={(e) =>
+                      setFormState({ ...formState, desc_EN: e.target.value })
+                    }
                     placeholder="Meal description in English (klik Auto-Translate jika ingin penerjemahan otomatis)..."
                     className="w-full rounded-xl border-2 border-[#1E1E1E] p-2.5 text-xs font-bold focus:border-[#8D9B7D] focus:outline-none"
                   />
@@ -1532,8 +1703,13 @@ export default function AdminPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-[#1E1E1E]/80 p-3 backdrop-blur-xs sm:p-4">
           <div className="my-auto max-h-[calc(100dvh-1.5rem)] w-full max-w-md overflow-y-auto border-2 border-[#1E1E1E] bg-white p-4 shadow-[6px_6px_0_#1E1E1E] sm:p-8 sm:shadow-[8px_8px_0_#1E1E1E]">
             <div className="flex items-center justify-between border-b-2 border-[#1E1E1E] pb-3 mb-5">
-              <h3 className="font-display text-lg font-black uppercase">Tambah Akun Admin Baru</h3>
-              <button type="button" onClick={() => setCreateUserModalOpen(false)}>
+              <h3 className="font-display text-lg font-black uppercase">
+                Tambah Akun Admin Baru
+              </h3>
+              <button
+                type="button"
+                onClick={() => setCreateUserModalOpen(false)}
+              >
                 <X size={18} />
               </button>
             </div>
@@ -1545,9 +1721,14 @@ export default function AdminPage() {
               </div>
             )}
 
-            <form onSubmit={handleCreateUserSubmit} className="space-y-4 text-xs font-sans font-bold">
+            <form
+              onSubmit={handleCreateUserSubmit}
+              className="space-y-4 text-xs font-sans font-bold"
+            >
               <div>
-                <label className="font-mono text-[10px] uppercase text-[#6B7860]">Nama Lengkap</label>
+                <label className="font-mono text-[10px] uppercase text-[#6B7860]">
+                  Nama Lengkap
+                </label>
                 <input
                   type="text"
                   required
@@ -1559,7 +1740,9 @@ export default function AdminPage() {
               </div>
 
               <div>
-                <label className="font-mono text-[10px] uppercase text-[#6B7860]">Email Admin</label>
+                <label className="font-mono text-[10px] uppercase text-[#6B7860]">
+                  Email Admin
+                </label>
                 <input
                   type="email"
                   required
@@ -1571,7 +1754,9 @@ export default function AdminPage() {
               </div>
 
               <div>
-                <label className="font-mono text-[10px] uppercase text-[#6B7860]">Password</label>
+                <label className="font-mono text-[10px] uppercase text-[#6B7860]">
+                  Password
+                </label>
                 <input
                   type="password"
                   required
@@ -1583,14 +1768,18 @@ export default function AdminPage() {
               </div>
 
               <div>
-                <label className="font-mono text-[10px] uppercase text-[#6B7860]">Role Hak Akses</label>
+                <label className="font-mono text-[10px] uppercase text-[#6B7860]">
+                  Role Hak Akses
+                </label>
                 <select
                   value={newUserRole}
                   onChange={(e) => setNewUserRole(e.target.value)}
                   className="mt-1 w-full rounded-xl border-2 border-[#1E1E1E] p-2.5 text-xs font-bold focus:border-[#8D9B7D] focus:outline-none"
                 >
                   <option value="admin">ADMIN (Kelola Katalog Menu)</option>
-                  <option value="superadmin">SUPERADMIN (Akses Penuh + User Management)</option>
+                  <option value="superadmin">
+                    SUPERADMIN (Akses Penuh + User Management)
+                  </option>
                 </select>
               </div>
 

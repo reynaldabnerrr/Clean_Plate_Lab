@@ -40,7 +40,6 @@ import {
   MessageCircle,
   PackageCheck,
   Phone,
-  ShieldCheck,
   Tag,
   Truck,
   User,
@@ -164,7 +163,7 @@ export function OrderModal({
   );
   const readyTimeMeal1 = mealsPerDay === 1 ? singleMealReadyTime : "12:00";
   const readyTimeMeal2 = "18:00";
-  const [mealCustomizations, setMealCustomizations] = useState(() => normalizeMealCustomizations(storedDraft?.mealCustomizations));
+  const [mealCustomizations, setMealCustomizations] = useState(() => normalizeMealCustomizations());
   const serviceDates = getServiceDates(startDate, endDate);
   const mealItems = buildMealItems({
     mealsPerDay, singleMealReadyTime, mealCustomizations, proteinTier, serviceDates,
@@ -195,6 +194,8 @@ export function OrderModal({
   const [copiedMapLink, setCopiedMapLink] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState({});
+  const [activeStep, setActiveStep] = useState(1);
+  const dialogScrollRef = useRef(null);
   const totalDays = serviceDates.length;
   const cateringPeriod = getCateringPeriod(totalDays);
   const selectedTier =
@@ -333,6 +334,10 @@ export function OrderModal({
   ]);
 
   useEffect(() => {
+    if (!isOpen) setActiveStep(1);
+  }, [isOpen]);
+
+  useEffect(() => {
     writeStoredState("order-draft", {
       proteinTier,
       startDate,
@@ -340,13 +345,11 @@ export function OrderModal({
       mealsPerDay,
       singleMealReadyTime,
       addonIds,
-      mealCustomizations,
       fulfillment,
       cutlery,
       referralCode,
     });
   }, [
-    mealCustomizations,
     addonIds,
     endDate,
     fulfillment,
@@ -417,21 +420,22 @@ export function OrderModal({
     if (!open) {
       setSubmitted(false);
       setErrors({});
+      setActiveStep(1);
       onClose();
     }
   };
 
-  const validateForm = () => {
+  const validateForm = (includeContact = true) => {
     const newErrors = {};
 
-    if (!name.trim()) {
+    if (includeContact && !name.trim()) {
       newErrors.name = t("orderNameReqError") || "Nama lengkap wajib diisi";
     }
 
     const phoneDigits = phone.replace(/\D/g, "");
-    if (!phone.trim()) {
+    if (includeContact && !phone.trim()) {
       newErrors.phone = t("orderPhoneReqError") || "Nomor WhatsApp wajib diisi";
-    } else if (phoneDigits.length < 10) {
+    } else if (includeContact && phoneDigits.length < 10) {
       newErrors.phone =
         t("orderPhoneMinError") ||
         "Nomor WhatsApp minimal 10 digit (contoh: 081234567890)";
@@ -469,19 +473,13 @@ export function OrderModal({
     return newErrors;
   };
 
-  const triggerShakeAndScroll = (validationErrors) => {
+  const triggerShakeAndScroll = (validationErrors, step = activeStep) => {
     const errorKeys = Object.keys(validationErrors);
     if (errorKeys.length === 0) return;
 
-    const errorPriority = [
-      "name",
-      "phone",
-      "startDate",
-      "endDate",
-      "address",
-      "mapsUrl",
-      "cutlery",
-    ];
+    const errorPriority = step === 2
+      ? ["startDate", "endDate", "address", "mapsUrl", "cutlery"]
+      : ["name", "phone", "startDate", "endDate", "address", "mapsUrl", "cutlery"];
     const firstKey = errorPriority.find((key) => errorKeys.includes(key));
 
     const elementMap = {
@@ -532,11 +530,17 @@ export function OrderModal({
   const handleSubmit = (event) => {
     event.preventDefault();
 
+    if (activeStep !== 3) return;
+
     const validationErrors = validateForm();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
+      const errorStep = Object.keys(validationErrors).some((key) =>
+        ["startDate", "endDate", "address", "mapsUrl", "cutlery"].includes(key),
+      ) ? 2 : 3;
+      setActiveStep(errorStep);
       setTimeout(() => {
-        triggerShakeAndScroll(validationErrors);
+        triggerShakeAndScroll(validationErrors, errorStep);
       }, 30);
       return;
     }
@@ -598,6 +602,7 @@ export function OrderModal({
   const handleReset = () => {
     setSubmitted(false);
     setErrors({});
+    setActiveStep(1);
     onClose();
   };
 
@@ -633,8 +638,12 @@ export function OrderModal({
     if (Object.keys(validationErrors).length) {
       setErrors(validationErrors);
       setSubmitted(false);
+      const errorStep = Object.keys(validationErrors).some((key) =>
+        ["startDate", "endDate", "address", "mapsUrl", "cutlery"].includes(key),
+      ) ? 2 : 3;
+      setActiveStep(errorStep);
       setTimeout(() => {
-        triggerShakeAndScroll(validationErrors);
+        triggerShakeAndScroll(validationErrors, errorStep);
       }, 30);
       return;
     }
@@ -644,11 +653,36 @@ export function OrderModal({
   };
 
   const datePickerOpenRef = useRef(false);
+  const stepLabels = isIndonesian
+    ? ["Pilih paket", "Atur jadwal", "Periksa pesanan"]
+    : ["Choose a plan", "Set your schedule", "Review your order"];
+
+  const goToStep = (step) => {
+    setActiveStep(step);
+    dialogScrollRef.current?.scrollTo({ top: 0, behavior: "auto" });
+  };
+
+  const handleNextStep = () => {
+    if (activeStep === 1) {
+      goToStep(2);
+      return;
+    }
+
+    const validationErrors = validateForm(false);
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      setTimeout(() => triggerShakeAndScroll(validationErrors), 30);
+      return;
+    }
+    setErrors({});
+    goToStep(3);
+  };
 
   return (
     <Dialog open={isOpen && hasSelectedLanguage} onOpenChange={handleOpenChange}>
       <DialogContent
-        style={{ width: "min(calc(100vw - 1rem), 52rem)", maxWidth: "none" }}
+        ref={dialogScrollRef}
+        style={{ width: "min(calc(100vw - 1rem), 62rem)", maxWidth: "none" }}
         onPointerDownOutside={(event) => {
           if (
             datePickerOpenRef.current ||
@@ -673,11 +707,11 @@ export function OrderModal({
             event.preventDefault();
           }
         }}
-        className="max-h-[calc(100dvh-1.5rem)] overflow-x-hidden overflow-y-auto rounded-[28px] border border-black/10 bg-[#FEFDF9] p-0 text-[#1E1E1E] shadow-2xl sm:rounded-[32px] [&>button]:right-3 [&>button]:top-3 [&>button]:z-30 [&>button]:grid [&>button]:size-11 [&>button]:place-items-center [&>button]:rounded-full [&>button]:border-2 [&>button]:border-white/70 [&>button]:bg-white [&>button]:p-0 [&>button]:text-[#1E1E1E] [&>button]:opacity-100 [&>button]:shadow-[0_8px_24px_rgba(0,0,0,0.28)] [&>button]:transition-[transform,background-color,box-shadow] [&>button:hover]:scale-105 [&>button:hover]:bg-[#E1ECD3] [&>button:active]:scale-95 [&>button:focus-visible]:ring-2 [&>button:focus-visible]:ring-[#C8D8B8] [&>button:focus-visible]:ring-offset-2 [&>button:focus-visible]:ring-offset-[#1E1E1E] sm:[&>button]:right-4 sm:[&>button]:top-4"
+        className="max-h-[calc(100dvh-1rem)] overflow-x-hidden overflow-y-auto rounded-[24px] border border-black/10 bg-[#FEFDF9] p-0 text-[#1E1E1E] shadow-2xl sm:max-h-[calc(100dvh-1.5rem)] sm:rounded-[32px] [&>button]:right-3 [&>button]:top-3 [&>button]:z-30 [&>button]:grid [&>button]:size-11 [&>button]:place-items-center [&>button]:rounded-full [&>button]:border-2 [&>button]:border-white/70 [&>button]:bg-white [&>button]:p-0 [&>button]:text-[#1E1E1E] [&>button]:opacity-100 [&>button]:shadow-[0_8px_24px_rgba(0,0,0,0.28)] [&>button]:transition-[transform,background-color,box-shadow] [&>button:hover]:scale-105 [&>button:hover]:bg-[#E1ECD3] [&>button:active]:scale-95 [&>button:focus-visible]:ring-2 [&>button:focus-visible]:ring-[#C8D8B8] [&>button:focus-visible]:ring-offset-2 [&>button:focus-visible]:ring-offset-[#1E1E1E] sm:[&>button]:right-4 sm:[&>button]:top-4"
       >
         {!submitted ? (
           <form noValidate onSubmit={handleSubmit} className="min-w-0">
-            <DialogHeader className="relative mx-3 mt-3 overflow-hidden rounded-[22px] border-0 bg-[#1E1E1E] py-5 pl-5 pr-16 text-left shadow-[0_14px_32px_rgba(30,30,30,0.18)] sm:mx-4 sm:mt-4 sm:rounded-[26px] sm:py-6 sm:pl-7 sm:pr-20">
+            <DialogHeader className="relative mx-3 mt-3 overflow-hidden rounded-[22px] border-0 bg-[#1E1E1E] py-5 pl-5 pr-14 text-left shadow-[0_14px_32px_rgba(30,30,30,0.18)] sm:mx-4 sm:mt-4 sm:rounded-[26px] sm:py-6 sm:pl-7 sm:pr-20">
               <div
                 className="absolute inset-y-0 right-0 hidden w-40 border-l border-white/10 sm:block"
                 aria-hidden="true"
@@ -694,30 +728,75 @@ export function OrderModal({
 
               <div className="relative flex items-center gap-2.5">
                 <CplLogoImage
-                  size={42}
+                  size={36}
                   className="border-white/40 shadow-none"
                 />
                 <div className="min-w-0">
-                  <p className="truncate font-display text-[10px] font-bold uppercase text-[#C8D8B8]">
-                    {t("orderInquiryBadge")}
+                  <p className="font-display text-[9px] font-bold uppercase tracking-wide text-[#C8D8B8] sm:text-[10px]">
+                    CPL Makassar · Order
                   </p>
-                  <DialogTitle className="mt-1 text-xl font-black uppercase leading-tight text-white sm:text-2xl">
-                    {t("orderModalTitle")}
+                  <DialogTitle className="mt-1 font-display text-lg font-black uppercase leading-tight text-white sm:text-2xl">
+                    {isIndonesian ? "Rakit Meal Plan" : "Build Your Meal Plan"}
                   </DialogTitle>
                 </div>
               </div>
-              <DialogDescription className="relative mt-2 max-w-lg pl-[52px] font-sans text-xs leading-relaxed text-white/60">
-                {t("orderModalSub")}
+              <DialogDescription className="relative mt-2 max-w-lg font-sans text-[11px] leading-relaxed text-white/70 sm:pl-[46px] sm:text-xs">
+                {isIndonesian ? "Pilih paket, atur jadwal, lalu kirim ke WhatsApp." : "Choose your plan, set a schedule, then send it on WhatsApp."}
               </DialogDescription>
             </DialogHeader>
 
-            <div className="grid min-w-0 gap-5 p-4 sm:p-7 md:grid-cols-2 md:gap-7">
-              <div className="min-w-0 space-y-5">
-                <section aria-labelledby={`${fieldId}-contact-title`}>
+            <div className="px-4 pt-5 sm:px-7 sm:pt-6">
+              <div className="mb-3 flex items-center justify-between gap-3">
+                <p className="font-mono text-[10px] font-bold uppercase tracking-[0.15em] text-[#6B7860]">
+                  {isIndonesian ? "Langkah" : "Step"} {activeStep} / 3
+                </p>
+                <p className="font-display text-xs font-extrabold uppercase text-[#1E1E1E]">
+                  {stepLabels[activeStep - 1]}
+                </p>
+              </div>
+              <div
+                role="progressbar"
+                aria-label={isIndonesian ? "Progres pemesanan" : "Order progress"}
+                aria-valuemin={1}
+                aria-valuemax={3}
+                aria-valuenow={activeStep}
+                className="grid grid-cols-3 gap-1.5"
+              >
+                {stepLabels.map((label, index) => (
+                  <span
+                    key={label}
+                    className={`h-1.5 rounded-full transition-colors duration-200 motion-reduce:transition-none ${index < activeStep ? "bg-[#1E1E1E]" : "bg-[#1E1E1E]/10"}`}
+                  />
+                ))}
+              </div>
+              <div className="mt-3 grid grid-cols-3 gap-2 text-center font-display text-[9px] font-bold uppercase leading-tight sm:text-[10px]">
+                {stepLabels.map((label, index) => (
+                  <span key={label} className={index + 1 === activeStep ? "text-[#1E1E1E]" : "text-[#6B7860]"}>
+                    {label}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className={`grid min-w-0 gap-5 px-4 pb-6 pt-6 sm:px-7 sm:pb-7 lg:gap-7 ${activeStep < 3 ? "lg:grid-cols-[minmax(0,1fr)_17.5rem]" : "lg:grid-cols-1"}`}>
+              <div className={`min-w-0 space-y-5 ${activeStep === 2 ? "hidden" : ""}`}>
+                {activeStep === 1 && (
+                  <div className="relative overflow-hidden rounded-2xl bg-[#1E1E1E] text-white">
+                    <img src="/images/chicken_teriyaki.webp" alt="Chicken Teriyaki Clean Plate Lab" className="absolute inset-0 h-full w-full object-cover opacity-55" />
+                    <div className="relative flex min-h-36 flex-col justify-end bg-gradient-to-r from-[#1E1E1E]/90 via-[#1E1E1E]/55 to-transparent p-5 sm:min-h-44 sm:p-6">
+                      <p className="font-mono text-[9px] font-bold uppercase tracking-[0.2em] text-[#C8D8B8]">Clean Plate Lab</p>
+                      <p className="mt-2 max-w-64 font-display text-xl font-black uppercase leading-tight sm:text-2xl">
+                        {isIndonesian ? "Paket sesuai targetmu." : "Built for your goals."}
+                      </p>
+                      <p className="mt-1.5 max-w-64 text-[10px] leading-4 text-white/80">
+                        {isIndonesian ? "Menu berganti setiap hari. Target proteinmu tetap jelas." : "The menu changes daily. Your protein target stays clear."}
+                      </p>
+                    </div>
+                  </div>
+                )}
+                <section aria-labelledby={`${fieldId}-contact-title`} className={activeStep === 3 ? "" : "hidden"}>
                   <div className="mb-3 flex items-center gap-2.5">
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#1E1E1E] font-mono text-[10px] font-bold text-white">
-                      01
-                    </span>
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#1E1E1E] text-white"><User size={13} /></span>
                     <h3
                       id={`${fieldId}-contact-title`}
                       className="min-w-0 font-display text-xs font-extrabold uppercase"
@@ -870,11 +949,9 @@ export function OrderModal({
                   </div>
                 </section>
 
-                <section aria-labelledby={`${fieldId}-protein-title`}>
+                <section aria-labelledby={`${fieldId}-protein-title`} className={activeStep === 1 ? "" : "hidden"}>
                   <div className="mb-3 flex items-center gap-2.5">
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#1E1E1E] font-mono text-[10px] font-bold text-white">
-                      02
-                    </span>
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#1E1E1E] text-white"><UtensilsCrossed size={13} /></span>
                     <h3
                       id={`${fieldId}-protein-title`}
                       className="min-w-0 font-display text-xs font-extrabold uppercase"
@@ -885,7 +962,7 @@ export function OrderModal({
                   </div>
 
                   <div
-                    className="grid grid-cols-5 gap-1.5 sm:gap-2"
+                    className="grid grid-cols-3 gap-2 sm:grid-cols-5"
                     role="radiogroup"
                     aria-label={t("orderProteinTier")}
                   >
@@ -994,11 +1071,32 @@ export function OrderModal({
                   </div>
                 </section>
 
-                <section aria-labelledby={`${fieldId}-customization-title`}>
+                <section className={activeStep === 1 ? "" : "hidden"} aria-label={orderCopy.servingsPerDay}>
+                  <div className="mb-2 flex items-center gap-2.5">
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#1E1E1E] text-white"><UtensilsCrossed size={13} /></span>
+                    <h3 className="font-display text-xs font-extrabold uppercase">{orderCopy.servingsPerDay}</h3>
+                    <span className="h-px min-w-[8px] flex-1 bg-[#1E1E1E]/15" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label={orderCopy.servingsPerDay}>
+                    {[1, 2].map((count) => (
+                      <button
+                        key={count}
+                        type="button"
+                        role="radio"
+                        aria-checked={mealsPerDay === count}
+                        onClick={() => setMealsPerDay(count)}
+                        className={`min-h-12 rounded-lg border-2 px-3 font-display text-[10px] font-extrabold uppercase transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D1954E] ${mealsPerDay === count ? "border-[#1E1E1E] bg-[#1E1E1E] text-white" : "border-[#1E1E1E]/20 bg-white hover:border-[#8D9B7D]"}`}
+                      >
+                        {count === 1 ? orderCopy.oneServing : orderCopy.twoServings}
+                      </button>
+                    ))}
+                  </div>
+                  {mealsPerDay === 2 && <p className="mt-2 text-[10px] leading-4 text-[#6B7860]">{orderCopy.sameMenu}</p>}
+                </section>
+
+                <section aria-labelledby={`${fieldId}-customization-title`} className={activeStep === 1 ? "" : "hidden"}>
                   <div className="mb-3 flex items-center gap-2.5">
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#1E1E1E] font-mono text-[10px] font-bold text-white">
-                      03
-                    </span>
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#1E1E1E] text-white"><Check size={13} /></span>
                     <h3
                       id={`${fieldId}-customization-title`}
                       className="min-w-0 font-display text-xs font-extrabold uppercase"
@@ -1015,7 +1113,7 @@ export function OrderModal({
                   />
                 </section>
 
-                <section aria-labelledby={`${fieldId}-addons-title`}>
+                <section aria-labelledby={`${fieldId}-addons-title`} className={activeStep === 1 ? "" : "hidden"}>
                   <div className="mb-3 flex items-center gap-2.5">
                     <h3
                       id={`${fieldId}-addons-title`}
@@ -1064,13 +1162,13 @@ export function OrderModal({
 
               <section
                 id={`${fieldId}-dates-group`}
-                aria-labelledby={`${fieldId}-delivery-title`}
-                className="min-w-0 transition-transform"
+                aria-labelledby={activeStep === 2 ? `${fieldId}-delivery-title` : undefined}
+                aria-label={activeStep === 3 ? t("orderSummary") : undefined}
+                className={`min-w-0 transition-transform ${activeStep === 1 ? "hidden" : ""}`}
               >
+                <div className={activeStep === 2 ? "" : "hidden"}>
                 <div className="mb-3 flex items-center gap-2.5">
-                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#1E1E1E] font-mono text-[10px] font-bold text-white">
-                    04
-                  </span>
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#1E1E1E] text-white"><CalendarDays size={13} /></span>
                   <h3
                     id={`${fieldId}-delivery-title`}
                     className="min-w-0 font-display text-xs font-extrabold uppercase"
@@ -1147,47 +1245,6 @@ export function OrderModal({
                   </div>
                 </div>
 
-                <div className="mt-5">
-                  <div className="mb-2 flex items-center gap-2.5">
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#1E1E1E] font-mono text-[10px] font-bold text-white">
-                      05
-                    </span>
-                    <p className="font-display text-[10px] font-extrabold uppercase">
-                      {orderCopy.servingsPerDay}
-                    </p>
-                    <span className="h-px min-w-[8px] flex-1 bg-[#1E1E1E]/15" />
-                  </div>
-                  <div
-                    className="mt-2 grid grid-cols-2 gap-2"
-                    role="radiogroup"
-                    aria-label={orderCopy.servingsPerDay}
-                  >
-                    <button
-                      type="button"
-                      role="radio"
-                      aria-checked={mealsPerDay === 1}
-                      onClick={() => setMealsPerDay(1)}
-                      className={`min-h-11 rounded-lg border-2 px-3 font-display text-[10px] font-extrabold uppercase transition-all duration-200 hover:-translate-y-0.5 hover:border-[#D1954E] hover:shadow-sm ${mealsPerDay === 1 ? "border-[#1E1E1E] bg-[#1E1E1E] text-white" : "border-[#1E1E1E]/20 bg-white"}`}
-                    >
-                      {orderCopy.oneServing}
-                    </button>
-                    <button
-                      type="button"
-                      role="radio"
-                      aria-checked={mealsPerDay === 2}
-                      onClick={() => setMealsPerDay(2)}
-                      className={`min-h-11 rounded-lg border-2 px-3 font-display text-[10px] font-extrabold uppercase transition-all duration-200 hover:-translate-y-0.5 hover:border-[#D1954E] hover:shadow-sm ${mealsPerDay === 2 ? "border-[#1E1E1E] bg-[#1E1E1E] text-white" : "border-[#1E1E1E]/20 bg-white"}`}
-                    >
-                      {orderCopy.twoServings}
-                    </button>
-                  </div>
-                  {mealsPerDay === 2 ? (
-                    <p className="mt-2 rounded-lg border border-[#8D9B7D]/40 bg-[#E1ECD3] px-3 py-2 text-[10px] font-semibold leading-4 text-[#6B7860]">
-                      {orderCopy.sameMenu}
-                    </p>
-                  ) : null}
-                </div>
-
                 <div className="mt-4 rounded-lg border border-[#1E1E1E]/20 bg-white p-3">
                   <p className="flex items-center gap-1.5 font-display text-[10px] font-bold uppercase text-[#4D4D4D]">
                     <Clock3 size={13} className="text-[#6B7860]" />
@@ -1251,9 +1308,7 @@ export function OrderModal({
 
                 <div className="mt-4">
                   <div className="mb-2 flex items-center gap-2.5">
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#1E1E1E] font-mono text-[10px] font-bold text-white">
-                      06
-                    </span>
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#1E1E1E] text-white"><Truck size={13} /></span>
                     <p className="font-display text-[10px] font-extrabold uppercase">
                       {orderCopy.fulfillment}
                     </p>
@@ -1486,16 +1541,14 @@ export function OrderModal({
                     </p>
                   )}
                 </fieldset>
+                </div>
 
                 <div
-                  className="mt-5 overflow-hidden rounded-2xl border-2 border-[#8D9B7D] bg-[#E1ECD3]"
+                  className={`${activeStep === 3 ? "" : "hidden"} overflow-hidden rounded-2xl border-2 border-[#8D9B7D] bg-[#E1ECD3]`}
                   aria-live="polite"
                 >
                   <div className="flex items-center gap-3 border-b border-[#8D9B7D]/35 px-3.5 py-3 sm:px-4">
                     <p className="flex min-w-0 items-center gap-2 font-display text-[10px] font-extrabold uppercase text-[#3A4A30]">
-                      <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-[#1E1E1E] font-mono text-[9px] text-white">
-                        07
-                      </span>
                       <PackageCheck size={15} className="shrink-0" />
                       <span>{t("orderSummary")}</span>
                     </p>
@@ -1685,30 +1738,54 @@ export function OrderModal({
                     </div>
                   </div>
                 </div>
-                <p className="mt-2 text-center text-[9px] leading-4 text-[#6B7860]">
+                <p className={`${activeStep === 3 ? "" : "hidden"} mt-2 text-center text-[9px] leading-4 text-[#6B7860]`}>
                   {orderCopy.courierNote}
                 </p>
-
-                <Button
-                  type="submit"
-                  variant="dark"
-                  disabled={totalDays === 0}
-                  className="mt-4 h-auto min-h-12 w-full min-w-0 whitespace-normal rounded-lg bg-[#D1954E] px-4 py-3 text-center text-xs leading-tight text-[#FEFDF9] hover:bg-[#B8803C]"
-                >
-                  <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-white/15 font-mono text-[9px] font-bold text-white">
-                    08
-                  </span>
-                  <span className="min-w-0 break-words">
-                    {t("orderSubmit")}
-                  </span>
-                  <ArrowRight size={17} className="hidden min-[430px]:block" />
-                </Button>
-
-                <div className="mt-2 flex items-center justify-center gap-1.5 text-center text-[9px] leading-tight text-[#6B7860]">
-                  <ShieldCheck size={12} className="shrink-0" />
-                  <span>{t("orderGuaranteeNote")}</span>
-                </div>
               </section>
+              {activeStep < 3 && (
+                <aside className="hidden self-start overflow-hidden rounded-2xl border border-[#1E1E1E]/15 bg-white shadow-[0_12px_32px_rgba(30,30,30,0.08)] lg:sticky lg:top-4 lg:block">
+                  <div className="bg-[#1E1E1E] px-5 py-4 text-white">
+                    <p className="font-mono text-[9px] font-bold uppercase tracking-[0.2em] text-[#C8D8B8]">
+                      {isIndonesian ? "Ringkasan langsung" : "Live summary"}
+                    </p>
+                    <p className="mt-1 font-display text-lg font-black uppercase leading-tight">
+                      {selectedTier.tier}g Protein
+                    </p>
+                    <p className="mt-1 font-mono text-[11px] font-bold text-[#C8D8B8]">
+                      Rp {pricePerBox.toLocaleString("id-ID")} / box
+                    </p>
+                  </div>
+                  <div className="space-y-3 p-5 text-[11px]">
+                    <div className="flex justify-between gap-3"><span className="text-[#6B7860]">{isIndonesian ? "Tarif" : "Rate"}</span><strong>{periodLabel}</strong></div>
+                    <div className="flex justify-between gap-3"><span className="text-[#6B7860]">{orderCopy.servingsPerDay}</span><strong>{mealsPerDay}x / {isIndonesian ? "hari" : "day"}</strong></div>
+                    <div className="flex justify-between gap-3"><span className="text-[#6B7860]">{isIndonesian ? "Hari layanan" : "Service days"}</span><strong>{totalDays}</strong></div>
+                    <div className="flex justify-between gap-3"><span className="text-[#6B7860]">{isIndonesian ? "Jumlah box" : "Total boxes"}</span><strong>{totalBoxes}</strong></div>
+                    <div className="flex justify-between gap-3"><span className="text-[#6B7860]">{orderCopy.addons}</span><strong>{selectedAddons.length ? `+ Rp ${addonsPerBox.toLocaleString("id-ID")}` : "—"}</strong></div>
+                  </div>
+                </aside>
+              )}
+            </div>
+            <div className="sticky bottom-0 z-20 grid grid-cols-2 items-center gap-2 border-t border-[#1E1E1E]/10 bg-[#FEFDF9]/95 px-4 py-3 shadow-[0_-12px_30px_rgba(30,30,30,0.08)] backdrop-blur-sm sm:flex sm:gap-3 sm:px-7">
+              {activeStep > 1 && (
+                <button type="button" onClick={() => goToStep(activeStep - 1)} className="row-start-2 min-h-12 rounded-lg border border-[#1E1E1E]/20 px-4 font-display text-[10px] font-extrabold uppercase text-[#1E1E1E] hover:bg-[#E1ECD3] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D1954E] sm:row-auto">
+                  {isIndonesian ? "Kembali" : "Back"}
+                </button>
+              )}
+              <div className="col-span-2 row-start-1 min-w-0 sm:col-auto sm:row-auto sm:mr-auto">
+                <p className="font-display text-[8px] font-bold uppercase tracking-wide text-[#6B7860]">{t("orderEstimatedTotal")}</p>
+                <p className="font-display text-xl font-black leading-tight text-[#1E1E1E]">Rp {totalCost.toLocaleString("id-ID")}</p>
+              </div>
+              {activeStep < 3 ? (
+                <button type="button" onClick={handleNextStep} className={`row-start-2 flex min-h-12 items-center justify-center gap-2 rounded-lg bg-[#1E1E1E] px-5 font-display text-[10px] font-extrabold uppercase text-white transition-colors hover:bg-[#3A4A30] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D1954E] focus-visible:ring-offset-2 sm:row-auto sm:ml-auto sm:px-7 ${activeStep === 1 ? "col-span-2" : "col-start-2"}`}>
+                  {isIndonesian ? "Lanjut" : "Continue"}<ArrowRight size={15} />
+                </button>
+              ) : (
+                <Button type="submit" variant="dark" disabled={totalDays === 0} className="col-start-2 row-start-2 min-h-12 min-w-0 rounded-lg bg-[#D1954E] px-4 text-[10px] font-extrabold uppercase text-white hover:bg-[#B8803C] sm:col-auto sm:row-auto sm:ml-auto sm:px-6">
+                  <MessageCircle size={16} className="shrink-0" />
+                  <span className="hidden min-[400px]:inline">{t("orderSubmit")}</span>
+                  <span className="min-[400px]:hidden">WhatsApp</span>
+                </Button>
+              )}
             </div>
           </form>
         ) : (
