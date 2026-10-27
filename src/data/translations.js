@@ -224,7 +224,7 @@ export const translations = {
     orderInquiryBadge: "Pemesanan Catering CPL Makassar",
     orderModalTitle: "Formulir Pemesanan Meal Plan CPL",
     orderModalSub:
-      "Pilih tingkat protein dan lengkapi data untuk memesan via WhatsApp.",
+      "Tentukan jadwal, pilih tingkat protein, dan lengkapi data untuk memesan via WhatsApp.",
     orderCustomerDetails: "Data pemesan",
     orderProteinTier: "Pilih porsi protein",
     orderDeliveryHighlight: "1–2 box segar, setiap hari",
@@ -529,7 +529,7 @@ export const translations = {
     orderInquiryBadge: "CPL Order Inquiry Makassar",
     orderModalTitle: "CPL Meal Plan Inquiry Form",
     orderModalSub:
-      "Choose your protein tier and fill details to order via WhatsApp.",
+      "Set your schedule, choose a protein tier, and fill in your details to order via WhatsApp.",
     orderCustomerDetails: "Customer details",
     orderProteinTier: "Choose protein portion",
     orderDeliveryHighlight: "1–2 fresh boxes, every day",

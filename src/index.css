@@ -674,16 +674,17 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   position: absolute;
   top: calc(100% + 6px);
   left: 50%;
-  transform: translateX(-50%);
   z-index: 100;
-  width: max(100%, min(640px, 98vw));
+  width: min(640px, calc(100vw - 24px));
+  max-height: calc(100dvh - 24px);
   background: #fff;
   border-radius: 16px;
   border: 1.5px solid rgba(30, 30, 30, 0.14);
   box-shadow:
     0 20px 60px rgba(0, 0, 0, 0.18),
     0 4px 16px rgba(0, 0, 0, 0.08);
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
   touch-action: auto;
   pointer-events: auto;
   user-select: none;

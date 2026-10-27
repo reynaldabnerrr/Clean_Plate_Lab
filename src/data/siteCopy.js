@@ -40,13 +40,14 @@ export const siteCopy = {
         "No cart, account, or complicated checkout. Build a complete order request, then continue with a real person on WhatsApp.",
       steps: [
         {
-          title: "Choose your protein",
-          description: "Start with a 25g, 40g, 60g, 80g, or 100g protein tier.",
-        },
-        {
           title: "Set your catering dates",
           description:
-            "Choose the delivery start and end date. The daily, weekly, or monthly rate is applied automatically.",
+            "Choose the start and end dates, servings per day, and your preferred schedule.",
+        },
+        {
+          title: "Choose your protein",
+          description:
+            "Compare 25g to 100g protein plans with the rate for your selected date range.",
         },
         {
           title: "Confirm on WhatsApp",
@@ -98,7 +99,7 @@ export const siteCopy = {
     final: {
       title: "Your next meal starts with a few clear choices.",
       description:
-        "Choose your protein and catering dates, review the estimate, then continue on WhatsApp.",
+        "Set your catering dates, choose a protein plan, review the estimate, then continue on WhatsApp.",
       cta: "Build your meal",
     },
     menu: {
@@ -215,14 +216,14 @@ export const siteCopy = {
         "Tanpa keranjang, akun, atau checkout rumit. Susun pesanan lengkap, lalu lanjutkan dengan tim kami melalui WhatsApp.",
       steps: [
         {
-          title: "Pilih proteinmu",
-          description:
-            "Mulai dari pilihan protein 25g, 40g, 60g, 80g, atau 100g.",
-        },
-        {
           title: "Tentukan tanggal katering",
           description:
-            "Pilih tanggal mulai dan selesai. Tarif harian, mingguan, atau bulanan diterapkan secara otomatis.",
+            "Pilih tanggal mulai dan selesai, jumlah porsi per hari, serta jadwal makan.",
+        },
+        {
+          title: "Pilih proteinmu",
+          description:
+            "Bandingkan paket protein 25g hingga 100g dengan tarif sesuai rentang tanggalmu.",
         },
         {
           title: "Konfirmasi di WhatsApp",
@@ -274,7 +275,7 @@ export const siteCopy = {
     final: {
       title: "Makanan berikutnya dimulai dari beberapa pilihan yang jelas.",
       description:
-        "Pilih protein dan tanggal katering, periksa estimasinya, lalu lanjutkan melalui WhatsApp.",
+        "Tentukan tanggal katering, pilih paket protein, periksa estimasinya, lalu lanjutkan melalui WhatsApp.",
       cta: "Pilih Paket Katering",
     },
     menu: {

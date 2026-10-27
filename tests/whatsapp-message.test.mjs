@@ -154,7 +154,7 @@ test("handles addons, two meals per day, and pickup method dynamically", () => {
   );
   assert.ok(
     message.includes(
-      "Add-on: Ganti Karbo: Baby Potato + Jagung (+Rp5.000/box)",
+      "Add-on: Ganti Karbo: Baby Potato + Jagung (+Rp5.000 per meal)",
     ),
   );
   assert.ok(
@@ -167,7 +167,7 @@ test("handles addons, two meals per day, and pickup method dynamically", () => {
   assert.ok(message.includes("Paket: Rp65.000 × 6 box = Rp390.000"));
   assert.ok(
     message.includes(
-      "Add-on (Ganti Karbo: Baby Potato + Jagung): Rp5.000 × 6 box = Rp30.000",
+      "Add-on (Ganti Karbo: Baby Potato + Jagung): Rp5.000 per meal × 6 meal = Rp30.000",
     ),
   );
   assert.ok(message.includes("TOTAL: Rp420.000"));

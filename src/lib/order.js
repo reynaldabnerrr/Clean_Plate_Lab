@@ -120,7 +120,7 @@ export function buildSimplifiedWhatsAppOrderMessage({
     addonText = selectedAddons
       .map(
         (addon) =>
-          `${addon.nameID || addon.name} (+Rp${addon.price.toLocaleString("id-ID")}/box)`,
+          `${addon.nameID || addon.name} (+Rp${addon.price.toLocaleString("id-ID")} per meal)`,
       )
       .join(", ");
   }
@@ -152,7 +152,7 @@ export function buildSimplifiedWhatsAppOrderMessage({
     );
     selectedAddons.forEach((addon) => {
       costLines.push(
-        `Add-on (${addon.nameID || addon.name}): Rp${addon.price.toLocaleString("id-ID")} × ${totalBoxes} box = Rp${(addon.price * totalBoxes).toLocaleString("id-ID")}`,
+        `Add-on (${addon.nameID || addon.name}): Rp${addon.price.toLocaleString("id-ID")} per meal × ${totalBoxes} meal = Rp${(addon.price * totalBoxes).toLocaleString("id-ID")}`,
       );
     });
   }

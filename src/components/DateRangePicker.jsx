@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { CalendarDays, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { getServiceDates, isKitchenClosed, kitchenCopy } from "../lib/kitchen";
-import { getDefaultOrderStartDate } from "../lib/order";
 
 const MONTH_ID = [
   "Januari",
@@ -254,20 +253,21 @@ export function DateRangePicker({
     const rect = rootRef.current.getBoundingClientRect();
     const pad = 12;
     const width = Math.min(640, window.innerWidth - pad * 2);
-    let left = rect.left;
-
-    if (left + width > window.innerWidth - pad)
-      left = window.innerWidth - width - pad;
-    if (left < pad) left = pad;
-
+    const left = Math.min(
+      Math.max(rect.left + (rect.width - width) / 2, pad),
+      window.innerWidth - width - pad,
+    );
+    const popupHeight = popupRef.current?.getBoundingClientRect().height || 430;
     const below = window.innerHeight - rect.bottom - pad;
-    const top =
-      below >= 500 || below >= window.innerHeight * 0.45
-        ? rect.bottom + 6
-        : rect.top - 506;
+    const above = rect.top - pad;
+    const top = below >= popupHeight
+      ? rect.bottom + 6
+      : above >= popupHeight
+        ? rect.top - popupHeight - 6
+        : Math.max(pad, (window.innerHeight - popupHeight) / 2);
     setPopupStyle({
       position: "fixed",
-      top: top < pad ? rect.bottom + 6 : top,
+      top,
       left,
       width,
       zIndex: 9999,
@@ -294,6 +294,7 @@ export function DateRangePicker({
     if (!popupEl) return undefined;
 
     const handleWheel = (event) => {
+      if (popupEl.scrollHeight > popupEl.clientHeight) return;
       const scrollable =
         rootRef.current?.closest(".overflow-y-auto") ||
         rootRef.current?.closest("[role='dialog']") ||
@@ -362,7 +363,6 @@ export function DateRangePicker({
 
       if (mode === "start") {
         onStartDateChange(ds);
-        if (endDate && ds > endDate) onEndDateChange(ds);
         setSelecting("end");
         selectingRef.current = "end";
         setHoverDate(null);
@@ -378,14 +378,13 @@ export function DateRangePicker({
         nextEndDate = startDate;
       }
 
-      onStartDateChange(nextStartDate);
+      if (nextStartDate !== startDate) onStartDateChange(nextStartDate);
       onEndDateChange(nextEndDate);
       setHoverDate(null);
       closePicker();
     },
     [
       startDate,
-      endDate,
       baseY,
       baseM,
       onStartDateChange,
@@ -398,16 +397,14 @@ export function DateRangePicker({
     (event) => {
       event.preventDefault();
       event.stopPropagation();
-      const defaultDate = getDefaultOrderStartDate(today);
-      onStartDateChange(defaultDate);
-      onEndDateChange(defaultDate);
+      onStartDateChange("");
       setSelecting("start");
       selectingRef.current = "start";
       setHoverDate(null);
       setOffset(0);
       closePicker();
     },
-    [today, onStartDateChange, onEndDateChange, closePicker],
+    [onStartDateChange, closePicker],
   );
 
   const locale = isIndonesian ? "id-ID" : "en-GB";
