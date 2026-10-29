@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { CplContext } from "./cpl-context";
-import { getDateInputValueInTimeZone } from "../lib/order";
 import { migrateStoredLanguage, writeStoredState } from "../lib/storage";
 import { supabase } from "../lib/supabase";
 import {
@@ -19,28 +18,22 @@ import {
   deleteAdminUser,
   getAdminProfile,
 } from "../lib/adminAuthService";
-import { INITIAL_MENU_ITEMS, INITIAL_ORDERS } from "../data/initialMenus";
 import { translate } from "../data/translations";
 
 export function CplProvider({ children }) {
-  const [menuItems, setMenuItems] = useState(INITIAL_MENU_ITEMS);
-  const [orders, setOrders] = useState(INITIAL_ORDERS);
+  const [menuItems, setMenuItems] = useState([]);
   const [supabaseUser, setSupabaseUser] = useState(null);
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
   const [userRole, setUserRole] = useState("admin");
   const [isFromDb, setIsFromDb] = useState(false);
-  const [loadingMenu, setLoadingMenu] = useState(false);
+  const [menuError, setMenuError] = useState(null);
+  const [loadingMenu, setLoadingMenu] = useState(true);
   const [loadingAdminSession, setLoadingAdminSession] = useState(
     Boolean(supabase),
   );
-  const [announcementText, setAnnouncementText] = useState(
-    "100% Lab Verified High Protein Meal Prep • Free Delivery Jabodetabek",
-  );
   const [storedLanguage] = useState(migrateStoredLanguage);
-  const [language, setLanguageState] = useState(storedLanguage || "EN");
-  const [hasSelectedLanguage, setHasSelectedLanguage] = useState(
-    Boolean(storedLanguage),
-  );
+  const [language, setLanguageState] = useState(storedLanguage || "ID");
+  const [hasSelectedLanguage, setHasSelectedLanguage] = useState(true);
 
   // Restore only real Supabase sessions that have an admin_users profile.
   useEffect(() => {
@@ -112,10 +105,9 @@ export function CplProvider({ children }) {
     setLoadingMenu(true);
     try {
       const res = await fetchWeeklyMenusFromSupabase();
-      if (res.data && res.data.length > 0) {
-        setMenuItems(res.data);
-        setIsFromDb(res.isFromDb);
-      }
+      setMenuItems(res.data);
+      setIsFromDb(res.isFromDb);
+      setMenuError(res.error);
       return res;
     } finally {
       setLoadingMenu(false);
@@ -217,14 +209,8 @@ export function CplProvider({ children }) {
         prev.map((item) => (item.id === id ? res.data : item)),
       );
       return { success: true };
-    } else {
-      setMenuItems((prev) =>
-        prev.map((item) =>
-          item.id === id ? { ...item, available: !currentStatus } : item,
-        ),
-      );
-      return { success: true, error: res.error };
     }
+    return { success: false, error: res.error };
   };
 
   const seedDefaultMenus = async () => {
@@ -234,25 +220,6 @@ export function CplProvider({ children }) {
       return { success: true };
     }
     return { success: false, error: res.error };
-  };
-
-  // Add new order
-  const addOrder = (orderData) => {
-    const newOrder = {
-      ...orderData,
-      id: `ord-${Date.now()}`,
-      refCode: `CPL-SUB-2026-${Math.floor(10 + Math.random() * 90)}`,
-      date: getDateInputValueInTimeZone(),
-      status: "Pending",
-    };
-    setOrders((prev) => [newOrder, ...prev]);
-  };
-
-  // Update order status
-  const updateOrderStatus = (id, status) => {
-    setOrders((prev) =>
-      prev.map((ord) => (ord.id === id ? { ...ord, status } : ord)),
-    );
   };
 
   return (
@@ -270,6 +237,7 @@ export function CplProvider({ children }) {
         getAdminUsers,
         deleteAdminUserAccount,
         isFromDb,
+        menuError,
         loadingMenu,
         loadingAdminSession,
         fetchLatestMenus,
@@ -278,11 +246,6 @@ export function CplProvider({ children }) {
         deleteMenuItem,
         toggleAvailability,
         seedDefaultMenus,
-        orders,
-        addOrder,
-        updateOrderStatus,
-        announcementText,
-        setAnnouncementText,
         language,
         setLanguage,
         hasSelectedLanguage,

@@ -18,9 +18,12 @@ export const analytics = {
   whatsappClicked: (order) =>
     trackEvent("whatsapp_order_clicked", {
       protein_tier: order.proteinTier,
-      meal_id: order.mealId,
-      period: order.orderPeriod,
-      quantity: order.quantity,
+      period: order.cateringPeriod,
+      days: order.totalDays,
+      meals_per_day: order.mealsPerDay,
+      quantity: order.totalBoxes,
+      value: order.totalCost,
+      has_referral: order.hasReferral,
     }),
   proteinTierSelected: (proteinTier) =>
     trackEvent("protein_tier_selected", { protein_tier: proteinTier }),

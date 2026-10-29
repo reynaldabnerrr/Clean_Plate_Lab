@@ -2,8 +2,6 @@ import React from "react";
 import { CplProvider } from "./context/CplContext";
 import { Navbar } from "./components/Navbar";
 import { Footer } from "./components/Footer";
-import { OrderModal } from "./components/OrderModal";
-import { LanguageWelcomeModal } from "./components/LanguageWelcomeModal";
 import { KitchenBreakNotice } from "./components/KitchenBreakNotice";
 import { WhatsAppFloatingCta } from "./components/WhatsAppFloatingCta";
 import HomePage from "./pages/HomePage";
@@ -12,6 +10,9 @@ import { analytics, trackEvent } from "./lib/analytics";
 import { useCpl } from "./hooks/useCpl";
 
 const AdminPage = React.lazy(() => import("./pages/AdminPage"));
+const OrderModal = React.lazy(() =>
+  import("./components/OrderModal").then((module) => ({ default: module.OrderModal })),
+);
 
 function AdminLoadingFallback() {
   return (
@@ -111,6 +112,9 @@ export default function App() {
   const [orderModalOpen, setOrderModalOpen] = React.useState(
     () => window.location.hash === "#order-form",
   );
+  const [orderModalLoaded, setOrderModalLoaded] = React.useState(
+    () => window.location.hash === "#order-form",
+  );
   const [initialProteinTier, setInitialProteinTier] = React.useState(40);
   const [initialMealsPerDay, setInitialMealsPerDay] = React.useState(1);
   const [hasExplicitOrderDefaults, setHasExplicitOrderDefaults] = React.useState(false);
@@ -130,6 +134,7 @@ export default function App() {
         window.location.pathname.startsWith("/admin");
       setIsAdminPage(isAdmin);
       setOrderModalOpen(window.location.hash === "#order-form");
+      if (window.location.hash === "#order-form") setOrderModalLoaded(true);
       if (window.location.hash !== "#order-form") orderOpenedFromPage.current = false;
     };
 
@@ -148,6 +153,7 @@ export default function App() {
 
   const handleBuild = (source, proteinTier, mealsPerDay = 1) => {
     analytics.builderOpened(source);
+    setOrderModalLoaded(true);
     if (proteinTier) setInitialProteinTier(proteinTier);
     setInitialMealsPerDay(mealsPerDay);
     setHasExplicitOrderDefaults(Boolean(proteinTier));
@@ -189,7 +195,6 @@ export default function App() {
           </SectionErrorBoundary>
         ) : (
           <div className="min-h-screen bg-[var(--cpl-cream)] text-[var(--cpl-dark)]">
-            <LanguageWelcomeModal />
             <KitchenBreakNotice enabled={!orderModalOpen} onOrder={() => handleBuild("kitchen_break")} />
             <Navbar onOpenOrder={() => handleBuild("navigation")} hidden={orderModalOpen} />
             <main id="main-content" tabIndex="-1" className="outline-none">
@@ -197,15 +202,19 @@ export default function App() {
             </main>
             <Footer />
             <WhatsAppFloatingCta hidden={orderModalOpen} />
-            <SectionErrorBoundary sectionName="Formulir Pemesanan">
-              <OrderModal
-                isOpen={orderModalOpen}
-                onClose={handleCloseOrder}
-                initialProteinTier={initialProteinTier}
-                initialMealsPerDay={initialMealsPerDay}
-                hasExplicitInitialValues={hasExplicitOrderDefaults}
-              />
-            </SectionErrorBoundary>
+            {orderModalLoaded && (
+              <SectionErrorBoundary sectionName="Formulir Pemesanan">
+                <React.Suspense fallback={null}>
+                  <OrderModal
+                    isOpen={orderModalOpen}
+                    onClose={handleCloseOrder}
+                    initialProteinTier={initialProteinTier}
+                    initialMealsPerDay={initialMealsPerDay}
+                    hasExplicitInitialValues={hasExplicitOrderDefaults}
+                  />
+                </React.Suspense>
+              </SectionErrorBoundary>
+            )}
           </div>
         )}
       </CplProvider>

@@ -105,14 +105,14 @@ export function MenuArchiveSection() {
                 {copy.menu.catalogNote}
               </p>
             </div>
-            <span className="font-mono text-[9px] font-bold uppercase tracking-wider text-black/50">
+            <span className="font-mono text-[11px] font-bold uppercase tracking-wide text-black/50">
               {weeklyMeals.length} {copy.menu.menuCount}
             </span>
           </div>
 
           {weeklyMeals.length > 1 ? (
             <div className="mb-4 md:hidden">
-              <p className="mb-1.5 font-mono text-[9px] font-bold uppercase tracking-wider text-[var(--cpl-sage-dark)]">
+              <p className="mb-1.5 font-mono text-[11px] font-bold uppercase tracking-wide text-[var(--cpl-sage-dark)]">
                 {copy.menu.selectMenu}
               </p>
               <Select
@@ -168,18 +168,18 @@ export function MenuArchiveSection() {
                     </span>
                   </div>
 
-                  <div className="flex flex-col p-4 sm:p-6">
+                  <div className="flex flex-col p-5 sm:p-6">
                     <div className="min-h-0 sm:min-h-[3.75rem]">
                       <h4 className="line-clamp-2 font-display text-lg font-extrabold uppercase leading-tight text-[var(--cpl-dark)] sm:text-2xl">
                         {meal.name}
                       </h4>
                     </div>
-                    <p className="mt-2 line-clamp-2 text-[11px] leading-5 text-[var(--cpl-dark-muted)] sm:mt-3 sm:min-h-[4.5rem] sm:text-xs sm:leading-6">
+                    <p className="mt-3 line-clamp-2 text-xs leading-5 text-[var(--cpl-dark-muted)] sm:mt-3 sm:min-h-[4.5rem] sm:text-xs sm:leading-6">
                       {mealDescription}
                     </p>
 
                     <div className="mt-4 sm:mt-5">
-                      <p className="font-mono text-[9px] font-bold uppercase tracking-wider text-[var(--cpl-sage-dark)]">
+                      <p className="font-mono text-[11px] font-bold uppercase tracking-wide text-[var(--cpl-sage-dark)]">
                         {copy.menu.chooseTier}
                       </p>
                       <div
@@ -199,7 +199,7 @@ export function MenuArchiveSection() {
                                 [meal.id]: tier,
                               }))
                             }
-                            className={`min-h-10 px-1 font-mono text-[9px] font-bold sm:min-h-11 sm:text-[10px] ${selectedTier === tier ? "bg-[#1E1E1E] text-white" : "bg-[var(--cpl-cream)] hover:bg-[var(--cpl-sage-light)]"}`}
+                            className={`cpl-tier-option min-h-11 px-1 font-mono text-[11px] font-bold sm:text-xs ${selectedTier === tier ? "bg-[#1E1E1E] text-white" : "bg-[var(--cpl-cream)] hover:bg-[var(--cpl-sage-light)]"}`}
                           >
                             {tier}g
                           </button>

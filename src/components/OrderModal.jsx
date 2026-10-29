@@ -3,7 +3,6 @@ import { getServiceDates, getOrderDateError, isServiceDate, kitchenCopy } from "
 import { KitchenBreakNotice } from "./KitchenBreakNotice";
 import { MealCustomization, MealCustomizationSummary } from "./MealCustomization";
 import { buildMealItems, normalizeMealCustomizations } from "../lib/mealCustomization";
-import confetti from "canvas-confetti";
 import { useCpl } from "../hooks/useCpl";
 import { CplLogoImage } from "./CplLogo";
 import { DateRangePicker } from "./DateRangePicker";
@@ -30,7 +29,6 @@ import {
   ArrowRight,
   CalendarDays,
   Check,
-  CheckCircle,
   Clock3,
   Link2,
   MapPin,
@@ -113,7 +111,7 @@ export function OrderModal({
   initialMealsPerDay = 1,
   hasExplicitInitialValues = false,
 }) {
-  const { addOrder, t, language, hasSelectedLanguage } = useCpl();
+  const { t, language, hasSelectedLanguage } = useCpl();
   const fieldId = useId();
   const [today, setToday] = useState(() => getDateInputValueInTimeZone());
   const defaultStartDate = getDefaultOrderStartDate(today);
@@ -543,30 +541,6 @@ export function OrderModal({
 
     setErrors({});
 
-    addOrder({
-      customerName: name,
-      phone,
-      referralCode: referralCode.trim(),
-      plan: planString,
-      startDate,
-      endDate,
-      totalDays,
-      serviceDates,
-      mealsPerDay,
-      totalBoxes,
-      readyTimeMeal1,
-      readyTimeMeal2: mealsPerDay === 2 ? readyTimeMeal2 : null,
-      addonIds,
-      addons: selectedAddonNames,
-      items: mealItems,
-      proteinTier,
-      fulfillment,
-      cutlery,
-      address,
-      mapsUrl,
-      amount: totalCost,
-    });
-
     setSubmitted(true);
     analytics.whatsappClicked({
       proteinTier,
@@ -583,16 +557,14 @@ export function OrderModal({
     const whatsappUrl = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, "_blank", "noopener,noreferrer");
 
-    try {
+    void import("canvas-confetti").then(({ default: confetti }) => {
       confetti({
         particleCount: 120,
         spread: 80,
         origin: { y: 0.6 },
         colors: ["#8D9B7D", "#1E1E1E", "#FEFDF9"],
       });
-    } catch (error) {
-      console.log("Confetti trigger error", error);
-    }
+    }).catch(() => {});
   };
 
   const handleReset = () => {
@@ -1726,7 +1698,7 @@ export function OrderModal({
           <div className="min-w-0 bg-[#F5F2E0] p-5 text-[#1E1E1E] sm:p-8">
             <div className="relative mx-auto max-w-xl text-center">
               <div className="relative mx-auto flex h-16 w-16 items-center justify-center rounded-full border-2 border-[#8D9B7D]/40 bg-[#E1ECD3] text-[#6B7860] shadow-md animate-in zoom-in-50 duration-300 sm:h-20 sm:w-20">
-                <CheckCircle
+                <MessageCircle
                   size={38}
                   strokeWidth={2.5}
                   className="text-[#6B7860] sm:size-11"

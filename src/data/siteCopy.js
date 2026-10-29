@@ -27,6 +27,7 @@ export const siteCopy = {
       weeklyDuration: "6–23 days",
       monthlyDuration: "24+ days",
       perServing: "per serving",
+      rateNote: "Prices shown are per serving. Weekly rates apply from 6 service days; monthly rates from 24. Sundays and kitchen closure dates are excluded.",
       swipeHint: "Swipe to compare protein tiers",
       calculatorPrompt: "Not sure which protein tier fits you?",
       calculatorDescription:
@@ -203,6 +204,7 @@ export const siteCopy = {
       weeklyDuration: "6–23 hari",
       monthlyDuration: "24+ hari",
       perServing: "per porsi",
+      rateNote: "Harga yang ditampilkan adalah per porsi. Tarif mingguan berlaku mulai 6 hari layanan; bulanan mulai 24 hari. Minggu dan tanggal tutup dapur tidak dihitung.",
       swipeHint: "Geser untuk membandingkan pilihan protein",
       calculatorPrompt: "Belum yakin menentukan pilihan protein?",
       calculatorDescription:

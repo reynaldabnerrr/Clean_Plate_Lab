@@ -286,11 +286,11 @@ export const translations = {
     orderSubmit: "Kirim Pemesanan via WhatsApp",
     orderGuaranteeNote:
       "Jaminan Kesegaran Lab • Langsung Terhubung ke WhatsApp CPL",
-    orderSuccessMsg: "Pemesanan Berhasil Terkirim!",
-    orderSuccessBadge: "Pemesanan Catering Terhubung",
+    orderSuccessMsg: "Lanjutkan di WhatsApp",
+    orderSuccessBadge: "Pesan Siap Dikirim",
     orderSuccessDetail:
-      "Terima kasih, {name}! Permintaan pesanan {plan} Anda telah diteruskan ke Concierge WhatsApp Clean Plate Lab.",
-    orderOpenWaCta: "Buka Chat WhatsApp",
+      "Terima kasih, {name}! Periksa pesan untuk paket {plan} di WhatsApp, lalu tekan Kirim. Pesanan akan diproses setelah tim Clean Plate Lab mengonfirmasinya.",
+    orderOpenWaCta: "Buka Lagi WhatsApp",
     orderTicketTitle: "Ringkasan Pesanan Meal Plan",
     orderBackBtn: "Kembali ke Beranda",
 
@@ -590,11 +590,11 @@ export const translations = {
     orderSubmit: "Submit Order via WhatsApp",
     orderGuaranteeNote:
       "Lab Fresh Guarantee • Direct Connect to CPL WhatsApp",
-    orderSuccessMsg: "Order Request Sent Successfully!",
-    orderSuccessBadge: "Catering Order Connected",
+    orderSuccessMsg: "Continue in WhatsApp",
+    orderSuccessBadge: "Message Ready to Send",
     orderSuccessDetail:
-      "Thank you, {name}! Your order request for {plan} has been forwarded to WhatsApp Clean Plate Lab Concierge.",
-    orderOpenWaCta: "Open WhatsApp Chat",
+      "Thank you, {name}! Review the message for your {plan} in WhatsApp, then tap Send. Our team will confirm your order before it is processed.",
+    orderOpenWaCta: "Reopen WhatsApp",
     orderTicketTitle: "Meal Plan Order Summary",
     orderBackBtn: "Back to Overview",
 

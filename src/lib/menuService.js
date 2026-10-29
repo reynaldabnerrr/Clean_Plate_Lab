@@ -429,18 +429,10 @@ export function sortMealsByDay(meals = []) {
   return result;
 }
 
-const getDefaultWeeklyMenus = () =>
-  DEFAULT_WEEKLY_MENUS.map((item) =>
-    normalizeMenuItem({
-      ...item,
-      nutrition_by_tier: buildNutritionByTier(item),
-    }),
-  );
-
 /** Fetch all weekly menus from Supabase */
 export async function fetchWeeklyMenusFromSupabase() {
   if (!supabase) {
-    return { data: sortMealsByDay(getDefaultWeeklyMenus()), isFromDb: false, error: null };
+    return { data: [], isFromDb: false, error: new Error("Database menu belum dikonfigurasi.") };
   }
 
   try {
@@ -449,12 +441,12 @@ export async function fetchWeeklyMenusFromSupabase() {
       .select("*");
 
     if (error) {
-      console.warn("Supabase fetch error (using fallback):", error.message);
-      return { data: sortMealsByDay(getDefaultWeeklyMenus()), isFromDb: false, error };
+      console.warn("Supabase menu fetch error:", error.message);
+      return { data: [], isFromDb: false, error };
     }
 
     if (!data || data.length === 0) {
-      return { data: sortMealsByDay(getDefaultWeeklyMenus()), isFromDb: false, error: null };
+      return { data: [], isFromDb: true, error: null };
     }
 
     return {
@@ -463,8 +455,8 @@ export async function fetchWeeklyMenusFromSupabase() {
       error: null,
     };
   } catch (err) {
-    console.warn("Error calling Supabase API (using fallback):", err);
-    return { data: sortMealsByDay(getDefaultWeeklyMenus()), isFromDb: false, error: err };
+    console.warn("Error calling Supabase menu API:", err);
+    return { data: [], isFromDb: false, error: err };
   }
 }
 

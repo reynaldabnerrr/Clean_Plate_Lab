@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { supabase } from '../src/lib/supabase.js';
 import {
   PROTEIN_TIERS,
   getMenuSlot,
@@ -12,7 +13,15 @@ import {
   getMenuNutritionForTier,
   sortMealsByDay,
   normalizeMenuItem,
+  fetchWeeklyMenusFromSupabase,
 } from '../src/lib/menuService.js';
+
+test('menu fetch never presents preset menus as live when database is unavailable', { skip: Boolean(supabase) }, async () => {
+  const result = await fetchWeeklyMenusFromSupabase();
+  assert.deepEqual(result.data, []);
+  assert.equal(result.isFromDb, false);
+  assert.ok(result.error);
+});
 
 test('getMenuSlot correctly resolves day slot from explicit slot or name', () => {
   assert.equal(getMenuSlot({ menu_slot: 1 }), 1);

@@ -30,7 +30,7 @@ function LegacySectionHeader({
 }) {
   return (
     <div
-      className={`mx-auto max-w-3xl space-y-4 text-center ${compact ? "mb-8 sm:mb-12" : "mb-12 sm:mb-16"}`}
+      className={`mx-auto max-w-3xl space-y-3 text-center sm:space-y-4 ${compact ? "mb-8 sm:mb-12" : "mb-12 sm:mb-16"}`}
     >
       <Badge
         variant={dark ? "solid" : "default"}
@@ -161,6 +161,9 @@ export default function HomePage({ onBuild }) {
                 );
               })}
             </div>
+            <p className="max-w-xl text-center text-xs leading-5 text-[var(--cpl-dark-muted)]">
+              {copy.protein.rateNote}
+            </p>
           </div>
           <div className="border-2 border-[#1E1E1E] bg-[#1E1E1E] shadow-[5px_5px_0_#8D9B7D]">
             <div className="grid gap-0.5 bg-[#1E1E1E] sm:grid-cols-2 lg:grid-cols-5">
@@ -198,6 +201,9 @@ export default function HomePage({ onBuild }) {
                         </p>
                         <p className="mt-0.5 whitespace-nowrap font-display text-base font-black tracking-tight text-[#1E1E1E] lg:mt-1 lg:text-xl">
                           {formatCurrency(tier.prices[pricingPeriod])}
+                          <span className="mt-0.5 block font-sans text-[10px] font-medium tracking-normal text-[var(--cpl-dark-muted)] lg:hidden">
+                            {copy.protein.perServing}
+                          </span>
                         </p>
                       </div>
                       <span className="hidden pb-0.5 text-right font-mono text-[8px] font-bold uppercase leading-tight text-[#1E1E1E]/50 lg:block">

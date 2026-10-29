@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useCpl } from "../hooks/useCpl";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
@@ -16,13 +16,36 @@ import {
   PROTEIN_TIERS,
 } from "../lib/menuService";
 import { MenuGridSkeleton } from "./ui/loading";
+import { getDateInputValueInTimeZone } from "../lib/order";
 
 export function ThisWeekMenuSection({ onOpenAdmin }) {
-  const { menuItems, language, isAdminLoggedIn, fetchLatestMenus, loadingMenu } = useCpl();
+  const { menuItems, language, isAdminLoggedIn, fetchLatestMenus, loadingMenu, menuError } = useCpl();
   const [selectedTiers, setSelectedTiers] = useState({});
   const [activeMenuIndex, setActiveMenuIndex] = useState(0);
+  const [today, setToday] = useState(() => getDateInputValueInTimeZone());
   const menuTrackRef = useRef(null);
   const nutritionLocale = language === "ID" ? "id-ID" : "en-US";
+
+  useEffect(() => {
+    let timer;
+    const syncDate = () => {
+      window.clearTimeout(timer);
+      const now = new Date();
+      const date = getDateInputValueInTimeZone(now);
+      setToday(date);
+      const nextMidnight = Date.parse(`${date}T00:00:00+08:00`) + 86_400_000;
+      timer = window.setTimeout(syncDate, nextMidnight - now.getTime() + 50);
+    };
+    const handleVisibility = () => {
+      if (document.visibilityState === "visible") syncDate();
+    };
+    syncDate();
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => {
+      window.clearTimeout(timer);
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
+  }, []);
 
   const scrollToMenu = (index) => {
     const track = menuTrackRef.current;
@@ -99,10 +122,22 @@ export function ThisWeekMenuSection({ onOpenAdmin }) {
         {/* Menu Cards Grid */}
         {loadingMenu ? (
           <MenuGridSkeleton className="lg:grid-cols-3" mobileCarousel hideImage />
+        ) : menuError ? (
+          <div role="status" className="border-2 border-dashed border-[#1E1E1E]/30 bg-white p-8 text-center">
+            <p className="font-display text-lg font-extrabold uppercase">
+              {language === "ID" ? "Menu belum bisa dimuat" : "Menu is unavailable"}
+            </p>
+            <p className="mt-2 text-sm text-gray-600">
+              {language === "ID" ? "Silakan coba lagi atau hubungi kami lewat WhatsApp untuk menu terbaru." : "Please try again or ask us on WhatsApp for the latest menu."}
+            </p>
+            <Button type="button" onClick={fetchLatestMenus} className="mt-4">
+              {language === "ID" ? "Coba lagi" : "Try again"}
+            </Button>
+          </div>
         ) : menuItems.length === 0 ? (
           <div className="text-center py-16 border-2 border-dashed border-[#1E1E1E]/30 bg-white p-8">
-            <p className="font-mono text-xs font-bold uppercase text-[#6B7860]">No Menus Found</p>
-            <p className="text-sm text-gray-500 mt-2">Belum ada menu yang ditambahkan.</p>
+            <p className="font-mono text-xs font-bold uppercase text-[#6B7860]">{language === "ID" ? "Menu belum tersedia" : "No menu available yet"}</p>
+            <p className="text-sm text-gray-500 mt-2">{language === "ID" ? "Menu minggu ini sedang disiapkan." : "This week's menu is being prepared."}</p>
             {isAdminLoggedIn && (
               <Button onClick={onOpenAdmin} className="mt-4 bg-[#8D9B7D]">
                 Buka Admin CMS untuk Tambah Menu
@@ -180,9 +215,16 @@ export function ThisWeekMenuSection({ onOpenAdmin }) {
                   className="group grid h-full min-w-0 flex-[0_0_calc(100%-2rem)] snap-start scroll-ml-4 grid-rows-[auto_1fr] overflow-hidden rounded-none border-2 border-[#1E1E1E] bg-white shadow-[6px_6px_0_#1E1E1E] transition-all duration-200 hover:-translate-y-1 hover:shadow-[9px_9px_0_#8D9B7D] md:flex-auto md:scroll-ml-0"
                 >
                   {/* Schedule header */}
-                  <div className="flex min-h-14 items-center justify-between gap-3 border-b-2 border-[#1E1E1E] bg-[#1E1E1E] px-4 py-3 sm:px-5">
+                  <div className="flex min-h-14 flex-wrap items-center justify-between gap-3 border-b-2 border-[#1E1E1E] bg-[#1E1E1E] px-4 py-3 sm:px-5">
+                    <div className="flex flex-wrap items-center gap-2">
                     <div className="border border-white/25 bg-white px-3 py-1 font-mono text-[10px] font-black uppercase tracking-wider text-[#1E1E1E] shadow-[2px_2px_0_#8D9B7D]">
                       {meal.day ? meal.day.toUpperCase() : meal.code}
+                    </div>
+                    {meal.menuDate === today && (
+                      <span className="border border-[#8D9B7D] bg-[#E1ECD3] px-2 py-1 font-mono text-[10px] font-bold uppercase tracking-wide text-[#1E1E1E]">
+                        {language === "ID" ? "Hari ini" : "Today"}
+                      </span>
+                    )}
                     </div>
                     {meal.menuDate && (
                       <div className="inline-flex items-center gap-1.5 font-mono text-[9px] font-black uppercase tracking-wide text-white/80">
@@ -216,7 +258,7 @@ export function ThisWeekMenuSection({ onOpenAdmin }) {
                     </p>
 
                     <fieldset className="mt-4">
-                      <legend className="font-mono text-[9px] font-black uppercase tracking-wider text-[#6B7860]">
+                      <legend className="font-mono text-[11px] font-black uppercase tracking-wide text-[#6B7860]">
                         {language === "ID" ? "Pilih kategori protein" : "Choose protein tier"}
                       </legend>
                       <div
@@ -238,7 +280,7 @@ export function ThisWeekMenuSection({ onOpenAdmin }) {
                                   [meal.id]: tier,
                                 }))
                               }
-                              className={`min-h-11 border-r border-[#1E1E1E] px-1 font-mono text-[9px] font-black last:border-r-0 focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8D9B7D] focus-visible:ring-inset sm:text-[10px] ${isSelected ? "bg-[#1E1E1E] text-white" : "bg-white hover:bg-[#E1ECD3]"}`}
+                              className={`cpl-tier-option min-h-11 border-r border-[#1E1E1E] px-1 font-mono text-[11px] font-black last:border-r-0 focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8D9B7D] focus-visible:ring-inset sm:text-xs ${isSelected ? "bg-[#1E1E1E] text-white" : "bg-white hover:bg-[#E1ECD3]"}`}
                             >
                               {tier}g
                             </button>
@@ -253,7 +295,7 @@ export function ThisWeekMenuSection({ onOpenAdmin }) {
                         {tags.map((tag, idx) => (
                           <span
                             key={idx}
-                            className="bg-[#FEFDF9] border border-[#1E1E1E]/30 px-2 py-0.5 font-mono text-[9px] font-bold text-[#1E1E1E]"
+                            className="bg-[#FEFDF9] border border-[#1E1E1E]/30 px-2 py-0.5 font-mono text-[10px] font-bold text-[#1E1E1E]"
                           >
                             #{tag}
                           </span>
@@ -262,39 +304,40 @@ export function ThisWeekMenuSection({ onOpenAdmin }) {
                     )}
 
                     {/* Nutrition Facts Specs Box */}
-                    <div className="mt-auto pt-4 border-t border-[#1E1E1E]/15">
-                      <div className="border-2 border-[#1E1E1E] bg-[#FEFDF9] p-3 space-y-2">
-                        <div className="border-b border-[#1E1E1E]/20 pb-1.5 font-mono text-[9px] font-black uppercase tracking-wider text-[#6B7860]">
+                    <div className="mt-auto pt-5 border-t border-[#1E1E1E]/15">
+                      <div key={selectedTier} className={`border-2 border-[#1E1E1E] bg-[#FEFDF9] p-3 space-y-2 ${selectedTiers[meal.id] ? "cpl-nutrition-feedback" : ""}`}>
+                        <p className="sr-only" role="status">{meal.name}: {selectedTier}g {language === "ID" ? "protein dipilih" : "protein selected"}</p>
+                        <div className="border-b border-[#1E1E1E]/20 pb-1.5 font-mono text-[11px] font-black uppercase tracking-wide text-[#6B7860]">
                           <span>LAB NUTRITION SPECS</span>
                         </div>
 
                         {/* Macros Grid */}
-                        <div className="grid grid-cols-4 gap-1 text-center font-display">
+                        <div className="grid grid-cols-2 min-[375px]:grid-cols-4 gap-1 text-center font-display tabular-nums">
                           <div className="border border-[#1E1E1E] bg-white p-1">
-                            <div className="text-[7.5px] font-mono font-bold uppercase text-gray-500">PROTEIN</div>
+                            <div className="text-[10px] font-sans font-bold uppercase text-[#555555]">PROTEIN</div>
                             <div className="text-xs font-black text-[#6B7860] mt-0.5">{formatNutritionValue(nutrition.protein, nutritionLocale)}g</div>
                           </div>
                           <div className="border border-[#1E1E1E] bg-white p-1">
-                            <div className="text-[7.5px] font-mono font-bold uppercase text-gray-500">CARBS</div>
+                            <div className="text-[10px] font-sans font-bold uppercase text-[#555555]">CARBS</div>
                             <div className="text-xs font-black text-[#1E1E1E] mt-0.5">{formatNutritionValue(nutrition.carbs, nutritionLocale)}g</div>
                           </div>
                           <div className="border border-[#1E1E1E] bg-white p-1">
-                            <div className="text-[7.5px] font-mono font-bold uppercase text-gray-500">FAT</div>
+                            <div className="text-[10px] font-sans font-bold uppercase text-[#555555]">FAT</div>
                             <div className="text-xs font-black text-[#1E1E1E] mt-0.5">{formatNutritionValue(nutrition.fat, nutritionLocale)}g</div>
                           </div>
                           <div className="border border-[#1E1E1E] bg-white p-1">
-                            <div className="text-[7.5px] font-mono font-bold uppercase text-gray-500">FIBER</div>
+                            <div className="text-[10px] font-sans font-bold uppercase text-[#555555]">FIBER</div>
                             <div className="text-xs font-black text-[#1E1E1E] mt-0.5">{formatNutritionValue(nutrition.fiber, nutritionLocale)}g</div>
                           </div>
                         </div>
 
                         {/* Micros Grid */}
-                        <div className="grid grid-cols-2 gap-1.5 font-mono text-[9px]">
-                          <div className="border border-[#1E1E1E]/40 bg-white px-2 py-1 flex items-center justify-between">
+                        <div className="grid grid-cols-2 gap-1.5 font-mono text-[10px] tabular-nums">
+                          <div className="border border-[#1E1E1E]/40 bg-white px-2 py-1.5 flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
                             <span className="text-gray-500 font-bold">SODIUM</span>
                             <span className="font-extrabold text-[#1E1E1E]">{formatNutritionValue(nutrition.sodium, nutritionLocale)}mg</span>
                           </div>
-                          <div className="border border-[#1E1E1E]/40 bg-white px-2 py-1 flex items-center justify-between">
+                          <div className="border border-[#1E1E1E]/40 bg-white px-2 py-1.5 flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
                             <span className="text-gray-500 font-bold">POTASSIUM</span>
                             <span className="font-extrabold text-[#1E1E1E]">{formatNutritionValue(nutrition.potassium, nutritionLocale)}mg</span>
                           </div>

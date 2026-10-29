@@ -102,6 +102,7 @@ export default function AdminPage() {
     deleteAdminUserAccount,
     menuItems,
     isFromDb,
+    menuError,
     loadingMenu,
     loadingAdminSession,
     fetchLatestMenus,
@@ -821,7 +822,7 @@ export default function AdminPage() {
               ) : (
                 <Database size={12} />
               )}
-              {loadingMenu ? "Syncing" : isFromDb ? "Live DB" : "Fallback"}
+              {loadingMenu ? "Syncing" : menuError ? "DB Error" : "Live DB"}
             </span>
           </div>
 
@@ -845,9 +846,11 @@ export default function AdminPage() {
               )}
               {loadingMenu
                 ? "Syncing Database..."
-                : isFromDb
+                : menuError
+                  ? "Database Tidak Tersedia"
+                  : isFromDb
                   ? "Live Database Active"
-                  : "Menggunakan Data Fallback"}
+                  : "Database Belum Terhubung"}
             </span>
 
             {activeTab === "menu" && (
